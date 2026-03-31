@@ -1,0 +1,6 @@
+streamlit
+clickhouse-connect
+pandas
+plotly
+streamlit-cookies-manager-v2
+extra-streamlit-components

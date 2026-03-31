@@ -1,0 +1,92 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: perfx-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: perfx
+      POSTGRES_USER: perfx_user
+      POSTGRES_PASSWORD: perfx_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U perfx_user -d perfx"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    environment:
+      CLICKHOUSE_DB: metrics
+      CLICKHOUSE_USER: metrics_user
+      CLICKHOUSE_PASSWORD: metrics_pass
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - ./clickhouse/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_INSTALL_PLUGINS: grafana-clickhouse-datasource
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - clickhouse
+
+
+  ktor-app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: perfx-backend
+    ports:
+      - "8080:8080"
+    environment:
+      APP_PORT: 8080
+
+      CLICKHOUSE_URL: http://clickhouse:8123
+      CLICKHOUSE_DB: metrics
+      CLICKHOUSE_USER: metrics_user
+      CLICKHOUSE_PASSWORD: metrics_pass
+
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: perfx
+      POSTGRES_USER: perfx_user
+      POSTGRES_PASSWORD: perfx_pass
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+
+
+volumes:
+  postgres_data:
+  clickhouse_data:
+  grafana_data:
