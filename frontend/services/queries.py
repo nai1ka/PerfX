@@ -19,15 +19,15 @@ def get_regressions_query(limit: int = 100) -> str:
 
 
 def get_metrics_query(
-    package_name: str,
+    project_id: str,
     metric_id: str,
     screen_name: str,
-    limit: int,
+    minutes_back: int = 60
 ) -> str:
     filters = []
 
-    if package_name:
-        filters.append(f"package_name = '{package_name}'")
+    if project_id:
+        filters.append(f"project_id = '{project_id}'")
     if metric_id:
         filters.append(f"metric_id = '{metric_id}'")
     if screen_name:
@@ -46,9 +46,8 @@ def get_metrics_query(
         device_cohort,
         value
     FROM metric_records
-    WHERE {where_clause}
+    WHERE {where_clause} AND ts >= now() - INTERVAL {minutes_back} MINUTE
     ORDER BY ts DESC
-    LIMIT {limit}
     """
 
 

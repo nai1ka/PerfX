@@ -1,7 +1,7 @@
 import requests
 import streamlit as st
 
-API_BASE = "http://localhost:8080"
+API_BASE = "http://185.71.196.185:8080"
 
 
 def login(email: str, password: str):
