@@ -45,6 +45,7 @@ class ClickHouseClient(
     }
 
     private fun buildJsonLines(batch: IngestBatchRequest): String {
+        val cohort = calculateDeviceCohort(batch.appInfo.totalRamGb, batch.appInfo.cpuCores)
         return buildString {
             for (m in batch.metrics) {
                 val obj = buildJsonObject {
@@ -58,10 +59,19 @@ class ClickHouseClient(
                     put("app_version", batch.appInfo.appVersion)
                     put("os_version", batch.appInfo.osVersion)
                     put("device_model", batch.appInfo.deviceModel)
+                     put("device_cohort", cohort)
                 }
                 append(obj.toString())
                 append('\n')
             }
+        }
+    }
+
+    private fun calculateDeviceCohort(totalRamGb: Double, cpuCores: Int): String {
+        return when {
+            totalRamGb <= 3.0 -> "Low"
+            totalRamGb <= 6.0 && cpuCores <= 8 -> "Medium"
+            else -> "High"
         }
     }
 }

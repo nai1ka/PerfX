@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS metrics.metric_records
     app_version LowCardinality(String),
     os_version LowCardinality(String),
     device_model LowCardinality(String),
+    device_cohort LowCardinality(String) DEFAULT 'Unknown',
     received_at DateTime DEFAULT now()
 )
 ENGINE = MergeTree

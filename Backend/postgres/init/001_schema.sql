@@ -22,3 +22,21 @@ CREATE TABLE thresholds (
 
     threshold_value DOUBLE PRECISION
 );
+
+CREATE TABLE regressions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+    
+    metric_id TEXT NOT NULL,
+    screen_name TEXT NOT NULL,
+    device_cohort TEXT NOT NULL,
+    
+    baseline_p95 DOUBLE PRECISION,
+    current_p95 DOUBLE PRECISION,
+    degradation_percent DOUBLE PRECISION,
+    p_value DOUBLE PRECISION,
+    
+    -- State management for the dashboard
+    status TEXT DEFAULT 'active', 
+    detected_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

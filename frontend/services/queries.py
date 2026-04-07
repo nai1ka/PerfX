@@ -43,6 +43,7 @@ def get_metrics_query(
         app_version,
         metric_id,
         screen_name,
+        device_cohort,
         value
     FROM metric_records
     WHERE {where_clause}

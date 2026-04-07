@@ -36,6 +36,19 @@ data class AppInfo(
 
     @SerialName("device_model")
     val deviceModel: String,
+
+    @SerialName("total_ram_gb")
+    val totalRamGb: Double,
+
+    @SerialName("cpu_cores")
+    val cpuCores: Int,
+
+    @SerialName("screen_refresh_rate")
+    val screenRefreshRate: Double,
+
+    @SerialName("is_power_save_mode")
+    val isPowerSaveMode: Boolean,
+
 )
 // TODO add removal of old metrics
 

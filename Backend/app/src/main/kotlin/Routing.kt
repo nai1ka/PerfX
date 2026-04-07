@@ -129,6 +129,7 @@ fun Application.configureRouting(authRepository: AuthRepository) {
                 return@post
             }
 
+// TODO check that such project exists
             clickHouseClient.insertBatch(request)
 
             call.respond(

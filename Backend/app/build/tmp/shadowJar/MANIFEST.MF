@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: io.ktor.server.netty.EngineMain
+Multi-Release: true
+

@@ -6,5 +6,5 @@ object Constants {
     const val MEMORY_LIMIT = 20
 
     // На диске может быть не более 500 метрик
-    const val DISK_LIMIT = 60
+    const val DISK_LIMIT = 200
 }
