@@ -1,19 +1,21 @@
-import streamlit as st
 import extra_streamlit_components as stx
+import streamlit as st
 
 COOKIE_NAME = "perfx_token"
 
-
-cookie_manager = stx.CookieManager(key="perfx_cookie_manager")
-
-
-def save_token(token: str):
-    cookie_manager.set(COOKIE_NAME, token)
+# Used only for write operations (set / delete).
+# Reading is done via st.context.cookies which is available on every render
+# without requiring a component round-trip.
+_writer = stx.CookieManager(key="perfx_cookie_writer")
 
 
-def get_token():
-    return cookie_manager.get(COOKIE_NAME)
+def save_token(token: str) -> None:
+    _writer.set(COOKIE_NAME, token)
 
 
-def clear_token():
-    cookie_manager.delete(COOKIE_NAME)
+def get_token() -> str | None:
+    return st.context.cookies.get(COOKIE_NAME)
+
+
+def clear_token() -> None:
+    _writer.delete(COOKIE_NAME)

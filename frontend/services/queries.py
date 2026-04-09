@@ -68,6 +68,65 @@ def get_latest_regressions_count_query() -> str:
     """
 
 
+def get_project_status_query(project_id: str) -> str:
+    return f"""
+    SELECT
+        count()                    AS total_rows,
+        max(ts)                    AS last_ingested,
+        uniq(metric_id)            AS unique_metrics,
+        uniq(screen_name)          AS unique_screens
+    FROM metric_records
+    WHERE project_id = '{project_id}'
+    """
+
+
+def get_project_metrics_query(project_id: str) -> str:
+    """Returns distinct (metric_id, screen_name, device_cohort) combos."""
+    return f"""
+    SELECT DISTINCT metric_id, screen_name, device_cohort
+    FROM metric_records
+    WHERE project_id = '{project_id}'
+    ORDER BY metric_id, screen_name, device_cohort
+    """
+
+
+def get_custom_plot_query(
+    project_id: str,
+    metric_id: str,
+    screen_name: str,
+    device_cohort: str,
+    minutes_back: int,
+    aggregation: str,
+    bucket_minutes: int,
+) -> str:
+    agg_fn = {
+        "P50": "quantile(0.50)(value)",
+        "P95": "quantile(0.95)(value)",
+        "Avg": "avg(value)",
+        "Max": "max(value)",
+    }.get(aggregation, "quantile(0.95)(value)")
+
+    cohort_filter = (
+        f"AND device_cohort = '{device_cohort}'"
+        if device_cohort != "All" else ""
+    )
+
+    return f"""
+    SELECT
+        toStartOfInterval(ts, INTERVAL {bucket_minutes} MINUTE) AS bucket,
+        {agg_fn} AS metric_value
+    FROM metric_records
+    WHERE
+        project_id  = '{project_id}'
+        AND metric_id   = '{metric_id}'
+        AND screen_name = '{screen_name}'
+        {cohort_filter}
+        AND ts >= now() - INTERVAL {minutes_back} MINUTE
+    GROUP BY bucket
+    ORDER BY bucket
+    """
+
+
 def get_thresholds_query() -> str:
     return """
     SELECT

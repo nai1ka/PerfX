@@ -1,9 +1,6 @@
 import streamlit as st
 from cookies import get_token
 from api_client import get_me
-from auth import logout
-
-
 def restore_session():
     if "token" not in st.session_state:
         token = get_token()
@@ -15,4 +12,8 @@ def restore_session():
         if me is not None:
             st.session_state["user"] = me
         else:
-            logout()
+            # Token rejected by backend — clear session but keep the cookie
+            # so a transient network error doesn't log the user out.
+            for key in ["token", "user", "project_id",
+                        "project_name", "package_name"]:
+                st.session_state.pop(key, None)

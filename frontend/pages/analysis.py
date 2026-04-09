@@ -16,8 +16,10 @@ menu_with_redirect()
 
 # ── Load data ─────────────────────────────────────────────────────────────────
 
+project_id = st.session_state.get("project_id")
+
 try:
-    rows = fetch_regressions()
+    rows = fetch_regressions(project_id=project_id)
 except Exception as e:
     show_error("Failed to load regressions", e)
     st.stop()
