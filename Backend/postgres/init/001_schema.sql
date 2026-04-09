@@ -35,8 +35,6 @@ CREATE TABLE regressions (
     current_p95 DOUBLE PRECISION,
     degradation_percent DOUBLE PRECISION,
     p_value DOUBLE PRECISION,
-    
-    -- State management for the dashboard
-    status TEXT DEFAULT 'active', 
+
     detected_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

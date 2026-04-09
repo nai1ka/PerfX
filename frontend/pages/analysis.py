@@ -1,87 +1,170 @@
+import pandas as pd
+import plotly.express as px
 import streamlit as st
-from services.clickhouse_service import get_clickhouse_client
-from services.queries import (
-    get_regressions_query,
-    get_thresholds_query,
+
+from menu import menu_with_redirect
+from services.postgres_service import (
+    fetch_regressions,
+    delete_regression,
 )
 from session_restore import restore_session
-from menu import menu_with_redirect
-from utils.ui import show_page_title, show_error
+from utils.ui import show_error, show_page_title
 
-show_page_title("Analysis", "Regression detection and alert thresholds")
+show_page_title("Analysis", "Detected performance regressions")
 restore_session()
 menu_with_redirect()
-client = get_clickhouse_client()
 
-st.subheader("Detected regressions")
+# ── Load data ─────────────────────────────────────────────────────────────────
 
 try:
-    regressions_df = client.query_df(get_regressions_query())
-
-    if regressions_df.empty:
-        st.info("No regressions detected.")
-    else:
-        st.dataframe(regressions_df, width="stretch")
-
+    rows = fetch_regressions()
 except Exception as e:
     show_error("Failed to load regressions", e)
+    st.stop()
+
+if not rows:
+    st.info("No regressions detected yet.")
+    st.stop()
+
+df = pd.DataFrame(rows)
+df["detected_at"] = pd.to_datetime(df["detected_at"], utc=True)
+df["degradation_percent"] = df["degradation_percent"].round(1)
+df["p_value"] = df["p_value"].round(4)
+
+# ── Filters ───────────────────────────────────────────────────────────────────
+
+col1, col2 = st.columns(2)
+
+with col1:
+    projects = ["All"] + sorted(df["project_name"].unique().tolist())
+    selected_project = st.selectbox("Project", projects)
+
+with col2:
+    metrics = ["All"] + sorted(df["metric_id"].unique().tolist())
+    selected_metric = st.selectbox("Metric", metrics)
+
+filtered = df.copy()
+if selected_project != "All":
+    filtered = filtered[filtered["project_name"] == selected_project]
+if selected_metric != "All":
+    filtered = filtered[filtered["metric_id"] == selected_metric]
+
+# ── Summary cards ─────────────────────────────────────────────────────────────
 
 st.divider()
 
-st.subheader("Threshold configuration")
-
-try:
-    thresholds_df = client.query_df(get_thresholds_query())
-
-    if thresholds_df.empty:
-        st.info("No thresholds configured.")
-    else:
-        st.dataframe(thresholds_df, width="stretch")
-
-except Exception as e:
-    show_error("Failed to load thresholds", e)
+c1, c2, c3 = st.columns(3)
+c1.metric("Total regressions", len(filtered))
+avg_deg = (
+    f'{filtered["degradation_percent"].mean():.1f}%'
+    if not filtered.empty else "—"
+)
+worst_deg = (
+    f'{filtered["degradation_percent"].max():.1f}%'
+    if not filtered.empty else "—"
+)
+c2.metric("Avg degradation", avg_deg)
+c3.metric("Worst degradation", worst_deg)
 
 st.divider()
 
-st.subheader("Add / update threshold")
+# ── Charts ────────────────────────────────────────────────────────────────────
 
-app_id = st.text_input("App ID")
-metric_id = st.text_input("Metric ID", value="frame_time")
-screen_name = st.text_input("Screen name")
-device_cohort = st.text_input("Device cohort")
+if filtered.empty:
+    st.info("No regressions match the selected filters.")
+    st.stop()
 
-p50_threshold = st.number_input("P50 threshold", value=0.10)
-p95_threshold = st.number_input("P95 threshold", value=0.20)
-p_value_threshold = st.number_input("P-value threshold", value=0.05)
+col_left, col_right = st.columns(2)
 
-if st.button("Save threshold"):
+with col_left:
+    st.subheader("Regressions over time")
+    timeline = (
+        filtered.set_index("detected_at")
+        .resample("1h")
+        .size()
+        .reset_index(name="count")
+    )
+    fig_time = px.bar(
+        timeline,
+        x="detected_at",
+        y="count",
+        labels={"detected_at": "Time", "count": "Regressions"},
+    )
+    fig_time.update_layout(margin=dict(t=20, b=0))
+    st.plotly_chart(fig_time, use_container_width=True)
+
+with col_right:
+    st.subheader("Degradation by metric")
+    fig_box = px.box(
+        filtered,
+        x="metric_id",
+        y="degradation_percent",
+        color="device_cohort",
+        labels={
+            "metric_id": "Metric",
+            "degradation_percent": "Degradation %",
+            "device_cohort": "Device tier",
+        },
+    )
+    fig_box.update_layout(margin=dict(t=20, b=0))
+    st.plotly_chart(fig_box, use_container_width=True)
+
+# ── Regression table ──────────────────────────────────────────────────────────
+
+st.subheader("Regression details")
+
+display_cols = [
+    "project_name", "metric_id", "screen_name", "device_cohort",
+    "baseline_p95", "current_p95", "degradation_percent", "p_value",
+    "detected_at",
+]
+
+col_cfg = {
+    "project_name": st.column_config.TextColumn("Project"),
+    "metric_id": st.column_config.TextColumn("Metric"),
+    "screen_name": st.column_config.TextColumn("Screen"),
+    "device_cohort": st.column_config.TextColumn("Device tier"),
+    "baseline_p95": st.column_config.NumberColumn(
+        "Baseline P95", format="%.2f"
+    ),
+    "current_p95": st.column_config.NumberColumn(
+        "Current P95", format="%.2f"
+    ),
+    "degradation_percent": st.column_config.NumberColumn(
+        "Degradation %", format="%.1f%%"
+    ),
+    "p_value": st.column_config.NumberColumn("p-value", format="%.4f"),
+    "detected_at": st.column_config.DatetimeColumn(
+        "Detected at", format="DD MMM YYYY, HH:mm"
+    ),
+}
+
+st.dataframe(
+    filtered[display_cols].reset_index(drop=True),
+    use_container_width=True,
+    column_config=col_cfg,
+)
+
+# ── Delete regressions ────────────────────────────────────────────────────────
+
+st.divider()
+st.subheader("Delete regression")
+
+options = {
+    (
+        f'{r["metric_id"]} | {r["screen_name"]} | '
+        f'{r["device_cohort"]} ({r["degradation_percent"]:.1f}%)'
+    ): str(r["id"])
+    for _, r in filtered.iterrows()
+}
+
+selected_label = st.selectbox("Select regression", list(options.keys()))
+
+if st.button("Delete", type="primary"):
     try:
-        insert_query = f"""
-        INSERT INTO alert_thresholds
-        (
-            app_id,
-            metric_id,
-            screen_name,
-            device_cohort,
-            p50_threshold,
-            p95_threshold,
-            p_value_threshold
-        )
-        VALUES
-        (
-            '{app_id}',
-            '{metric_id}',
-            '{screen_name}',
-            '{device_cohort}',
-            {p50_threshold},
-            {p95_threshold},
-            {p_value_threshold}
-        )
-        """
-
-        client.command(insert_query)
-
-        st.success("Threshold saved")
-
+        delete_regression(options[selected_label])
+        st.success("Regression deleted.")
+        st.cache_resource.clear()
+        st.rerun()
     except Exception as e:
-        show_error("Failed to save threshold", e)
+        show_error("Failed to delete regression", e)

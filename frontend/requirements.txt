@@ -4,3 +4,4 @@ pandas
 plotly
 streamlit-cookies-manager-v2
 extra-streamlit-components
+psycopg2-binary
