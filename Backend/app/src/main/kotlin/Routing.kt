@@ -22,7 +22,7 @@ import org.mindrot.jbcrypt.BCrypt
 
 fun Application.configureRouting(authRepository: AuthRepository) {
     val clickHouseClient = ClickHouseClient(
-        baseUrl = System.getenv("CLICKHOUSE_URL") ?: "http://185.71.196.185:8123",
+        baseUrl = System.getenv("CLICKHOUSE_URL") ?: "http://localhost:8123",
         db = System.getenv("CLICKHOUSE_DB") ?: "metrics",
         user = System.getenv("CLICKHOUSE_USER") ?: "metrics_user",
         password = System.getenv("CLICKHOUSE_PASSWORD") ?: "metrics_pass"
