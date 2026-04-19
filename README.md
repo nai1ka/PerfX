@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/logo.png" alt="PerfX" width="160" />
+
 # PerfX
 
 **Performance monitoring and regression detection system for Android applications.**
