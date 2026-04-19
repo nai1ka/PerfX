@@ -1,6 +1,7 @@
 package data.repository
 
 import com.perfx.models.ProjectDto
+import com.perfx.models.RegressionDto
 import models.UserDto
 
 data class InternalUser(
@@ -16,4 +17,7 @@ interface AuthRepository {
     suspend fun existsProjectByName(name: String): Boolean
     suspend fun existsProjectByPackageName(appId: String): Boolean
     suspend fun createProjectForUser(userId: String, name: String, appId: String): ProjectDto
+    suspend fun isProjectOwnedByUser(projectId: String, userId: String): Boolean
+    suspend fun getRegressionsForProject(projectId: String, limit: Int = 200): List<RegressionDto>
+    suspend fun deleteRegression(regressionId: String, projectId: String): Boolean
 }

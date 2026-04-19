@@ -2,12 +2,11 @@ import plotly.express as px
 import streamlit as st
 
 from menu import menu_with_redirect
-from services.clickhouse_service import get_clickhouse_client
-from services.postgres_service import fetch_regressions
-from services.queries import (
-    get_project_status_query,
-    get_project_metrics_query,
-    get_custom_plot_query,
+from api_client import (
+    get_project_status,
+    get_project_dimensions,
+    get_custom_plot,
+    get_regressions,
 )
 from session_restore import restore_session
 from utils.ui import show_error, show_page_title
@@ -23,8 +22,6 @@ if not project_id:
     st.info("Select a project from the sidebar to continue.")
     st.stop()
 
-ch = get_clickhouse_client()
-
 # ── System status ─────────────────────────────────────────────────────────────
 
 st.subheader("System status")
@@ -32,32 +29,27 @@ st.subheader("System status")
 c1, c2, c3, c4, c5 = st.columns(5)
 
 try:
-    status_df = ch.query_df(get_project_status_query(project_id))
-    row = status_df.iloc[0] if not status_df.empty else None
-    total_rows = int(row["total_rows"]) if row is not None else 0
-    last_ingested = (
-        row["last_ingested"].strftime("%d %b %Y %H:%M")
-        if row is not None and row["last_ingested"] is not None
-        else "—"
-    )
-    unique_metrics = int(row["unique_metrics"]) if row is not None else 0
-    unique_screens = int(row["unique_screens"]) if row is not None else 0
+    status = get_project_status(project_id)
+    total_rows = status["total_rows"] if status else 0
+    last_ingested = status["last_ingested"] or "—" if status else "—"
+    unique_metrics = status["unique_metrics"] if status else 0
+    unique_screens = status["unique_screens"] if status else 0
 except Exception as e:
     total_rows = unique_metrics = unique_screens = None
     last_ingested = "error"
-    show_error("ClickHouse status unavailable", e)
+    show_error("Status unavailable", e)
 
 try:
-    regressions = fetch_regressions(project_id=project_id)
+    regressions = get_regressions(project_id=project_id)
     regression_count = len(regressions)
     last_regression = (
-        regressions[0]["detected_at"].strftime("%d %b %Y %H:%M")
+        regressions[0]["detected_at"]
         if regressions else "—"
     )
 except Exception as e:
     regression_count = None
     last_regression = "error"
-    show_error("PostgreSQL status unavailable", e)
+    show_error("Regressions unavailable", e)
 
 c1.metric("Metric rows", total_rows if total_rows is not None else "N/A")
 c2.metric("Last ingested", last_ingested)
@@ -70,10 +62,10 @@ st.divider()
 # ── Load available dimensions for plot builder ────────────────────────────────
 
 try:
-    dims_df = ch.query_df(get_project_metrics_query(project_id))
-    has_dims = not dims_df.empty
+    dims = get_project_dimensions(project_id)
+    has_dims = len(dims) > 0
 except Exception as e:
-    dims_df = None
+    dims = []
     has_dims = False
     show_error("Could not load metric dimensions", e)
 
@@ -91,9 +83,11 @@ with st.expander("Add plot", expanded=not plots):
     if not has_dims:
         st.info("No metric data available for this project yet.")
     else:
-        metrics = sorted(dims_df["metric_id"].unique().tolist())
-        screens = sorted(dims_df["screen_name"].unique().tolist())
-        cohorts = ["All"] + sorted(dims_df["device_cohort"].unique().tolist())
+        metrics = sorted(set(d["metric_id"] for d in dims))
+        screens = sorted(set(d["screen_name"] for d in dims))
+        cohorts = ["All"] + sorted(
+            set(d["device_cohort"] for d in dims)
+        )
 
         fa, fb, fc = st.columns(3)
         with fa:
@@ -150,7 +144,7 @@ else:
                 f" / {plot['device_cohort']}"
                 if plot["device_cohort"] != "All" else ""
             )
-            + f"  —  last "
+            + "  —  last "
             + (
                 f"{plot['minutes_back']} min"
                 if plot["minutes_back"] < 60
@@ -167,18 +161,20 @@ else:
                 st.rerun()
 
         try:
-            df = ch.query_df(get_custom_plot_query(
+            import pandas as pd
+            points = get_custom_plot(
                 project_id=project_id,
                 metric_id=plot["metric_id"],
                 screen_name=plot["screen_name"],
                 device_cohort=plot["device_cohort"],
-                minutes_back=plot["minutes_back"],
                 aggregation=plot["aggregation"],
+                minutes_back=plot["minutes_back"],
                 bucket_minutes=plot["bucket_minutes"],
-            ))
-            if df.empty:
+            )
+            if not points:
                 st.caption("No data for this combination.")
             else:
+                df = pd.DataFrame(points)
                 fig = px.line(
                     df,
                     x="bucket",

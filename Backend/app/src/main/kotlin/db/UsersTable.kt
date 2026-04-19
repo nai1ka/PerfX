@@ -32,3 +32,24 @@ object ThresholdsTable : UUIDTable("thresholds") {
 
     val thresholdValue = double("threshold_value")
 }
+
+object RegressionsTable : UUIDTable("regressions") {
+
+    val projectId = reference("project_id", ProjectsTable, onDelete = ReferenceOption.CASCADE)
+
+    val metricId = text("metric_id")
+
+    val screenName = text("screen_name")
+
+    val deviceCohort = text("device_cohort")
+
+    val baselineP95 = double("baseline_p95").nullable()
+
+    val currentP95 = double("current_p95").nullable()
+
+    val degradationPercent = double("degradation_percent").nullable()
+
+    val pValue = double("p_value").nullable()
+
+    val detectedAt = text("detected_at").nullable()
+}

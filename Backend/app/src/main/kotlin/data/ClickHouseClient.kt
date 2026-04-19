@@ -16,6 +16,29 @@ class ClickHouseClient(
 ) {
     private val http = HttpClient(CIO)
 
+    suspend fun query(sql: String): List<Map<String, JsonElement>> {
+        val url = "$baseUrl/?database=$db"
+        val body = "$sql FORMAT JSONEachRow"
+
+        val response = http.post(url) {
+            basicAuth(user, password)
+            contentType(ContentType.Text.Plain)
+            setBody(body)
+        }
+
+        if (!response.status.isSuccess()) {
+            val text: String = response.body()
+            error("ClickHouse query failed: ${response.status} $text")
+        }
+
+        val text: String = response.body()
+        if (text.isBlank()) return emptyList()
+
+        return text.trim().lines().map { line ->
+            Json.parseToJsonElement(line).jsonObject.toMap()
+        }
+    }
+
     suspend fun insertBatch(batch: IngestBatchRequest) {
         val rows = buildJsonLines(batch)
 

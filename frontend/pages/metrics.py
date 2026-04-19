@@ -3,8 +3,7 @@ import pandas as pd
 import plotly.express as px
 from session_restore import restore_session
 from menu import menu_with_redirect
-from services.clickhouse_service import get_clickhouse_client
-from services.queries import get_metrics_query
+from api_client import get_metric_screens, get_metric_ids, get_metrics
 from utils.ui import show_error
 
 st.set_page_config(page_title="Metrics", layout="wide")
@@ -17,24 +16,20 @@ project_name = st.session_state.get("project_name", "Unknown project")
 project_id = st.session_state.get("project_id")
 st.caption(f"Project: {project_name}")
 
-client = get_clickhouse_client()
-
 available_screens = [""]
 available_metrics = []
 
 if project_id:
     try:
-        screens_query = f"SELECT DISTINCT screen_name FROM metric_records WHERE project_id = '{project_id}' ORDER BY screen_name ASC"
-        screens_df = client.query_df(screens_query)
-        if not screens_df.empty:
-            available_screens.extend(screens_df["screen_name"].tolist())
+        screens = get_metric_screens(project_id)
+        if screens:
+            available_screens.extend(screens)
 
-        metrics_query = f"SELECT DISTINCT metric_id FROM metric_records WHERE project_id = '{project_id}' ORDER BY metric_id ASC"
-        metrics_df = client.query_df(metrics_query)
-        if not metrics_df.empty:
-            available_metrics.extend(metrics_df["metric_id"].tolist())
+        metric_ids = get_metric_ids(project_id)
+        if metric_ids:
+            available_metrics.extend(metric_ids)
     except Exception as e:
-        st.warning("Could not load available filters from database.")
+        st.warning("Could not load available filters.")
 
 if not available_metrics:
     available_metrics = ["frameTime", "cpuUsage", "memoryUsage"]
@@ -59,14 +54,14 @@ with st.form("metrics_form"):
 
 if submitted:
     try:
-        query = get_metrics_query(
+        rows = get_metrics(
             project_id=project_id,
             metric_id=metric_id,
             screen_name=screen_name,
             minutes_back=minutes_back
         )
 
-        df = client.query_df(query)
+        df = pd.DataFrame(rows)
 
         if df.empty:
             st.info("No metrics found.")
@@ -83,11 +78,9 @@ if submitted:
                 title=f"{metric_id} over time"
             )
             st.plotly_chart(fig, width='stretch')
-        
+
             st.subheader("Raw data")
             st.dataframe(df, width='stretch')
-
-           
 
     except Exception as e:
         show_error("Failed to load metrics", e)

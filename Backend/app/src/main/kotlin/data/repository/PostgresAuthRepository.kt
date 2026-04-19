@@ -4,12 +4,17 @@ package data.repository
 
 import com.perfx.db.suspendTransaction
 import com.perfx.models.ProjectDto
+import com.perfx.models.RegressionDto
 import db.ProjectsTable
+import db.RegressionsTable
 import db.UsersTable
 import models.UserDto
 import org.jetbrains.exposed.v1.core.ResultRow
+import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.dao.id.EntityID
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import java.util.UUID
@@ -81,6 +86,48 @@ class PostgresAuthRepository : AuthRepository {
         id = row[UsersTable.id].value.toString(),
         email = row[UsersTable.email],
         passwordHash = row[UsersTable.passwordHash]
+    )
+
+    override suspend fun isProjectOwnedByUser(projectId: String, userId: String): Boolean = suspendTransaction {
+        ProjectsTable
+            .selectAll()
+            .where {
+                (ProjectsTable.id eq UUID.fromString(projectId)) and
+                        (ProjectsTable.userId eq UUID.fromString(userId))
+            }
+            .limit(1)
+            .count() > 0
+    }
+
+    override suspend fun getRegressionsForProject(projectId: String, limit: Int): List<RegressionDto> =
+        suspendTransaction {
+            RegressionsTable
+                .innerJoin(ProjectsTable)
+                .selectAll()
+                .where { RegressionsTable.projectId eq UUID.fromString(projectId) }
+                .orderBy(RegressionsTable.detectedAt, SortOrder.DESC)
+                .limit(limit)
+                .map(::rowToRegressionDto)
+        }
+
+    override suspend fun deleteRegression(regressionId: String, projectId: String): Boolean = suspendTransaction {
+        RegressionsTable.deleteWhere {
+            (id eq UUID.fromString(regressionId)) and
+                    (RegressionsTable.projectId eq UUID.fromString(projectId))
+        } > 0
+    }
+
+    private fun rowToRegressionDto(row: ResultRow) = RegressionDto(
+        id = row[RegressionsTable.id].value.toString(),
+        projectName = row[ProjectsTable.name],
+        metricId = row[RegressionsTable.metricId],
+        screenName = row[RegressionsTable.screenName],
+        deviceCohort = row[RegressionsTable.deviceCohort],
+        baselineP95 = row[RegressionsTable.baselineP95],
+        currentP95 = row[RegressionsTable.currentP95],
+        degradationPercent = row[RegressionsTable.degradationPercent],
+        pValue = row[RegressionsTable.pValue],
+        detectedAt = row[RegressionsTable.detectedAt]?.toString(),
     )
 
     private fun rowToProjectDto(row: ResultRow) = ProjectDto(

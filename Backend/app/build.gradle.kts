@@ -31,6 +31,7 @@ dependencies {
     implementation(libs.ktor.server.auth)
     implementation(libs.postgresql)
     implementation(libs.exposed.jdbc)
+    implementation(libs.exposed.java.time)
     implementation("org.mindrot:jbcrypt:0.4")
 
 

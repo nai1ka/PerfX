@@ -39,7 +39,10 @@ object PerfX {
     private var composeScreenTracker: ComposeScreenTracker? = null
     lateinit var appInfo: AppInfo
 
-    fun initialize(application: Application, projectId: String) {
+    fun initialize(
+        application: Application,
+        projectId: String,
+    ) {
         if (isRunning) return
 
         appInfo = AppInfoProvider().get(application, projectId)
@@ -112,7 +115,7 @@ object PerfX {
                     resumedCount--
                     if (resumedCount <= 0) {
                         resumedCount = 0
-                        SyncManager.stopPeriodicSync()
+
                     }
                 }
             }
@@ -122,7 +125,7 @@ object PerfX {
 
                 resumedCount++
                 if (resumedCount == 1) {
-                    SyncManager.startPeriodicSync(application)
+
                 }
             }
 

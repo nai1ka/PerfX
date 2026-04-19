@@ -21,6 +21,7 @@ ktor-server-auth-jwt = {module = "io.ktor:ktor-server-auth-jwt", version.ref = "
 ktor-server-auth = {module = "io.ktor:ktor-server-auth", version.ref = "ktor"}
 postgresql = {module = "org.postgresql:postgresql", version.ref = "postgres"}
 exposed-jdbc = {module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed"}
+exposed-java-time = {module = "org.jetbrains.exposed:exposed-java-time", version.ref = "exposed"}
 
 [plugins]
 

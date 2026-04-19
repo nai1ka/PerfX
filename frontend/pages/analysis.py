@@ -3,10 +3,7 @@ import plotly.express as px
 import streamlit as st
 
 from menu import menu_with_redirect
-from services.postgres_service import (
-    fetch_regressions,
-    delete_regression,
-)
+from api_client import get_regressions, delete_regression
 from session_restore import restore_session
 from utils.ui import show_error, show_page_title
 
@@ -19,7 +16,7 @@ menu_with_redirect()
 project_id = st.session_state.get("project_id")
 
 try:
-    rows = fetch_regressions(project_id=project_id)
+    rows = get_regressions(project_id=project_id)
 except Exception as e:
     show_error("Failed to load regressions", e)
     st.stop()
@@ -164,9 +161,8 @@ selected_label = st.selectbox("Select regression", list(options.keys()))
 
 if st.button("Delete", type="primary"):
     try:
-        delete_regression(options[selected_label])
+        delete_regression(options[selected_label], project_id)
         st.success("Regression deleted.")
-        st.cache_resource.clear()
         st.rerun()
     except Exception as e:
         show_error("Failed to delete regression", e)
