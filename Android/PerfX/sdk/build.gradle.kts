@@ -67,11 +67,13 @@ afterEvaluate {
         publications {
             create<MavenPublication>("release") {
                 from(components["release"])
-
                 groupId = "com.ndevelop"
                 artifactId = "perfx-sdk"
                 version = "1.0.0"
             }
+        }
+        repositories {
+            mavenLocal()
         }
     }
 }

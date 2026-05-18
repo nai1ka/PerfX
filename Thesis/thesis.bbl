@@ -1,0 +1,1367 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global}
+    \entry{Tang}{article}{}
+      \name{author}{9}{}{%
+        {{hash=e0e5348346d2cc540fa7f277ed8301be}{%
+           family={Tang},
+           familyi={T\bibinitperiod},
+           given={Yutian},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=44ddd1947297940fae36faf60cfdc356}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Haoyu},
+           giveni={H\bibinitperiod}}}%
+        {{hash=bf28562280298543a93c514d02db96a7}{%
+           family={Zhan},
+           familyi={Z\bibinitperiod},
+           given={Xian},
+           giveni={X\bibinitperiod}}}%
+        {{hash=7d405dc8c3ba97bdd21d7ea41fcd9b3b}{%
+           family={Luo},
+           familyi={L\bibinitperiod},
+           given={Xiapu},
+           giveni={X\bibinitperiod}}}%
+        {{hash=fdf4df45ac31656265c83a3cebaa9fd4}{%
+           family={Zhou},
+           familyi={Z\bibinitperiod},
+           given={Yajin},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=bf8821420565328b3085cef67e44b2af}{%
+           family={Zhou},
+           familyi={Z\bibinitperiod},
+           given={Hao},
+           giveni={H\bibinitperiod}}}%
+        {{hash=b679eaee9b69b41850bc86ad80ccc4af}{%
+           family={Yan},
+           familyi={Y\bibinitperiod},
+           given={Qiben},
+           giveni={Q\bibinitperiod}}}%
+        {{hash=4f8972ae9d4a27c62278025a98c8b389}{%
+           family={Sui},
+           familyi={S\bibinitperiod},
+           given={Yulei},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=69d587f05c8a813f8013895aefcd8183}{%
+           family={Keung},
+           familyi={K\bibinitperiod},
+           given={Jacky},
+           giveni={J\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {IEEE Press}%
+      }
+      \strng{namehash}{a3fc1e61d88171f0ec5cf93e14ae693d}
+      \strng{fullhash}{f92facc007c831edfc1d57a7d7fe333c}
+      \strng{bibnamehash}{a3fc1e61d88171f0ec5cf93e14ae693d}
+      \strng{authorbibnamehash}{a3fc1e61d88171f0ec5cf93e14ae693d}
+      \strng{authornamehash}{a3fc1e61d88171f0ec5cf93e14ae693d}
+      \strng{authorfullhash}{f92facc007c831edfc1d57a7d7fe333c}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{0098-5589}
+      \field{journaltitle}{IEEE Trans. Softw. Eng.}
+      \field{month}{8}
+      \field{number}{8}
+      \field{title}{A Systematical Study on Application Performance Management Libraries for Apps}
+      \field{volume}{48}
+      \field{year}{2022}
+      \field{pages}{3044\bibrangedash 3065}
+      \range{pages}{22}
+      \verb{doi}
+      \verb 10.1109/TSE.2021.3077654
+      \endverb
+    \endentry
+    \entry{FirebasePerf}{online}{}
+      \name{author}{1}{}{%
+        {{hash=035489ff8d092741943e4a83241f5af9}{%
+           family={{Firebase}},
+           familyi={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{fullhash}{035489ff8d092741943e4a83241f5af9}
+      \strng{bibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorbibnamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authornamehash}{035489ff8d092741943e4a83241f5af9}
+      \strng{authorfullhash}{035489ff8d092741943e4a83241f5af9}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Accessed: 30 Oct 2025}
+      \field{title}{Firebase Performance Monitoring}
+      \field{year}{2025}
+      \verb{urlraw}
+      \verb https://firebase.google.com/docs/perf-mon
+      \endverb
+      \verb{url}
+      \verb https://firebase.google.com/docs/perf-mon
+      \endverb
+    \endentry
+    \entry{Zikan}{inproceedings}{}
+      \name{author}{8}{}{%
+        {{hash=099bd8c1edd45714de8c09b786dec77a}{%
+           family={Dong},
+           familyi={D\bibinitperiod},
+           given={Zikan},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=14e6e67151fcd0f9de7104ca4abbe2dc}{%
+           family={Zhao},
+           familyi={Z\bibinitperiod},
+           given={Yanjie},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=7faa75cd0a9341fee33d1761b2b44234}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Tianming},
+           giveni={T\bibinitperiod}}}%
+        {{hash=3ad93e4c675a68a22a9c2c52b38e2751}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Chao},
+           giveni={C\bibinitperiod}}}%
+        {{hash=a29a98853399964e7fb74e33e68977fa}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Guosheng},
+           giveni={G\bibinitperiod}}}%
+        {{hash=1767e15687ef27d74808512a43003d44}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Guoai},
+           giveni={G\bibinitperiod}}}%
+        {{hash=3a1f1a0016bb4e33e52e9bd0f48cfd33}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Lin},
+           giveni={L\bibinitperiod}}}%
+        {{hash=44ddd1947297940fae36faf60cfdc356}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Haoyu},
+           giveni={H\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Sacramento, CA, USA}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computing Machinery}%
+      }
+      \strng{namehash}{971eb5838f2c5c26a6b537468b4feb53}
+      \strng{fullhash}{6d71437637284de51322a0fda40be145}
+      \strng{bibnamehash}{971eb5838f2c5c26a6b537468b4feb53}
+      \strng{authorbibnamehash}{971eb5838f2c5c26a6b537468b4feb53}
+      \strng{authornamehash}{971eb5838f2c5c26a6b537468b4feb53}
+      \strng{authorfullhash}{6d71437637284de51322a0fda40be145}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 39th IEEE/ACM International Conference on Automated Software Engineering}
+      \field{isbn}{9798400712487}
+      \field{series}{ASE '24}
+      \field{title}{Same App, Different Behaviors: Uncovering Device-specific Behaviors in Android Apps}
+      \field{year}{2024}
+      \field{pages}{2099\bibrangedash 2109}
+      \range{pages}{11}
+      \verb{doi}
+      \verb 10.1145/3691620.3695272
+      \endverb
+    \endentry
+    \entry{Fragmentation}{article}{}
+      \name{author}{3}{}{%
+        {{hash=7814764909da17d2c26f31b616c55c20}{%
+           family={Kamran},
+           familyi={K\bibinitperiod},
+           given={Muhammad},
+           giveni={M\bibinitperiod}}}%
+        {{hash=b37ca57a88175fd9927beb372362e8d7}{%
+           family={Rashid},
+           familyi={R\bibinitperiod},
+           given={Junaid},
+           giveni={J\bibinitperiod}}}%
+        {{hash=a8e70f5d46b5539321e409da5e67e7b6}{%
+           family={Nisar},
+           familyi={N\bibinitperiod},
+           given={Muhammad},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{8c71d6c4611991b20efb3cc82c965135}
+      \strng{fullhash}{8c71d6c4611991b20efb3cc82c965135}
+      \strng{bibnamehash}{8c71d6c4611991b20efb3cc82c965135}
+      \strng{authorbibnamehash}{8c71d6c4611991b20efb3cc82c965135}
+      \strng{authornamehash}{8c71d6c4611991b20efb3cc82c965135}
+      \strng{authorfullhash}{8c71d6c4611991b20efb3cc82c965135}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{International Journal of Computer Network and Information Security}
+      \field{month}{09}
+      \field{title}{Android Fragmentation Classification, Causes, Problems and Solutions}
+      \field{volume}{14}
+      \field{year}{2016}
+      \field{pages}{992\bibrangedash 999}
+      \range{pages}{8}
+    \endentry
+    \entry{ProfileDroid}{article}{}
+      \name{author}{4}{}{%
+        {{hash=a93ea3f47cff8d8658b961ccba63c5b7}{%
+           family={Wei},
+           familyi={W\bibinitperiod},
+           given={Xuetao},
+           giveni={X\bibinitperiod}}}%
+        {{hash=d713f541b6dc330c40f5e963660f47c3}{%
+           family={Gomez},
+           familyi={G\bibinitperiod},
+           given={Lorenzo},
+           giveni={L\bibinitperiod}}}%
+        {{hash=be86789e440002722a477c1065d11890}{%
+           family={Neamtiu},
+           familyi={N\bibinitperiod},
+           given={Iulian},
+           giveni={I\bibinitperiod}}}%
+        {{hash=7ad29c6165b6ded11a3af6afe5f35633}{%
+           family={Faloutsos},
+           familyi={F\bibinitperiod},
+           given={Michalis},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{df02d51843e552e2d97a330e4ccf4e88}
+      \strng{fullhash}{4c1b02f189270ba1c4394c2d3c1c65a9}
+      \strng{bibnamehash}{4c1b02f189270ba1c4394c2d3c1c65a9}
+      \strng{authorbibnamehash}{4c1b02f189270ba1c4394c2d3c1c65a9}
+      \strng{authornamehash}{df02d51843e552e2d97a330e4ccf4e88}
+      \strng{authorfullhash}{4c1b02f189270ba1c4394c2d3c1c65a9}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{08}
+      \field{title}{ProfileDroid: multi-layer profiling of android applications}
+      \field{year}{2012}
+      \verb{doi}
+      \verb 10.1145/2348543.2348563
+      \endverb
+    \endentry
+    \entry{AndroStep}{inproceedings}{}
+      \name{author}{5}{}{%
+        {{hash=ceb927023a25797e19eefca622711d31}{%
+           family={Jeong},
+           familyi={J\bibinitperiod},
+           given={Sooman},
+           giveni={S\bibinitperiod}}}%
+        {{hash=62829048d3f9e8d49a04b55163b552f9}{%
+           family={Lee},
+           familyi={L\bibinitperiod},
+           given={Kisung},
+           giveni={K\bibinitperiod}}}%
+        {{hash=544a1c72f1814230107b6fa209030f0d}{%
+           family={Hwang},
+           familyi={H\bibinitperiod},
+           given={Jung-Yeon},
+           giveni={J\bibinithyphendelim Y\bibinitperiod}}}%
+        {{hash=fdff5265a366191e6b623312e88bc8e2}{%
+           family={Lee},
+           familyi={L\bibinitperiod},
+           given={Seongjin},
+           giveni={S\bibinitperiod}}}%
+        {{hash=e83909c3af34582bfc1b2b1d9acb42b3}{%
+           family={Won},
+           familyi={W\bibinitperiod},
+           given={Youjip},
+           giveni={Y\bibinitperiod}}}%
+      }
+      \strng{namehash}{df33ea0d80c26a27355a9ed37e9855b3}
+      \strng{fullhash}{36f8fd5bc41c973ec70db4c43365dc5b}
+      \strng{bibnamehash}{36f8fd5bc41c973ec70db4c43365dc5b}
+      \strng{authorbibnamehash}{36f8fd5bc41c973ec70db4c43365dc5b}
+      \strng{authornamehash}{df33ea0d80c26a27355a9ed37e9855b3}
+      \strng{authorfullhash}{36f8fd5bc41c973ec70db4c43365dc5b}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Software Engineering}
+      \field{title}{AndroStep: Android Storage Performance Analysis Tool}
+      \field{year}{2013}
+    \endentry
+    \entry{PowDroid}{inproceedings}{}
+      \name{author}{3}{}{%
+        {{hash=38b2a4ed4bb863719c214fc04d94f9a0}{%
+           family={Bouaffar},
+           familyi={B\bibinitperiod},
+           given={Fares},
+           giveni={F\bibinitperiod}}}%
+        {{hash=f0f4d861f8030d4d21d3fc357fd080da}{%
+           family={Goaer},
+           familyi={G\bibinitperiod},
+           given={Olivier\bibnamedelima Le},
+           giveni={O\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+        {{hash=36b7ed6c8d1e26d1a67ef4aadba6856c}{%
+           family={Noureddine},
+           familyi={N\bibinitperiod},
+           given={Adel},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{d6f0d322280bc0e8e4096cd1fdd96207}
+      \strng{fullhash}{d6f0d322280bc0e8e4096cd1fdd96207}
+      \strng{bibnamehash}{d6f0d322280bc0e8e4096cd1fdd96207}
+      \strng{authorbibnamehash}{d6f0d322280bc0e8e4096cd1fdd96207}
+      \strng{authornamehash}{d6f0d322280bc0e8e4096cd1fdd96207}
+      \strng{authorfullhash}{d6f0d322280bc0e8e4096cd1fdd96207}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2021 36th IEEE/ACM International Conference on Automated Software Engineering Workshops (ASEW)}
+      \field{title}{PowDroid: Energy Profiling of Android Applications}
+      \field{year}{2021}
+      \field{pages}{251\bibrangedash 254}
+      \range{pages}{4}
+      \verb{doi}
+      \verb 10.1109/ASEW52652.2021.00055
+      \endverb
+      \keyw{Measurement;Energy consumption;Runtime;Codes;Conferences;Hardware;Energy efficiency;Energy consumption;Android;Battery drain;Estimation;Tool}
+    \endentry
+    \entry{AppInsight}{article}{}
+      \name{author}{6}{}{%
+        {{hash=3ce6e36fbb6b128aab63be0719faac58}{%
+           family={Sivalingam},
+           familyi={S\bibinitperiod},
+           given={Lenin\bibnamedelima Ravindranath},
+           giveni={L\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=ff5f2ad1629acf52018ec470b61bf2c9}{%
+           family={Padhye},
+           familyi={P\bibinitperiod},
+           given={Jitendra},
+           giveni={J\bibinitperiod}}}%
+        {{hash=57af2e22f09e6de3fe786034dd0ec2c6}{%
+           family={Agarwal},
+           familyi={A\bibinitperiod},
+           given={Sharad},
+           giveni={S\bibinitperiod}}}%
+        {{hash=e8ce58ede231fd7e57dbf683b8b1d0ec}{%
+           family={Mahajan},
+           familyi={M\bibinitperiod},
+           given={Ratul},
+           giveni={R\bibinitperiod}}}%
+        {{hash=27db1fa8f63cfa3b8fe42e10da348c72}{%
+           family={Obermiller},
+           familyi={O\bibinitperiod},
+           given={Ian},
+           giveni={I\bibinitperiod}}}%
+        {{hash=3f8a6ad3fc92632a1955fe600bca420b}{%
+           family={Shayandeh},
+           familyi={S\bibinitperiod},
+           given={Shahin},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{6171950aa1011e8364b3527bd0a00733}
+      \strng{fullhash}{327e6698b6a6d4db95c54a93ede57622}
+      \strng{bibnamehash}{327e6698b6a6d4db95c54a93ede57622}
+      \strng{authorbibnamehash}{327e6698b6a6d4db95c54a93ede57622}
+      \strng{authornamehash}{6171950aa1011e8364b3527bd0a00733}
+      \strng{authorfullhash}{327e6698b6a6d4db95c54a93ede57622}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{11}
+      \field{title}{AppInsight: Mobile App Performance Monitoring in the Wild}
+      \field{year}{2012}
+    \endentry
+    \entry{Hubble}{inproceedings}{}
+      \name{author}{8}{}{%
+        {{hash=78fbe46f8fb763daef158e511a35dbb2}{%
+           family={Luo},
+           familyi={L\bibinitperiod},
+           given={Yu},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=92664b7c838853421b908a69b1cb82db}{%
+           family={Rodrigues},
+           familyi={R\bibinitperiod},
+           given={Kirk},
+           giveni={K\bibinitperiod}}}%
+        {{hash=2a8de66f7edbca8e5b9ab922f5d3633b}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Cuiqin},
+           giveni={C\bibinitperiod}}}%
+        {{hash=65afd11c8e50cacdbd6ae4f35d03e308}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Feng},
+           giveni={F\bibinitperiod}}}%
+        {{hash=b97d41109892826712929861432456c4}{%
+           family={Jiang},
+           familyi={J\bibinitperiod},
+           given={Lijin},
+           giveni={L\bibinitperiod}}}%
+        {{hash=5592741a6fc1e78b81d077e83db8fa6f}{%
+           family={Xia},
+           familyi={X\bibinitperiod},
+           given={Bing},
+           giveni={B\bibinitperiod}}}%
+        {{hash=a4913fefbb2c503b0bec13df1e83c6fc}{%
+           family={Lion},
+           familyi={L\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+        {{hash=03e39d14ea8566df7611b8b263cd86be}{%
+           family={Yuan},
+           familyi={Y\bibinitperiod},
+           given={Ding},
+           giveni={D\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Carlsbad, CA}%
+      }
+      \list{publisher}{1}{%
+        {USENIX Association}%
+      }
+      \strng{namehash}{96f730622bc21413bd63e3708de92ca9}
+      \strng{fullhash}{4432a3425e7d4a43d5989845b09ad0b0}
+      \strng{bibnamehash}{96f730622bc21413bd63e3708de92ca9}
+      \strng{authorbibnamehash}{96f730622bc21413bd63e3708de92ca9}
+      \strng{authornamehash}{96f730622bc21413bd63e3708de92ca9}
+      \strng{authorfullhash}{4432a3425e7d4a43d5989845b09ad0b0}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{16th USENIX Symposium on Operating Systems Design and Implementation (OSDI 22)}
+      \field{isbn}{978-1-939133-28-1}
+      \field{month}{7}
+      \field{title}{Hubble: Performance Debugging with {In-Production}, {Just-In-Time} Method Tracing on Android}
+      \field{year}{2022}
+      \field{pages}{787\bibrangedash 803}
+      \range{pages}{17}
+    \endentry
+    \entry{Panappticon}{inproceedings}{}
+      \name{author}{5}{}{%
+        {{hash=0820f15b080fb3d0f28acf7a2906b38e}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Lide},
+           giveni={L\bibinitperiod}}}%
+        {{hash=bab1bfface7d041f52c12ebab3dcad9f}{%
+           family={Bild},
+           familyi={B\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+        {{hash=539d11a90cad5711439ae06549f0c6a5}{%
+           family={Dick},
+           familyi={D\bibinitperiod},
+           given={Robert},
+           giveni={R\bibinitperiod}}}%
+        {{hash=a4de780668d679349fb3b6b7962245a4}{%
+           family={Mao},
+           familyi={M\bibinitperiod},
+           given={Z.},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=49066815363d37ce7e0312300e032306}{%
+           family={Dinda},
+           familyi={D\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+      }
+      \strng{namehash}{a30217ba23a00b312fe9a4a50f31f3c5}
+      \strng{fullhash}{c9b0bde565f5655f4ac791b1999e50c2}
+      \strng{bibnamehash}{c9b0bde565f5655f4ac791b1999e50c2}
+      \strng{authorbibnamehash}{c9b0bde565f5655f4ac791b1999e50c2}
+      \strng{authornamehash}{a30217ba23a00b312fe9a4a50f31f3c5}
+      \strng{authorfullhash}{c9b0bde565f5655f4ac791b1999e50c2}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{2013 International Conference on Hardware/Software Codesign and System Synthesis, CODES+ISSS 2013}
+      \field{month}{09}
+      \field{title}{Panappticon: Event-based tracing to measure mobile application and platform performance}
+      \field{year}{2013}
+      \field{pages}{1\bibrangedash 10}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1109/CODES-ISSS.2013.6659020
+      \endverb
+    \endentry
+    \entry{PerfProbe}{inproceedings}{}
+      \name{author}{5}{}{%
+        {{hash=a159360176ab9003f64ac68f5e629581}{%
+           family={Hong},
+           familyi={H\bibinitperiod},
+           given={David\bibnamedelima Ke},
+           giveni={D\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+        {{hash=4091f1e3c15f9930d8ea0b97f6173156}{%
+           family={Nikravesh},
+           familyi={N\bibinitperiod},
+           given={Ashkan},
+           giveni={A\bibinitperiod}}}%
+        {{hash=055cf8f6bda6dc13a608c2707cac9aa3}{%
+           family={Mao},
+           familyi={M\bibinitperiod},
+           given={Z.\bibnamedelimi Morley},
+           giveni={Z\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=91c8aaefab859b2ba5cf96d2ec5bc9cf}{%
+           family={Ketkar},
+           familyi={K\bibinitperiod},
+           given={Mahesh},
+           giveni={M\bibinitperiod}}}%
+        {{hash=d76416ed46c2fdfe5136ba083684bd49}{%
+           family={Kishinevsky},
+           familyi={K\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{2289d796c8d1319c7b2640da5c155f9a}
+      \strng{fullhash}{12ecc1e87f4b1285cb014602e3b3d22b}
+      \strng{bibnamehash}{12ecc1e87f4b1285cb014602e3b3d22b}
+      \strng{authorbibnamehash}{12ecc1e87f4b1285cb014602e3b3d22b}
+      \strng{authornamehash}{2289d796c8d1319c7b2640da5c155f9a}
+      \strng{authorfullhash}{12ecc1e87f4b1285cb014602e3b3d22b}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2019 IEEE/ACM 6th International Conference on Mobile Software Engineering and Systems (MOBILESoft)}
+      \field{title}{PerfProbe: A Systematic, Cross-Layer Performance Diagnosis Framework for Mobile Platforms}
+      \field{year}{2019}
+      \field{pages}{50\bibrangedash 61}
+      \range{pages}{12}
+      \verb{doi}
+      \verb 10.1109/MOBILESoft.2019.00018
+      \endverb
+      \keyw{Performance evaluation;Runtime;Monitoring;Mobile applications;Mobile handsets;Degradation;Cryptography;mobile app;performance;diagnosis}
+    \endentry
+    \entry{AnomalySurvey}{article}{}
+      \name{author}{3}{}{%
+        {{hash=818074037ed2f89ce51237af38dec11f}{%
+           family={Chandola},
+           familyi={C\bibinitperiod},
+           given={Varun},
+           giveni={V\bibinitperiod}}}%
+        {{hash=4ddb7b9c38d8c15a70bc573ba4e51ea9}{%
+           family={Banerjee},
+           familyi={B\bibinitperiod},
+           given={Arindam},
+           giveni={A\bibinitperiod}}}%
+        {{hash=efb90d78e35ff61d3bc639f5c6f3d822}{%
+           family={Kumar},
+           familyi={K\bibinitperiod},
+           given={Vipin},
+           giveni={V\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {New York, NY, USA}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computing Machinery}%
+      }
+      \strng{namehash}{135c55bbecd240d054a5541e3cf77609}
+      \strng{fullhash}{135c55bbecd240d054a5541e3cf77609}
+      \strng{bibnamehash}{135c55bbecd240d054a5541e3cf77609}
+      \strng{authorbibnamehash}{135c55bbecd240d054a5541e3cf77609}
+      \strng{authornamehash}{135c55bbecd240d054a5541e3cf77609}
+      \strng{authorfullhash}{135c55bbecd240d054a5541e3cf77609}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{0360-0300}
+      \field{journaltitle}{ACM Comput. Surv.}
+      \field{month}{7}
+      \field{number}{3}
+      \field{title}{Anomaly detection: A survey}
+      \field{volume}{41}
+      \field{year}{2009}
+      \verb{doi}
+      \verb 10.1145/1541880.1541882
+      \endverb
+      \keyw{Anomaly detection,outlier detection}
+    \endentry
+    \entry{AnomalyEvaluation}{article}{}
+      \name{author}{3}{}{%
+        {{hash=4a742bada01b9a54aa361c425bdc817d}{%
+           family={Schmidl},
+           familyi={S\bibinitperiod},
+           given={Sebastian},
+           giveni={S\bibinitperiod}}}%
+        {{hash=57c098baaa906cd941d31b83350f2fe5}{%
+           family={Wenig},
+           familyi={W\bibinitperiod},
+           given={Phillip},
+           giveni={P\bibinitperiod}}}%
+        {{hash=7a50a572ebbc65b289cc3df3ee2cba96}{%
+           family={Papenbrock},
+           familyi={P\bibinitperiod},
+           given={Thorsten},
+           giveni={T\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {VLDB Endowment}%
+      }
+      \strng{namehash}{2a5f7ca2f6f4d1afe4fd1525899bb8f9}
+      \strng{fullhash}{2a5f7ca2f6f4d1afe4fd1525899bb8f9}
+      \strng{bibnamehash}{2a5f7ca2f6f4d1afe4fd1525899bb8f9}
+      \strng{authorbibnamehash}{2a5f7ca2f6f4d1afe4fd1525899bb8f9}
+      \strng{authornamehash}{2a5f7ca2f6f4d1afe4fd1525899bb8f9}
+      \strng{authorfullhash}{2a5f7ca2f6f4d1afe4fd1525899bb8f9}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{2150-8097}
+      \field{journaltitle}{Proc. VLDB Endow.}
+      \field{month}{5}
+      \field{number}{9}
+      \field{title}{Anomaly detection in time series: a comprehensive evaluation}
+      \field{volume}{15}
+      \field{year}{2022}
+      \field{pages}{1779\bibrangedash 1797}
+      \range{pages}{19}
+      \verb{doi}
+      \verb 10.14778/3538598.3538602
+      \endverb
+    \endentry
+    \entry{Ibidunmoye}{article}{}
+      \name{author}{3}{}{%
+        {{hash=6c32449c64044f460fd614d16825258c}{%
+           family={Ibidunmoye},
+           familyi={I\bibinitperiod},
+           given={Olumuyiwa},
+           giveni={O\bibinitperiod}}}%
+        {{hash=a3a4fb4505e9d1beaa688a8f3cb4e7d9}{%
+           family={Hernandez-Rodriguez},
+           familyi={H\bibinithyphendelim R\bibinitperiod},
+           given={Francisco},
+           giveni={F\bibinitperiod}}}%
+        {{hash=6f8a9f4cd117ddfcad2a7b97d25415f5}{%
+           family={Elmroth},
+           familyi={E\bibinitperiod},
+           given={Erik},
+           giveni={E\bibinitperiod}}}%
+      }
+      \strng{namehash}{019fa28949aa85aece3e25193ec07d6e}
+      \strng{fullhash}{019fa28949aa85aece3e25193ec07d6e}
+      \strng{bibnamehash}{019fa28949aa85aece3e25193ec07d6e}
+      \strng{authorbibnamehash}{019fa28949aa85aece3e25193ec07d6e}
+      \strng{authornamehash}{019fa28949aa85aece3e25193ec07d6e}
+      \strng{authorfullhash}{019fa28949aa85aece3e25193ec07d6e}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{ACM Computing Surveys}
+      \field{month}{06}
+      \field{title}{Performance Anomaly Detection and Bottleneck Identification}
+      \field{volume}{48}
+      \field{year}{2015}
+      \verb{doi}
+      \verb 10.1145/2791120
+      \endverb
+    \endentry
+    \entry{GuiWatcher}{inproceedings}{}
+      \name{author}{5}{}{%
+        {{hash=c0e0d23e2d09e45e6f51cc2bcea6d9f9}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Wei},
+           giveni={W\bibinitperiod}}}%
+        {{hash=37177639f418a6c6c34ed11f1d8ee99c}{%
+           family={Lin},
+           familyi={L\bibinitperiod},
+           given={Feng},
+           giveni={F\bibinitperiod}}}%
+        {{hash=6307b815de196077809d2ef69b54d9c1}{%
+           family={Guo},
+           familyi={G\bibinitperiod},
+           given={Linqiang},
+           giveni={L\bibinitperiod}}}%
+        {{hash=21cae5fc26d99efffe1e5b6f2b5e2105}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Tse-Hsun},
+           giveni={T\bibinithyphendelim H\bibinitperiod}}}%
+        {{hash=c57d70bdcbd6111110bd0c040a14c30e}{%
+           family={Hassan},
+           familyi={H\bibinitperiod},
+           given={Ahmed},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{3015d73efd82b920e796f28af9e8ae9b}
+      \strng{fullhash}{349a3da9f04e282f8e81eee4f1e43a63}
+      \strng{bibnamehash}{349a3da9f04e282f8e81eee4f1e43a63}
+      \strng{authorbibnamehash}{349a3da9f04e282f8e81eee4f1e43a63}
+      \strng{authornamehash}{3015d73efd82b920e796f28af9e8ae9b}
+      \strng{authorfullhash}{349a3da9f04e282f8e81eee4f1e43a63}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{02}
+      \field{title}{GUIWatcher: Automatically Detecting GUI Lags by Analyzing Mobile Application Screencasts}
+      \field{year}{2025}
+      \verb{doi}
+      \verb 10.48550/arXiv.2502.04202
+      \endverb
+    \endentry
+    \entry{ADEL}{inproceedings}{}
+      \name{author}{6}{}{%
+        {{hash=0820f15b080fb3d0f28acf7a2906b38e}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Lide},
+           giveni={L\bibinitperiod}}}%
+        {{hash=52fa69e3fcdb33121e6079f246da684d}{%
+           family={Gordon},
+           familyi={G\bibinitperiod},
+           given={Mark},
+           giveni={M\bibinitperiod}}}%
+        {{hash=539d11a90cad5711439ae06549f0c6a5}{%
+           family={Dick},
+           familyi={D\bibinitperiod},
+           given={Robert},
+           giveni={R\bibinitperiod}}}%
+        {{hash=fa874bd4c4f5d5145914a1f3d5d21050}{%
+           family={Mao},
+           familyi={M\bibinitperiod},
+           given={Zhuoqing},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=49066815363d37ce7e0312300e032306}{%
+           family={Dinda},
+           familyi={D\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+        {{hash=a395f08974363438b5b4297f5a3830aa}{%
+           family={Yang},
+           familyi={Y\bibinitperiod},
+           given={Lei},
+           giveni={L\bibinitperiod}}}%
+      }
+      \strng{namehash}{93fd0d680af64dfcd4c07f3f52db0977}
+      \strng{fullhash}{cbdc616df05e484d93e14105b4655fe5}
+      \strng{bibnamehash}{cbdc616df05e484d93e14105b4655fe5}
+      \strng{authorbibnamehash}{cbdc616df05e484d93e14105b4655fe5}
+      \strng{authornamehash}{93fd0d680af64dfcd4c07f3f52db0977}
+      \strng{authorfullhash}{cbdc616df05e484d93e14105b4655fe5}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{10}
+      \field{title}{ADEL: an automatic detector of energy leaks for smartphone applications}
+      \field{year}{2012}
+      \field{pages}{363\bibrangedash 372}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1145/2380445.2380503
+      \endverb
+    \endentry
+    \entry{Yaohui}{article}{}
+      \name{author}{4}{}{%
+        {{hash=56755ea509209085a86bb9f4d64e2ad0}{%
+           family={Fu},
+           familyi={F\bibinitperiod},
+           given={Jiaojiao},
+           giveni={J\bibinitperiod}}}%
+        {{hash=85c44b90af7ae0ab0977c70ccd95a900}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Yaohui},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=1f002985b7cceb65b53c997e86b9974c}{%
+           family={Zhou},
+           familyi={Z\bibinitperiod},
+           given={Yangfan},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=03d3e23852937fa39b0e34246c4ecd1d}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Xin},
+           giveni={X\bibinitperiod}}}%
+      }
+      \strng{namehash}{0482f9767562241e35de76379972c88e}
+      \strng{fullhash}{a7ab2649ff7a5f29d4f7a4927adf8024}
+      \strng{bibnamehash}{a7ab2649ff7a5f29d4f7a4927adf8024}
+      \strng{authorbibnamehash}{a7ab2649ff7a5f29d4f7a4927adf8024}
+      \strng{authornamehash}{0482f9767562241e35de76379972c88e}
+      \strng{authorfullhash}{a7ab2649ff7a5f29d4f7a4927adf8024}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Information and Software Technology}
+      \field{month}{09}
+      \field{title}{How resource utilization influences UI responsiveness of Android software}
+      \field{volume}{141}
+      \field{year}{2021}
+      \field{pages}{106728}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1016/j.infsof.2021.106728
+      \endverb
+    \endentry
+    \entry{DroidPerf}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=557b472d3813342fd4f83bfbd9186da4}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Bolun},
+           giveni={B\bibinitperiod}}}%
+        {{hash=9231defcad82cddaacabf7c08a85125d}{%
+           family={Zhao},
+           familyi={Z\bibinitperiod},
+           given={Qidong},
+           giveni={Q\bibinitperiod}}}%
+        {{hash=9316afff992fc72ec63318bb64b1db56}{%
+           family={Jiao},
+           familyi={J\bibinitperiod},
+           given={Shuyin},
+           giveni={S\bibinitperiod}}}%
+        {{hash=0acb094e371db85d102e7a7366a7fcd5}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Xu},
+           giveni={X\bibinitperiod}}}%
+      }
+      \strng{namehash}{5889f259dfd09f104aaf0f764db3e79c}
+      \strng{fullhash}{e73511c314cc47a2fc024dd9d1fe6a6a}
+      \strng{bibnamehash}{e73511c314cc47a2fc024dd9d1fe6a6a}
+      \strng{authorbibnamehash}{e73511c314cc47a2fc024dd9d1fe6a6a}
+      \strng{authornamehash}{5889f259dfd09f104aaf0f764db3e79c}
+      \strng{authorfullhash}{e73511c314cc47a2fc024dd9d1fe6a6a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{07}
+      \field{title}{DroidPerf: Profiling Memory Objects on Android Devices}
+      \field{year}{2023}
+      \field{pages}{1\bibrangedash 15}
+      \range{pages}{15}
+      \verb{doi}
+      \verb 10.1145/3570361.3592503
+      \endverb
+    \endentry
+    \entry{Saraiva}{article}{}
+      \name{author}{2}{}{%
+        {{hash=0d4d33b8a24aad3be2e315b27f164368}{%
+           family={Rua},
+           familyi={R\bibinitperiod},
+           given={Rui},
+           giveni={R\bibinitperiod}}}%
+        {{hash=a772b5aa30aa09c26654983ee7fe0af7}{%
+           family={Saraiva},
+           familyi={S\bibinitperiod},
+           given={João},
+           giveni={J\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {USA}%
+      }
+      \list{publisher}{1}{%
+        {Kluwer Academic Publishers}%
+      }
+      \strng{namehash}{9d97ffa602becda657fc6b9118b346fc}
+      \strng{fullhash}{9d97ffa602becda657fc6b9118b346fc}
+      \strng{bibnamehash}{9d97ffa602becda657fc6b9118b346fc}
+      \strng{authorbibnamehash}{9d97ffa602becda657fc6b9118b346fc}
+      \strng{authornamehash}{9d97ffa602becda657fc6b9118b346fc}
+      \strng{authorfullhash}{9d97ffa602becda657fc6b9118b346fc}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{1382-3256}
+      \field{journaltitle}{Empirical Softw. Engg.}
+      \field{month}{12}
+      \field{number}{1}
+      \field{title}{A large-scale empirical study on mobile performance: energy, run-time and memory}
+      \field{volume}{29}
+      \field{year}{2023}
+      \verb{doi}
+      \verb 10.1007/s10664-023-10391-y
+      \endverb
+      \keyw{Performance,Empirical,Mobile,Testing}
+    \endentry
+    \entry{Nguyen2012}{inproceedings}{}
+      \name{author}{6}{}{%
+        {{hash=9de2827c1797705320f45bcc0fc4a2eb}{%
+           family={Nguyen},
+           familyi={N\bibinitperiod},
+           given={Thanh\bibnamedelimb H.\bibnamedelimi D.},
+           giveni={T\bibinitperiod\bibinitdelim H\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
+        {{hash=dc191f92000b5aaddb093f1dbf1d7974}{%
+           family={Adams},
+           familyi={A\bibinitperiod},
+           given={Bram},
+           giveni={B\bibinitperiod}}}%
+        {{hash=7b5b3edf86a22761a4093a10eb259966}{%
+           family={Jiang},
+           familyi={J\bibinitperiod},
+           given={Zhen\bibnamedelima Ming},
+           giveni={Z\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=37a79f9b3d67c262a89ed8c5521d654f}{%
+           family={Hassan},
+           familyi={H\bibinitperiod},
+           given={Ahmed\bibnamedelima E.},
+           giveni={A\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+        {{hash=b56f26dc0c54ad6366f639bc83c57f64}{%
+           family={Nasser},
+           familyi={N\bibinitperiod},
+           given={Mohamed},
+           giveni={M\bibinitperiod}}}%
+        {{hash=09334670c9a506dfa99436fbaf980dc6}{%
+           family={Flora},
+           familyi={F\bibinitperiod},
+           given={Parminder},
+           giveni={P\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {ACM}%
+      }
+      \strng{namehash}{203756e487d4132b91b4263fb82b8aa6}
+      \strng{fullhash}{229dcf7211a32a0ede6dd340d00fdc53}
+      \strng{bibnamehash}{229dcf7211a32a0ede6dd340d00fdc53}
+      \strng{authorbibnamehash}{229dcf7211a32a0ede6dd340d00fdc53}
+      \strng{authornamehash}{203756e487d4132b91b4263fb82b8aa6}
+      \strng{authorfullhash}{229dcf7211a32a0ede6dd340d00fdc53}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 3rd ACM/SPEC International Conference on Performance Engineering (ICPE '12)}
+      \field{title}{Automated detection of performance regressions using statistical process control techniques}
+      \field{year}{2012}
+      \field{pages}{299\bibrangedash 310}
+      \range{pages}{12}
+    \endentry
+    \entry{Shang2015}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=4e9c94d2869abcd85ed93308ed526d58}{%
+           family={Shang},
+           familyi={S\bibinitperiod},
+           given={Wei},
+           giveni={W\bibinitperiod}}}%
+        {{hash=37a79f9b3d67c262a89ed8c5521d654f}{%
+           family={Hassan},
+           familyi={H\bibinitperiod},
+           given={Ahmed\bibnamedelima E.},
+           giveni={A\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+        {{hash=b56f26dc0c54ad6366f639bc83c57f64}{%
+           family={Nasser},
+           familyi={N\bibinitperiod},
+           given={Mohamed},
+           giveni={M\bibinitperiod}}}%
+        {{hash=09334670c9a506dfa99436fbaf980dc6}{%
+           family={Flora},
+           familyi={F\bibinitperiod},
+           given={Parminder},
+           giveni={P\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {ACM}%
+      }
+      \strng{namehash}{a3b4a4ea1d27b48ca513b043bd66ee81}
+      \strng{fullhash}{a308fe8091dbfd8b4cfc9b171dfae13e}
+      \strng{bibnamehash}{a308fe8091dbfd8b4cfc9b171dfae13e}
+      \strng{authorbibnamehash}{a308fe8091dbfd8b4cfc9b171dfae13e}
+      \strng{authornamehash}{a3b4a4ea1d27b48ca513b043bd66ee81}
+      \strng{authorfullhash}{a308fe8091dbfd8b4cfc9b171dfae13e}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 6th ACM/SPEC International Conference on Performance Engineering}
+      \field{title}{Automated Detection of Performance Regressions Using Regression Models on Clustered Performance Counters}
+      \field{year}{2015}
+      \field{pages}{15\bibrangedash 26}
+      \range{pages}{12}
+    \endentry
+    \entry{FBDetect}{inproceedings}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{3}{}{%
+        {{hash=05fe4e46bf4ffc5980b26dd8129d8af0}{%
+           family={Yoon},
+           familyi={Y\bibinitperiod},
+           given={Dong\bibnamedelima Young},
+           giveni={D\bibinitperiod\bibinitdelim Y\bibinitperiod}}}%
+        {{hash=a84866b4900b3fe9a714de1f78dbf282}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Yang},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=829fb0f3f571c51e0b584fffe4c94f0b}{%
+           family={Yu},
+           familyi={Y\bibinitperiod},
+           given={Miao},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {ACM}%
+      }
+      \strng{namehash}{54aa76597cd42f8ba8157edbe0bc3905}
+      \strng{fullhash}{54aa76597cd42f8ba8157edbe0bc3905}
+      \strng{bibnamehash}{54aa76597cd42f8ba8157edbe0bc3905}
+      \strng{authorbibnamehash}{54aa76597cd42f8ba8157edbe0bc3905}
+      \strng{authornamehash}{54aa76597cd42f8ba8157edbe0bc3905}
+      \strng{authorfullhash}{54aa76597cd42f8ba8157edbe0bc3905}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the ACM SIGOPS 30th Symposium on Operating Systems Principles (SOSP '24)}
+      \field{title}{{FBDetect}: Catching Tiny Performance Regressions at Hyperscale through In-Production Monitoring}
+      \field{year}{2024}
+    \endentry
+    \entry{Carat}{article}{}
+      \name{author}{5}{}{%
+        {{hash=5b89b8c3c13025e50043d2e1566d4383}{%
+           family={Oliner},
+           familyi={O\bibinitperiod},
+           given={Adam},
+           giveni={A\bibinitperiod}}}%
+        {{hash=a56d18421899dc0c622f223fc2c84366}{%
+           family={Iyer},
+           familyi={I\bibinitperiod},
+           given={Anand},
+           giveni={A\bibinitperiod}}}%
+        {{hash=51d9ef26181e2e8a9dc546b401e0bb26}{%
+           family={Stoica},
+           familyi={S\bibinitperiod},
+           given={Ion},
+           giveni={I\bibinitperiod}}}%
+        {{hash=d42704670e5951576200fa13eafe9c31}{%
+           family={Lagerspetz},
+           familyi={L\bibinitperiod},
+           given={Eemil},
+           giveni={E\bibinitperiod}}}%
+        {{hash=e935e5d3dbf7bbbe18aab2f618b1b740}{%
+           family={Tarkoma},
+           familyi={T\bibinitperiod},
+           given={Sasu},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{e5ba50be0ccb0a07901b71bdd11ae1bb}
+      \strng{fullhash}{f342c1a20a57220f3b999120f31327c4}
+      \strng{bibnamehash}{f342c1a20a57220f3b999120f31327c4}
+      \strng{authorbibnamehash}{f342c1a20a57220f3b999120f31327c4}
+      \strng{authornamehash}{e5ba50be0ccb0a07901b71bdd11ae1bb}
+      \strng{authorfullhash}{f342c1a20a57220f3b999120f31327c4}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{978-1-4503-2027-6}
+      \field{month}{11}
+      \field{title}{Carat: collaborative energy diagnosis for mobile devices}
+      \field{year}{2013}
+      \verb{doi}
+      \verb 10.1145/2517351.2517354
+      \endverb
+    \endentry
+    \entry{Schmidt}{inproceedings}{}
+      \name{author}{5}{}{%
+        {{hash=0a8d89a563eac34f1162595c6638ea6e}{%
+           family={Schmidt},
+           familyi={S\bibinitperiod},
+           given={Aubrey-Derrick},
+           giveni={A\bibinithyphendelim D\bibinitperiod}}}%
+        {{hash=549a2ade7923a9ecb8e258e85aa1a14b}{%
+           family={Peters},
+           familyi={P\bibinitperiod},
+           given={Frank},
+           giveni={F\bibinitperiod}}}%
+        {{hash=750f8045741cb1d2d3a02870746bff82}{%
+           family={Lamour},
+           familyi={L\bibinitperiod},
+           given={Florian},
+           giveni={F\bibinitperiod}}}%
+        {{hash=e74fd318f8814c85b51cae4f7b17251f}{%
+           family={Albayrak},
+           familyi={A\bibinitperiod},
+           given={Sahin},
+           giveni={S\bibinitperiod}}}%
+        {{hash=9a35579142cfffee4672a2f961d4e3e3}{%
+           family={Camtepe},
+           familyi={C\bibinitperiod},
+           given={Seyit},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{3464ad9c3361ad77a1d5578244a83d78}
+      \strng{fullhash}{a58b54af38bde8d9ff4d559b275a99a4}
+      \strng{bibnamehash}{a58b54af38bde8d9ff4d559b275a99a4}
+      \strng{authorbibnamehash}{a58b54af38bde8d9ff4d559b275a99a4}
+      \strng{authornamehash}{3464ad9c3361ad77a1d5578244a83d78}
+      \strng{authorfullhash}{a58b54af38bde8d9ff4d559b275a99a4}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Mobile Networks and Applications - MONET}
+      \field{month}{02}
+      \field{title}{Monitoring Smartphones for Anomaly Detection}
+      \field{volume}{14}
+      \field{year}{2008}
+      \field{pages}{40}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1007/s11036-008-0113-x
+      \endverb
+    \endentry
+    \entry{android_slow_rendering}{online}{}
+      \name{author}{1}{}{%
+        {{hash=7ace771b22ac28958ff5694e260839cc}{%
+           family={{Android Developers}},
+           familyi={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{7ace771b22ac28958ff5694e260839cc}
+      \strng{fullhash}{7ace771b22ac28958ff5694e260839cc}
+      \strng{bibnamehash}{7ace771b22ac28958ff5694e260839cc}
+      \strng{authorbibnamehash}{7ace771b22ac28958ff5694e260839cc}
+      \strng{authornamehash}{7ace771b22ac28958ff5694e260839cc}
+      \strng{authorfullhash}{7ace771b22ac28958ff5694e260839cc}
+      \field{extraname}{1}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Accessed: 19 April 2026}
+      \field{title}{Slow rendering}
+      \field{year}{2026}
+      \verb{urlraw}
+      \verb https://developer.android.com/topic/performance/vitals/render
+      \endverb
+      \verb{url}
+      \verb https://developer.android.com/topic/performance/vitals/render
+      \endverb
+    \endentry
+    \entry{jensen-time-series}{article}{}
+      \name{author}{3}{}{%
+        {{hash=27566aa6b91ff63b49ada9cdb537946d}{%
+           family={Jensen},
+           familyi={J\bibinitperiod},
+           given={S{ø}ren\bibnamedelima Kejser},
+           giveni={S\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+        {{hash=b52fd3bd8624cc8eda72a44b296eb355}{%
+           family={Pedersen},
+           familyi={P\bibinitperiod},
+           given={Torben\bibnamedelima Bach},
+           giveni={T\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+        {{hash=e3618ebf407972ac424da133798b351a}{%
+           family={Thomsen},
+           familyi={T\bibinitperiod},
+           given={Christian},
+           giveni={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{84323c54de77761961018e5aac1766cd}
+      \strng{fullhash}{84323c54de77761961018e5aac1766cd}
+      \strng{bibnamehash}{84323c54de77761961018e5aac1766cd}
+      \strng{authorbibnamehash}{84323c54de77761961018e5aac1766cd}
+      \strng{authornamehash}{84323c54de77761961018e5aac1766cd}
+      \strng{authorfullhash}{84323c54de77761961018e5aac1766cd}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Knowledge and Data Engineering}
+      \field{number}{11}
+      \field{title}{Time Series Management Systems: A Survey}
+      \field{volume}{29}
+      \field{year}{2017}
+      \field{pages}{2581\bibrangedash 2600}
+      \range{pages}{20}
+      \verb{doi}
+      \verb 10.1109/TKDE.2017.2740932
+      \endverb
+    \endentry
+    \entry{mann1947test}{article}{}
+      \name{author}{2}{}{%
+        {{hash=5cf19aa5110d49e31bafd83ce394b092}{%
+           family={Mann},
+           familyi={M\bibinitperiod},
+           given={Henry\bibnamedelima B.},
+           giveni={H\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+        {{hash=c28a32eaa7f3921fc42ff47698be3a36}{%
+           family={Whitney},
+           familyi={W\bibinitperiod},
+           given={Donald\bibnamedelima R.},
+           giveni={D\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \strng{namehash}{faa025e01f364e80ee2e1076e0bc30ac}
+      \strng{fullhash}{faa025e01f364e80ee2e1076e0bc30ac}
+      \strng{bibnamehash}{faa025e01f364e80ee2e1076e0bc30ac}
+      \strng{authorbibnamehash}{faa025e01f364e80ee2e1076e0bc30ac}
+      \strng{authornamehash}{faa025e01f364e80ee2e1076e0bc30ac}
+      \strng{authorfullhash}{faa025e01f364e80ee2e1076e0bc30ac}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The Annals of Mathematical Statistics}
+      \field{number}{1}
+      \field{title}{On a Test of Whether One of Two Random Variables is Stochastically Larger than the Other}
+      \field{volume}{18}
+      \field{year}{1947}
+      \field{pages}{50\bibrangedash 60}
+      \range{pages}{11}
+      \verb{doi}
+      \verb 10.1214/aoms/1177730491
+      \endverb
+    \endentry
+    \entry{KotlinFirst}{online}{}
+      \name{author}{1}{}{%
+        {{hash=7ace771b22ac28958ff5694e260839cc}{%
+           family={{Android Developers}},
+           familyi={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{7ace771b22ac28958ff5694e260839cc}
+      \strng{fullhash}{7ace771b22ac28958ff5694e260839cc}
+      \strng{bibnamehash}{7ace771b22ac28958ff5694e260839cc}
+      \strng{authorbibnamehash}{7ace771b22ac28958ff5694e260839cc}
+      \strng{authornamehash}{7ace771b22ac28958ff5694e260839cc}
+      \strng{authorfullhash}{7ace771b22ac28958ff5694e260839cc}
+      \field{extraname}{2}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Accessed: 19 April 2026}
+      \field{title}{Android's Kotlin-first approach}
+      \field{year}{2026}
+      \verb{urlraw}
+      \verb https://developer.android.com/kotlin/first
+      \endverb
+      \verb{url}
+      \verb https://developer.android.com/kotlin/first
+      \endverb
+    \endentry
+    \entry{AndroidVitals}{online}{}
+      \name{author}{1}{}{%
+        {{hash=d85a9fcce6b38928adcd686492261dfb}{%
+           family={{Google Android}},
+           familyi={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{d85a9fcce6b38928adcd686492261dfb}
+      \strng{fullhash}{d85a9fcce6b38928adcd686492261dfb}
+      \strng{bibnamehash}{d85a9fcce6b38928adcd686492261dfb}
+      \strng{authorbibnamehash}{d85a9fcce6b38928adcd686492261dfb}
+      \strng{authornamehash}{d85a9fcce6b38928adcd686492261dfb}
+      \strng{authorfullhash}{d85a9fcce6b38928adcd686492261dfb}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Accessed: 30 Oct 2025}
+      \field{title}{Android vitals: App quality}
+      \field{year}{2025}
+      \verb{urlraw}
+      \verb https://developer.android.com/topic/performance/vitals
+      \endverb
+      \verb{url}
+      \verb https://developer.android.com/topic/performance/vitals
+      \endverb
+    \endentry
+    \entry{schulze2024clickhouse}{article}{}
+      \name{author}{5}{}{%
+        {{hash=a9ddde99d00041988bd9fb98bdc352bf}{%
+           family={Schulze},
+           familyi={S\bibinitperiod},
+           given={Robert},
+           giveni={R\bibinitperiod}}}%
+        {{hash=47b8b9fa8f3e48c8984ebdb61877f34d}{%
+           family={Schreiber},
+           familyi={S\bibinitperiod},
+           given={Tom},
+           giveni={T\bibinitperiod}}}%
+        {{hash=8609719f84e3c34204eb24c438269057}{%
+           family={Yatsishin},
+           familyi={Y\bibinitperiod},
+           given={Ilya},
+           giveni={I\bibinitperiod}}}%
+        {{hash=371695047b3a2279aea71823bdfeff89}{%
+           family={Dahimene},
+           familyi={D\bibinitperiod},
+           given={Ryadh},
+           giveni={R\bibinitperiod}}}%
+        {{hash=5c7500f50a12750223dd1e6b82353ae6}{%
+           family={Milovidov},
+           familyi={M\bibinitperiod},
+           given={Alexey},
+           giveni={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{6aa4a63b528b11eb73e64753b5690820}
+      \strng{fullhash}{131ad67f047f3dad3e9e4e23c6923484}
+      \strng{bibnamehash}{131ad67f047f3dad3e9e4e23c6923484}
+      \strng{authorbibnamehash}{131ad67f047f3dad3e9e4e23c6923484}
+      \strng{authornamehash}{6aa4a63b528b11eb73e64753b5690820}
+      \strng{authorfullhash}{131ad67f047f3dad3e9e4e23c6923484}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Proceedings of the VLDB Endowment}
+      \field{number}{12}
+      \field{title}{{ClickHouse} - Lightning Fast Analytics for Everyone}
+      \field{volume}{17}
+      \field{year}{2024}
+      \field{pages}{3731\bibrangedash 3744}
+      \range{pages}{14}
+      \verb{doi}
+      \verb 10.14778/3685800.3685802
+      \endverb
+    \endentry
+    \entry{AndroidTracing}{online}{}
+      \name{author}{1}{}{%
+        {{hash=7ace771b22ac28958ff5694e260839cc}{%
+           family={{Android Developers}},
+           familyi={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{7ace771b22ac28958ff5694e260839cc}
+      \strng{fullhash}{7ace771b22ac28958ff5694e260839cc}
+      \strng{bibnamehash}{7ace771b22ac28958ff5694e260839cc}
+      \strng{authorbibnamehash}{7ace771b22ac28958ff5694e260839cc}
+      \strng{authornamehash}{7ace771b22ac28958ff5694e260839cc}
+      \strng{authorfullhash}{7ace771b22ac28958ff5694e260839cc}
+      \field{extraname}{3}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Accessed: 20 Oct 2025}
+      \field{title}{Overview of system tracing}
+      \field{year}{2025}
+      \verb{urlraw}
+      \verb https://developer.android.com/topic/performance/tracing
+      \endverb
+      \verb{url}
+      \verb https://developer.android.com/topic/performance/tracing
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

@@ -21,6 +21,9 @@ interface MetricDao {
 
     @Query("SELECT COUNT(*) FROM metrics")
     suspend fun getCount(): Int
+
+    @Query("DELETE FROM metrics WHERE id IN (SELECT id FROM metrics ORDER BY id ASC LIMIT :count)")
+    suspend fun deleteOldest(count: Int)
 }
 
 @Database(entities = [MetricDb::class], version = 1)

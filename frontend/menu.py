@@ -54,11 +54,6 @@ def authenticated_menu():
     st.sidebar.markdown("## Navigation")
 
     st.sidebar.page_link(
-        "pages/dashboard.py",
-        label="Dashboard",
-        icon="📊",
-    )
-    st.sidebar.page_link(
         "pages/metrics.py",
         label="Metrics",
         icon="📈",

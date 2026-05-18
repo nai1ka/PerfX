@@ -1,0 +1,33 @@
+flowchart TD
+    Start([User opens the app])
+
+    Start --> Collect["SDK collects performance metrics<br/>(frame time, CPU, memory, ANR, startup...)"]
+
+    Collect --> Buffer["Store metrics in local buffer"]
+
+    Buffer --> Check{"Buffer full<br/>OR time window expired?"}
+    Check -- No --> Collect
+    Check -- Yes --> Send["Send batch to backend"]
+
+    Send --> Ingest["Backend validates the batch<br/>and assigns device cohort<br/>(Low / Medium / High)"]
+
+    Ingest --> Store[("Save metrics in<br/>time-series storage")]
+
+    Store --> Schedule{"Detection<br/>window reached?"}
+    Schedule -- No --> Wait([Wait for next batch])
+    Schedule -- Yes --> Partition["Partition data by<br/>metric, screen, cohort"]
+
+    Partition --> Baseline["Compute P95 baseline<br/>from historical window"]
+    Baseline --> Current["Compute P95 current<br/>from recent window"]
+
+    Current --> Compare{"Relative change<br/>> threshold?"}
+    Compare -- No --> NoReg([No regression])
+    Compare -- Yes --> Test["Run statistical test<br/>(Mann-Whitney U)"]
+
+    Test --> PVal{"p-value < 0.05?"}
+    PVal -- No --> FalseAlarm([Likely noise<br/>— ignore])
+    PVal -- Yes --> Confirmed["Mark as confirmed regression"]
+
+    Confirmed --> SaveReg[("Save regression<br/>with metadata")]
+    SaveReg --> Notify["Send notification<br/>to developer"]
+    Notify --> Review([Developer reviews<br/>on the dashboard])

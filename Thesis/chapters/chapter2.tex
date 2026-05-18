@@ -1,0 +1,175 @@
+% !TEX root = /Users/nai1ka/Projects/thesis_template/thesis.tex
+\chapter{Literature Review}
+\label{chap:lr}
+\chaptermark{Second Chapter Heading}
+
+This chapter provides an overview of existing research related to mobile applications profiling and monitoring, It
+examines the methods used to collect performance metrics and the various types of metrics that are considered important
+for mobile application development. In addition, it discusses different approaches to anomaly detection, providing a
+foundation for selecting the most suitable method for this study.
+
+The review is divided into three main parts:
+\begin{itemize}
+      \item Section 2.1 compares two main approaches to collect performance metrics in mobile applications: pre-release
+            profiling and post-release monitoring. This section outlines their main ideas, methodologies, and
+            trade-offs, showing the advantages and limitaitons of each approach.
+      \item Section 2.2 focuses on the metrics used in previous research, summarizing which ones are most frequently
+            applied and explaining how they contribute to the assessment of application performance and user experience.
+      \item Section 2.3 provides an overview of existing anomaly detection approaches, ranging from simple
+            threshold-based methods to advanced statistical and machine learning algorithms.
+\end{itemize}
+
+Together, these sections show the current state of research, providing a foundation for identifying the gaps that the
+the proposed SDK aims to address.
+
+\section{Performance monitoring}
+
+Performance is a critical aspect in mobile application development, as it directly affects user experience and
+retention. Performance issues such as slow response times, high energy consumption, or UI lags can lead to poor user
+experience, which may ofter result in negative ratings and uninstalls. The ability to automatically detect such
+performance problems can significantly improve application quality and positively impact user satisfaction, as shown by
+Tang \emph{et al.} \cite{Tang}. Profiling and monitoring are the two main strategies used to understand and improve
+application performance. Profiling can be used during development or testing and provides deep insights through
+high-resolution data collection. Monitoring, in contrast, takes place after the application is released and runs on real
+user devices. It must introduce as little overhead as possible to prevent any interference with normal app usage.
+
+The Android ecosystem adds complexity to performance evaluation due to fragmentation - the wide variety of hardware,
+operating system versions, and user behaviors. \cite{Fragmentation}. This diversity makes it difficult to reproduce rare
+or device-specific issues found in the wild. The same app may behave differently on various devices depending on their
+environment, OS version, and hardware specifications \cite{Zikan}. This problem motivates research into tools and
+methods for collecting and analyzing mobile performance data effectively.
+
+\section{Techniques for Performance Data Collection}
+\subsection{Pre-release Profiling Techniques}
+
+Several tools have been developed to support detailed performance profiling during development. One example is
+ProfileDroid by Wei \emph{et al.} \cite{ProfileDroid}, which uses a multi-layer approach to profiling. Their method
+involves gathering data from four layers: application metadata, user interface interaction traces, operating system
+metrics(such as CPU or memory usage), and network activity. This allows developers to observe how different components
+interact. For example, how a UI event may trigger a CPU spike or a network request. The main strength of ProfileDroid is
+its ability to correlate performance across layers, giving a complete system-level view. However, its high overhead and
+dependence on a controlled environment limit its practical use on real devices.
+
+Another relevant project is AndroStep \cite{AndroStep}, which focuses on analyzing Android storage performance during
+I/O operations. The authors found that existing Android benchmarking tools did not simulate realistic app behavior,
+especially missing operations like fsync() followed by 4 KB random writes — a common and essential operation used by
+SQLite \cite{AndroStep}. Their tool provides valuable insights for benchmarking Android storage, but it only coveres
+storage metrics and requires manual execution, making it useful only for testing environment.
+
+% TODO i think i need to add soemthing else here
+PowDroid, introduced by Bouaffar \emph{et al.} in 2021 \cite{PowDroid}, was designed to measure the energy consumption
+of applications. However, like most pre-release tools, it works only under controlled conditions, which makes it
+difficult to test applications on a large range of real devices.
+
+In the field of UI performance, a new state-of-the-art work, GuiWatcher, was proposed by Liu \emph{et al.}
+\cite{GuiWatcher}. They presented an advanced way to detect UI lags and freezes. GUIWatcher uses computer vision
+techniques on screen recordings and is able to detect three types of problematic frames: "junky" frames (dropped or
+delayed ones), long loading frames (lengthy transition), and frozen frames. This method reflects what users actually see
+rather than relying only on timing logs. However, it is computationally expensive and suitable only for use during
+development or continuous integration testing. It also raises privacy concerns since it requires recording the device
+screen.
+
+Finally, ADEL by Zhang \emph{et al.} \cite{ADEL} provides a method to track network performance and detect energy leaks
+in Android applications by extending the platform with taint-tracking to trace how downloaded data is used within apps.
+It identifies unnecessary network activity that increases energy consumption. However, the approach is not suitable for
+continuous monitoring, as it requires modifications to the Android system and introduces high overhead, making it
+impractical for deployment on real user devices.
+
+
+% TODO add somewhere: As noted by Xia et al. (2022), enabling full method tracing in Android Studio can slow apps down
+% by over 10×, making it “unsuitable for continuous use in production”
+
+
+
+\subsection{Post-release Monitoring Techniques}
+
+The main idea of post-release profiling is to collect metrics from apps as they run on real user devices. The main
+advantage of this approach is that it captures realistic usage patterns and real-world diversity that are hard to
+reproduce in a lab. The main challenge is to minimize overhead to avoid affecting user experience.
+
+One of the first studies in this area was AppInsight \cite{AppInsight}, which introduced a method for instrumenting
+applications without modifying their source code. The framework automatically injects instrumentation into the compiled
+bytecode and collects runtime traces. By collecting traces from 30 users over several months, the authors were able to
+identify performance bottlenecks that were not visible during development. However, this approach is limited because
+developers cannot easily add custom metrics.
+
+Another example is Hubble \cite{Hubble}, which is currently integrated into all Huawei devices. The main feature of
+Hubble is that it monitors the performance in an efficient in-memory buffer, where older data is constantly overwritten
+\cite{Hubble}. The relevant metrics are only persited when a performance issue is detected, providing engineers with
+detailed runtime traces right before an anomaly occurs. This approach combines high efficiency with low storage cost.
+
+% TODO GPT written
+PerfProbe \cite{PerfProbe} is another post-release performance profiling tool that provides cross-layer insights to
+identify the root causes of performance issues. It monitors both application and system layers on mobile devices,
+collecting runtime traces with low overhead. Using statistical analysis, PerfProbe detects critical functions that
+deviate from normal performance and correlates them with system-level resource factors such as CPU, memory, or I/O
+usage. This allows developers to understand not only where the slowdown occurs but also why. In experiments with 22
+Android apps, PerfProbe successfully diagnosed real-world issues and helped developers to decrease the user-perceived
+latency of 6 applications by 32-86\% \cite{PerfProbe}
+
+Another important work is Panappticon \cite{Panappticon}, a lightweight tracing system that captures performance across
+application, system, and kernel layers. It automatically identifies critical execution paths by linking user inputs to
+display updates. Unlike AppInsight, Panappticon can detect problems caused by interactions between multiple apps or
+system components. A one-month study showed it had only about 6\% performance overhead, proving it suitable for
+continuous real-world monitoring.
+
+
+\section{Performance Metrics}
+Performance metrics are the foundation of profiling and anomaly detection. Commonly used metrics include:
+\begin{itemize}
+      \item \textbf{CPU usage}: High CPU utilization often leads to reduced responsiveness. Overloaded threads or
+            inefficient scheduling can cause UI lag. Studies have shown CPU contention to be a frequent cause of poor
+            user experience on Android \cite{Yaohui}.
+      \item \textbf{Memory usage}: Memory consumption is critical for app stability and avoiding resource leaks. An app
+            that uses excessive RAM can trigger the system's low-memory killer or frequent garbage collection pauses.
+            Developers, therefore, profile heap usage to catch allocation bottlenecks and memory leaks \cite{DroidPerf}.
+            Keeping memory usage in check helps prevent crashes and ensures smooth operation as the app scales in
+            features or data.
+            % TODO random citation - check
+      \item \textbf{I/O operations}: Storage I/O significantly affects latency. This is especially true on mobile
+            devices with slower flash storage or SD cards. For example, opening a new screen can take twice as long as
+            normal due to slow disk I/O \cite{AndroStep}.
+      \item \textbf{Energy consumption}: Battery life is one of the most important factors for users, because they are
+            likely to notice and uninstall apps that drain the battery excessively. In fact, surveys show battery life
+            often tops performance concerns for smartphone users, and many will avoid apps they perceive as
+            energy-greedy \cite{Saraiva}. Therefore, profiling energy usage and detecting “energy leaks” is a key part
+            of mobile optimization.
+      \item \textbf{UI responsiveness}: This metric reflects how quickly the user interface responds to user actions.
+      Even when CPU, memory, and other performance indicators appear normal, delayed or uneven UI updates can
+      significantly reduce user satisfaction. Both research and industry standards emphasize the importance of
+      minimizing user-perceived latency. For instance, according to Google’s RAIL model, if a response takes longer than
+      approximately one second, the user’s attention is likely to shift elsewhere \cite{PerfProbe}. Therefore, smooth
+      scrolling, quick startup, and minimal frame drops are essential for maintaining a positive user experience.
+\end{itemize}
+
+Many tools combine serveral metrics to provide a comprehensive view. For example, ProfileDroid and Panappticon correlate
+UI and system activity, while PerfProbe connect CPU and I/O data with execution paths. The choice of metrics depends on
+the study goal: detailed pre-release profiling or lightweight post-release monitoring.
+
+\section{Performance Regression Detection}
+
+A performance regression is a situation where software still functions correctly but performs worse than before — for example, slower response times or higher resource usage. In mobile systems, this can appear as increased frame rendering time, slower startup, higher CPU usage, or excessive memory consumption after an application update. The goal of regression detection is not to find individual outliers but to identify degradation (i.e performance regression) across a user population.
+
+\subsection{Regression Detection in Software Systems}
+
+Performance regression detection has been actively studied in the context of large-scale software systems. Nguyen \emph{et al.} \cite{Nguyen2012} proposed one of the first automated approaches, using statistical process control techniques called control charts. Their method builds control limits from a baseline test run and scores new runs against them. If the violation ratio exceeds a threshold, the run is flagged as having a regression. The approach was evaluated on both industrial and open-source systems and showed accurate detection with simple and interpretable results.
+
+Shang \emph{et al.} \cite{Shang2015} extended this direction by using regression models built on clustered performance counters. Instead of analyzing individual counters, they grouped related counters into clusters and built models to detect regressions automatically, avoiding the need for manual selection of target metrics.
+
+A recent large-scale example is FBDetect by Yoon \emph{et al.} \cite{FBDetect}, Meta's in-production regression detection system presented at SOSP 2024. FBDetect monitors around 800,000 time series and can detect regressions as small as 0.005\%. It achieves this by measuring performance at the subroutine level rather than the service level, which significantly reduces noise. FBDetect uses statistical hypothesis testing to validate detected regressions and filters out false positives caused by transient issues such as load spikes or rolling updates. This work demonstrates the importance of combining statistical validation with practical filtering techniques in production environments
+
+\subsection{Mobile-Specific Gaps and Considerations}
+
+While regression detection is well explored in cloud and enterprise systems, mobile environments add unique constraints such as hardware diversity, limited resources, and privacy concerns. Systems like Carat \cite{Carat} demonstrate a crowd-based approach to mobile performance analysis. Carat collects energy usage data from many users and builds a baseline of normal behavior for each application, identifying outliers through statistical normalization across similar devices.
+
+Schmidt \emph{et al.} \cite{Schmidt} proposed an architecture that combines lightweight on-device feature extraction with remote analysis on a server. Although their study was based on older Symbian devices, the core idea of moving complex analysis to the server side remains practical for mobile performance monitoring today.
+
+However, despite the progress in both server-side regression detection and mobile monitoring, there is still no solution that combines continuous post-release performance monitoring on Android devices with automated server-side regression detection. Existing mobile monitoring tools either do not provide alerting at all or rely on hardcoded thresholds. At the same time, the statistical methods successfully used in large-scale systems (such as percentile comparison and hypothesis testing) have not been applied to continuous monitoring of mobile applications. This gap is what the proposed system aims to address.
+
+
+\section{Summary}
+This chapter reviewed existing research on mobile performance profiling, monitoring, and regression detection. Pre-release tools such as ProfileDroid, AndroStep and PowDroid offer deep system-level insights but introduce high overhead and require controlled environments, making them unsuitable for real user devices. Post-release monitoring systems, including AppInsight, PerfProbe and Hubble, solve this problem by collecting performance data directly from real users with minimal overhead.
+
+The chapter also covered key performance metrics used in mobile applications, such as CPU usage, memory consumption, I/O operations, energy usage, and UI responsiveness. Finally, it reviewed existing approaches to performance regression detection, from control charts to large-scale industrial systems like FBDetect, showing that statistical methods can effectively identify sustained performance degradation.
+
+Despite this progress, there is still no solution that combines continuous, low-overhead post-release monitoring with automated server-side regression detection specifically designed for Android applications. This gap motivates the development of the proposed system.

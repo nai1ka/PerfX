@@ -8,7 +8,7 @@ internal object UploadTask {
 
     suspend fun uploadOnce(context: Context): Boolean {
         val db = MetricDatabase.getInstance(context)
-        val batch = db.metricDao().getBatch(Constants.DISK_LIMIT)
+        val batch = db.metricDao().getBatch(Constants.DISK_HARD_LIMIT)
 
         if (batch.isEmpty()) {
             Log.d("PerfX", "No metrics to upload")

@@ -9,8 +9,10 @@ CREATE TABLE users (
 CREATE TABLE projects (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL,
-    package_name TEXT NOT NULL UNIQUE,
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE
+    package_name TEXT NOT NULL,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE (user_id, name),
+    UNIQUE (user_id, package_name)
 );
 
 CREATE TABLE thresholds (

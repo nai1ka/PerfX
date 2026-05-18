@@ -17,9 +17,14 @@ object ProjectsTable : UUIDTable("projects") {
 
     val userId = reference("user_id", UsersTable, onDelete = ReferenceOption.CASCADE)
 
-    val name = text("name").uniqueIndex()
+    val name = text("name")
 
-    val packageName = text("package_name").uniqueIndex()
+    val packageName = text("package_name")
+
+    init {
+        uniqueIndex(userId, name)
+        uniqueIndex(userId, packageName)
+    }
 }
 
 object ThresholdsTable : UUIDTable("thresholds") {

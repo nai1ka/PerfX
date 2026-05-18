@@ -9,7 +9,6 @@ import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
 
 object NetworkClient {
-    private const val BASE_URL = "http:/192.168.1.147:8080/"
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(HttpLoggingInterceptor().apply {
@@ -22,9 +21,14 @@ object NetworkClient {
         ignoreUnknownKeys = true
     }
 
-    val api: MetricsApiService by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
+    private var _api: MetricsApiService? = null
+
+    val api: MetricsApiService
+        get() = _api ?: error("NetworkClient is not initialized. Call PerfX.initialize() first.")
+
+    internal fun initialize(endpointUrl: String) {
+        _api = Retrofit.Builder()
+            .baseUrl(endpointUrl)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()

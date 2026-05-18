@@ -2,17 +2,20 @@ package com.ndevelop.sdk
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import android.os.Bundle
 import androidx.navigation.NavController
 import com.ndevelop.sdk.data.AppInfoProvider
 import com.ndevelop.sdk.data.MetricDatabase
 import com.ndevelop.sdk.data.MetricsRepository
+import com.ndevelop.sdk.data.NetworkClient
 import com.ndevelop.sdk.data.SyncManager
 import com.ndevelop.sdk.models.AppInfo
 import com.ndevelop.sdk.trackers.CpuCollector
 import com.ndevelop.sdk.trackers.FrameTimeCollector
 import com.ndevelop.sdk.trackers.PerformanceCollector
 import com.ndevelop.sdk.trackers.RamCollector
+import com.ndevelop.sdk.trackers.StartupTimeCollector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -42,42 +45,45 @@ object PerfX {
     fun initialize(
         application: Application,
         projectId: String,
+        endpointUrl: String = "http://10.0.2.2:8080/",
     ) {
         if (isRunning) return
 
+        NetworkClient.initialize(endpointUrl)
         appInfo = AppInfoProvider().get(application, projectId)
         db = MetricDatabase.getInstance(application)
-        SyncManager.startPeriodicSync(application)
 
-        val cpuCollector = CpuCollector().apply {
-            isDebug = false
-        }
-
-        val frameCollector = FrameTimeCollector().apply {
-            isDebug = false
-        }
-
-        val ramCollector = RamCollector().apply {
-            isDebug = false
-        }
+        val cpuCollector = CpuCollector().apply { isDebug = false }
+        val frameCollector = FrameTimeCollector().apply { isDebug = false }
+        val ramCollector = RamCollector().apply { isDebug = false }
 
         collectors = listOf(cpuCollector, frameCollector, ramCollector)
 
-        val allMetrics = collectors.map { it.collect(500) }.merge()
-        metricsRepository.observeCollector(
-            flow = allMetrics,
-            db = db,
-            context = application
-        )
+        // Startup is one-shot — observe independently, not part of pause/resume cycle.
+        val startupCollector = StartupTimeCollector(application)
+        metricsRepository.observeOneShot(startupCollector.collect(0), db, application)
+
         registerActivityCallback(application)
         isRunning = true
+    }
+
+    private fun startCollectors(context: Context) {
+        val allMetrics = collectors.map { it.collect(500) }.merge()
+        metricsRepository.observeCollector(flow = allMetrics, db = db, context = context)
+        SyncManager.startPeriodicSync(context)
+    }
+
+    private fun stopCollectors() {
+        collectors.forEach { it.stop() }
+        metricsRepository.stopObserving()
+        SyncManager.stopPeriodicSync()
     }
 
     fun stop(application: Application) {
         if (!isRunning) return
 
         SyncManager.stopPeriodicSync()
-        collectors.forEach { it.stop() }
+        stopCollectors()
         collectors = emptyList()
 
         composeScreenTracker?.stop()
@@ -115,7 +121,7 @@ object PerfX {
                     resumedCount--
                     if (resumedCount <= 0) {
                         resumedCount = 0
-
+                        stopCollectors()
                     }
                 }
             }
@@ -125,7 +131,7 @@ object PerfX {
 
                 resumedCount++
                 if (resumedCount == 1) {
-
+                    startCollectors(activity.applicationContext)
                 }
             }
 

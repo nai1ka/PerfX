@@ -1,0 +1,68 @@
+% !TEX root = /Users/nai1ka/Projects/thesis_template/thesis.tex
+\chapter{Introduction}
+\label{chap:intro}
+
+\section{Background and motivation}
+Mobile applications are now an essential part of everyday life, and users expect them to be fast, responsive, and
+stable. Poor performance (e.g. slow startup, high CPU usage, or freezing UI) can quickly degrade the user experience and result in negative reviews \cite{Tang, FirebasePerf}. Because of this, performance monitoring has become a crucial part of modern software development. 
+
+Performance analysis methods for mobile applications can be divided into two main categories: pre-release profiling
+and post-release monitoring. Pre-release profiling provides detailed insights under controlled laboratory conditions but
+cannot accurately represent the wide variety of real devices and user behaviours. This limitation is critical because of Android fragmentation - the large variety of devices, operating system versions, and hardware configurations.
+The same application may perform differently across devices, which makes lab-based testing results less reliable
+\cite{Zikan, Fragmentation}. In contrast, post-release monitoring reflects actual user conditions but often lacks automated alerting mechanisms. Existing solutions either do not provide alerting at all or rely on very limited predefined thresholds, which require tuning and can easily
+ lead to inaccurate detection. As a result, developers need a way to continuously monitor how an application behaves on real devices under real usage conditions, with the ability to detect performance regressions automatically.
+
+\section{Research Gap}
+
+Current research and existing tools focus on either pre-release profiling (e.g., multi-layer profiling, energy or storage analysis) \cite{ProfileDroid, AndroStep, PowDroid} or post-release monitoring and tracing in the wild \cite{AppInsight, Hubble, Panappticon, PerfProbe}. However, none of them integrate automated performance regression detection. Tools that do provide alerting, such as Firebase Performance Monitoring, rely on hardcoded thresholds, which can lead to a large number of false positives or false negatives \cite{FirebasePerf}. At the same time, studies on regression detection are developed independently and are not connected with continuous monitoring of Android applications \cite{AnomalySurvey, AnomalyEvaluation, Ibidunmoye}. As a result, there is no existing solution that combines continuous post-release performance monitoring with server-side regression detection. This gap is what the current work aims to address.
+
+\section{Research Questions and Aim}
+
+The aim of this thesis is to develop a system for continuous collection of performance metrics from
+running Android application and detect performance regressions in them. The system will collect key metrics directly from users' devices,
+send data to a backend, and notify developers when performance regressions are detected.
+
+The study addresses the following research questions:
+\begin{enumerate}
+    \item How to implement a low-overhead, continuous performance monitoring system for Android applications that can be deployed on real user devices without significantly impacting the user experience?
+    % \item Which metrics are most relevant for detecting performance regressions in Android applications under real-world conditions?
+\item How to accurately detect performance regressions using statistical methods, while minimizing false alerts.
+    \item How effective is the proposed system at detecting performance regressions when tested on real Android applications?
+\end{enumerate}
+
+\section{Novelty and Contribution}
+
+% The novelty of this work lies in combining post-release monitoring with automated regression detection in a single tool.
+% Existing tools either focus on lab profiling or lack intelligent alerting features \cite{AndroidVitals,
+% MonitoringAppPerformance}. For example, widely used tool for performance monitoring Firebase Performance Monitoring provides a limited alerting, which is based on predefind hardcoded thresholds, which can lead to a large number of false positives or false negatives \cite{FirebasePerf}. 
+
+% The proposed soluton addresses this gap by introducing a low-overhead, continuous monitoring system designed for Android's fragmented ecosystem. It provides a regression detection mechanism based on statistical analysis. Unlike threshold-based approaches, the system compares current performance against a historical baseline using percentile shifts and confirms regressions with statistical hypothesis testing, so the developers do not need to configure thresholds manually. As a result, they can receive timely and more reliable notifications about performance regressions and fix problems before they affect significant number of users.
+
+
+The novelty of this work is in combining post-release monitoring with automated performance regression detection in a single tool. The proposed solution introduces a low-overhead, continuous monitoring system designed for Android's fragmented ecosystem. Instead of relying on static thresholds, the system compares current performance against a historical baseline using statistical methods, so developers do not need to configure thresholds manually. As a result, they can receive timely and more reliable notifications about performance regressions and fix problems before they affect a significant number of users.
+
+
+\section{Structure}
+
+The thesis is organized as follows.
+
+Chapter 2 reviews previous research and related work on mobile application performance monitoring and
+performance regression detection. It discusses existing pre-release profiling and post-release monitoring
+approaches, summarizes the performance metrics used in earlier studies, and highlights the research gap
+that motivates this work.
+
+Chapter 3 describes the design of the proposed system. It explains the system requirements, the high-level
+architecture, the design of the mobile SDK and the backend server, and the regression detection methods
+that were considered, including the approach selected for this work.
+
+Chapter 4 presents the implementation of the system, covering the mobile SDK, the backend server, the
+frontend dashboard, and the performance regression detection pipeline.
+
+Chapter 5 evaluates the proposed system. It describes the validation setup, measures the overhead
+introduced by the SDK, compares the accuracy of the collected metrics against reference tools, evaluates
+the regression detection on synthetic regressions, and discusses the results together with their
+limitations.
+
+Finally, Chapter 6 concludes the thesis by summarizing the work, answering the research questions, stating
+the main contribution, and outlining directions for future work.

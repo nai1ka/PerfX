@@ -32,19 +32,10 @@ df["p_value"] = df["p_value"].round(4)
 
 # ── Filters ───────────────────────────────────────────────────────────────────
 
-col1, col2 = st.columns(2)
-
-with col1:
-    projects = ["All"] + sorted(df["project_name"].unique().tolist())
-    selected_project = st.selectbox("Project", projects)
-
-with col2:
-    metrics = ["All"] + sorted(df["metric_id"].unique().tolist())
-    selected_metric = st.selectbox("Metric", metrics)
+metrics = ["All"] + sorted(df["metric_id"].unique().tolist())
+selected_metric = st.selectbox("Metric", metrics)
 
 filtered = df.copy()
-if selected_project != "All":
-    filtered = filtered[filtered["project_name"] == selected_project]
 if selected_metric != "All":
     filtered = filtered[filtered["metric_id"] == selected_metric]
 
@@ -113,13 +104,12 @@ with col_right:
 st.subheader("Regression details")
 
 display_cols = [
-    "project_name", "metric_id", "screen_name", "device_cohort",
+    "metric_id", "screen_name", "device_cohort",
     "baseline_p95", "current_p95", "degradation_percent", "p_value",
     "detected_at",
 ]
 
 col_cfg = {
-    "project_name": st.column_config.TextColumn("Project"),
     "metric_id": st.column_config.TextColumn("Metric"),
     "screen_name": st.column_config.TextColumn("Screen"),
     "device_cohort": st.column_config.TextColumn("Device tier"),

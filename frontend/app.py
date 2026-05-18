@@ -34,7 +34,7 @@ with tab_login:
             st.error("Invalid credentials")
         else:
             save_login(result)
-            st.switch_page("pages/metrics.py")
+            st.switch_page("pages/projects.py")
 
 with tab_signup:
     email = st.text_input("Email", key="signup_email")

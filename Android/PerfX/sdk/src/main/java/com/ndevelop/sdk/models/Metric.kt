@@ -27,4 +27,10 @@ internal sealed interface Metric {
         override val timestamp: Long,
         override val value: Double,
     ): Metric
+
+    data class AppStartup(
+        override val id: String = "appStartup",
+        override val timestamp: Long,
+        override val value: Double,
+    ) : Metric
 }

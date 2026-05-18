@@ -56,7 +56,7 @@ internal class RamCollector : PerformanceCollector() {
             emit(
                 Metric.MemoryUsage(
                     timestamp = timestamp,
-                    value = javaHeapUsedMb
+                    value = pssMb
                 )
             )
 
