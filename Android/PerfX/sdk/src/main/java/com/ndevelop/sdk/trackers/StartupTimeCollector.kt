@@ -5,6 +5,7 @@ import android.app.Application
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
+import android.view.Choreographer
 import android.view.ViewTreeObserver
 import com.ndevelop.sdk.models.Metric
 import kotlinx.coroutines.flow.Flow
@@ -32,8 +33,13 @@ internal class StartupTimeCollector(
                         object : ViewTreeObserver.OnPreDrawListener {
                             override fun onPreDraw(): Boolean {
                                 decorView.viewTreeObserver.removeOnPreDrawListener(this)
-                                if (continuation.isActive) {
-                                    continuation.resume(SystemClock.uptimeMillis())
+                                // Post to Choreographer so the timestamp is captured
+                                // after layout and draw passes complete (vsync boundary),
+                                // not before them as onPreDraw fires.
+                                Choreographer.getInstance().postFrameCallback {
+                                    if (continuation.isActive) {
+                                        continuation.resume(SystemClock.uptimeMillis())
+                                    }
                                 }
                                 return true
                             }

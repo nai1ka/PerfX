@@ -1,22 +1,42 @@
 #!/bin/bash
-# SDK Overhead Measurement Script — Cheddar (Hacker News reader)
+# SDK Overhead Measurement Script
 # Usage:
-#   ./measure_overhead.sh withSdk   — install withSdk flavor and measure
-#   ./measure_overhead.sh noSdk     — install noSdk flavor and measure
+#   ./measure_overhead.sh [withSdk|noSdk] [--build] [options]
 #
-# Results saved to results/withSdk.csv and results/noSdk.csv
-# Run: python3 analyze_overhead.py to compare.
+#   withSdk|noSdk      flavor to install and measure (default: withSdk)
+#   --build            build the flavor APK first; without it the script
+#                      reuses the already-built APK and only installs it
+#   --app-dir PATH     host-app project directory (default: Cheddar)
+#   --package NAME     application id of the installed app
+#   --activity NAME    launch activity
+#
+# Results saved to results/withSdk.csv and results/noSdk.csv.
+# Run both flavors, then analyse in overhead_analysis.ipynb.
 
 set -e
 
-FLAVOR=${1:-withSdk}
+FLAVOR="withSdk"
+DO_BUILD=false
+APP_DIR="/Users/nai1ka/Projects/Cheddar"
 PACKAGE="co.adrianblan.cheddar.debug"
 ACTIVITY="co.adrianblan.cheddar.MainActivity"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        withSdk|noSdk) FLAVOR="$1"; shift ;;
+        --build)       DO_BUILD=true; shift ;;
+        --app-dir)     APP_DIR="$2"; shift 2 ;;
+        --package)     PACKAGE="$2"; shift 2 ;;
+        --activity)    ACTIVITY="$2"; shift 2 ;;
+        -h|--help)     grep '^#' "$0" | sed 's/^#\{1,2\} \{0,1\}//'; exit 0 ;;
+        *) echo "Unknown argument: $1" >&2; exit 1 ;;
+    esac
+done
+
 DURATION_SECS=90
-RESULTS_DIR="$(dirname "$0")/results"
+RESULTS_DIR="$(cd "$(dirname "$0")/.." && pwd)/results"
 OUTPUT="$RESULTS_DIR/${FLAVOR}.csv"
 STARTUP_OUTPUT="$RESULTS_DIR/${FLAVOR}_startup.txt"
-CHEDDAR_DIR="/Users/nai1ka/Projects/Cheddar"
 
 mkdir -p "$RESULTS_DIR"
 
@@ -26,16 +46,19 @@ if ! adb get-state > /dev/null 2>&1; then
     exit 1
 fi
 
-# ── build APK ───────────────────────────────────────────────────────────────
-echo "=== Building $FLAVOR debug APK ==="
-FLAVOR_CAP="$(echo "${FLAVOR:0:1}" | tr '[:lower:]' '[:upper:]')${FLAVOR:1}"
-cd "$CHEDDAR_DIR"
-./gradlew ":app:assemble${FLAVOR_CAP}Debug" --quiet
-cd - > /dev/null
+# ── build APK (optional) ────────────────────────────────────────────────────
+APK_PATH="$APP_DIR/app/build/outputs/apk/${FLAVOR}/debug/app-${FLAVOR}-debug.apk"
+if [ "$DO_BUILD" = true ]; then
+    echo "=== Building $FLAVOR debug APK ==="
+    FLAVOR_CAP="$(echo "${FLAVOR:0:1}" | tr '[:lower:]' '[:upper:]')${FLAVOR:1}"
+    cd "$APP_DIR"
+    ./gradlew ":app:assemble${FLAVOR_CAP}Debug" --quiet
+    cd - > /dev/null
+fi
 
-APK_PATH="$CHEDDAR_DIR/app/build/outputs/apk/${FLAVOR}/debug/app-${FLAVOR}-debug.apk"
 if [ ! -f "$APK_PATH" ]; then
     echo "APK not found at: $APK_PATH"
+    echo "Pass --build to build it first."
     exit 1
 fi
 
@@ -47,7 +70,7 @@ echo ""
 echo "=== Measuring startup time (10 cold starts) ==="
 echo "startup_ms" > "$STARTUP_OUTPUT"
 
-for i in $(seq 1 10); do
+for i in $(seq 1 20); do
     adb shell am force-stop "$PACKAGE" > /dev/null
     sleep 1
     TIME=$(adb shell am start -W -n "$PACKAGE/$ACTIVITY" \
@@ -101,9 +124,10 @@ sleep 4  # wait for feed to load
 # start auto-scroll in background
 auto_scroll "$PACKAGE" &
 SCROLL_PID=$!
+disown   # untrack the job so the shell stays quiet when it is killed below
 trap 'kill $SCROLL_PID 2>/dev/null' EXIT
 
-echo "timestamp_s,cpu_pct,pss_kb,java_heap_kb,threads,rx_bytes,tx_bytes" > "$OUTPUT"
+echo "timestamp_s,cpu_pct,pss_kb,java_heap_kb" > "$OUTPUT"
 
 for i in $(seq 1 "$DURATION_SECS"); do
     TS=$i
@@ -152,24 +176,8 @@ for i in $(seq 1 "$DURATION_SECS"); do
            | grep "^VmRSS:" | awk '{print $2}')
     JAVA=${JAVA:-0}
 
-    # Thread count
-    THREADS=$(adb shell cat /proc/"$PID"/status 2>/dev/null \
-              | grep "^Threads:" | awk '{print $2}')
-    THREADS=${THREADS:-0}
-
-    # Network I/O: cumulative bytes from /proc/<pid>/net/dev is not per-pid;
-    # use /proc/<pid>/net/tcp counters via uid_stat instead
-    UID=$(adb shell cat /proc/"$PID"/status 2>/dev/null \
-          | grep "^Uid:" | awk '{print $2}' | tr -d '\r')
-    RX=0; TX=0
-    if [ -n "$UID" ]; then
-        RX=$(adb shell cat /proc/uid_stat/"$UID"/tcp_rcv 2>/dev/null | tr -d '\r\n')
-        TX=$(adb shell cat /proc/uid_stat/"$UID"/tcp_snd 2>/dev/null | tr -d '\r\n')
-        RX=${RX:-0}; TX=${TX:-0}
-    fi
-
-    echo "$TS,$CPU,$PSS,$JAVA,$THREADS,$RX,$TX" >> "$OUTPUT"
-    echo "  t=${TS}s  CPU=${CPU}%  PSS=${PSS}KB  VmRSS=${JAVA}KB  Threads=${THREADS}  RX=${RX}B  TX=${TX}B"
+    echo "$TS,$CPU,$PSS,$JAVA" >> "$OUTPUT"
+    echo "  t=${TS}s  CPU=${CPU}%  PSS=${PSS}KB  VmRSS=${JAVA}KB"
 done
 
 kill $SCROLL_PID 2>/dev/null
