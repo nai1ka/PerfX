@@ -74,7 +74,7 @@ if submitted:
                 chart_df.sort_values("ts"),
                 x="ts",
                 y="value",
-                color="app_version",
+                color="version_name",
                 title=f"{metric_id} over time"
             )
             st.plotly_chart(fig, width='stretch')

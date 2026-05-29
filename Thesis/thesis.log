@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.1.20)  17 MAY 2026 18:27
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.1.20)  29 MAY 2026 00:22
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**/Users/nai1ka/Projects/thesis_template/thesis
-(/Users/nai1ka/Projects/thesis_template/thesis.tex
+**/Users/nai1ka/Projects/PerfX/Thesis/thesis
+(/Users/nai1ka/Projects/PerfX/Thesis/thesis.tex
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
 (/usr/local/texlive/2024/texmf-dist/tex/latex/extsizes/extreport.cls
@@ -2176,7 +2176,7 @@ Package hyperref Info: Link coloring ON on input line 152.
 \openout5 = `thesis.out'.
 
 \c@lstlisting=\count503
-<title.pdf, id=272, 597.23125pt x 845.1575pt>
+<title.pdf, id=268, 597.23125pt x 845.1575pt>
 File: title.pdf Graphic file (type pdf)
 <use title.pdf>
 Package pdftex.def Info: title.pdf  used on input line 154.
@@ -2185,7 +2185,7 @@ File: title.pdf Graphic file (type pdf)
 <use title.pdf>
 Package pdftex.def Info: title.pdf  used on input line 154.
 (pdftex.def)             Requested size: 597.22978pt x 845.15544pt.
-<title.pdf, id=275, page=1, 597.23125pt x 845.1575pt>
+<title.pdf, id=271, page=1, 597.23125pt x 845.1575pt>
 File: title.pdf Graphic file (type pdf)
 <use title.pdf, page 1>
 Package pdftex.def Info: title.pdf , page1 used on input line 154.
@@ -2259,7 +2259,7 @@ File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.5 \end{abstract}
+l.6 \end{abstract}
                    [1
 
 ])
@@ -2312,21 +2312,21 @@ Chapter 3.
 
 
 ]
-<figs/system_architecture_new.png, id=545, 3681.755pt x 735.74875pt>
+<figs/system_architecture_new.png, id=551, 3681.755pt x 735.74875pt>
 File: figs/system_architecture_new.png Graphic file (type png)
 <use figs/system_architecture_new.png>
-Package pdftex.def Info: figs/system_architecture_new.png  used on input line 34.
+Package pdftex.def Info: figs/system_architecture_new.png  used on input line 35.
 (pdftex.def)             Requested size: 464.42021pt x 92.79913pt.
  [22 <./figs/system_architecture_new.png>] [23]
 LaTeX Font Info:    Font shape `T2A/Tempora-TLF/m/n' will be
-(Font)              scaled to size 10.0pt on input line 64.
+(Font)              scaled to size 10.0pt on input line 65.
 LaTeX Font Info:    Font shape `T2A/Tempora-TLF/m/n' will be
-(Font)              scaled to size 7.0pt on input line 64.
+(Font)              scaled to size 7.0pt on input line 65.
  [24] [25]
-<figs/sequence_diagram.png, id=576, 612.2875pt x 299.1175pt>
+<figs/sequence_diagram.png, id=582, 612.2875pt x 299.1175pt>
 File: figs/sequence_diagram.png Graphic file (type png)
 <use figs/sequence_diagram.png>
-Package pdftex.def Info: figs/sequence_diagram.png  used on input line 102.
+Package pdftex.def Info: figs/sequence_diagram.png  used on input line 103.
 (pdftex.def)             Requested size: 371.53758pt x 181.50293pt.
  [26 <./figs/sequence_diagram.png>] [27] [28] [29]) [30] [31]
 \openout2 = `chapters/chapter4.aux'.
@@ -2366,7 +2366,7 @@ Overfull \hbox (48.2725pt too wide) in paragraph at lines 76--77
  []
 
 [35] [36] [37] [38]
-<figs/postgres_schema.png, id=726, 1210.5225pt x 831.105pt>
+<figs/postgres_schema.png, id=732, 1210.5225pt x 831.105pt>
 File: figs/postgres_schema.png Graphic file (type png)
 <use figs/postgres_schema.png>
 Package pdftex.def Info: figs/postgres_schema.png  used on input line 176.
@@ -2378,24 +2378,24 @@ File: lstlang1.sty 2024/02/21 1.10 listings language file
 LaTeX Warning: Reference `fig:clickhouse_schema' on page 42 undefined on input line 212.
 
 [42]
-<figs/frontend_auth.png, id=776, 1408.26125pt x 434.62375pt>
+<figs/frontend_auth.png, id=782, 1408.26125pt x 434.62375pt>
 File: figs/frontend_auth.png Graphic file (type png)
 <use figs/frontend_auth.png>
 Package pdftex.def Info: figs/frontend_auth.png  used on input line 234.
 (pdftex.def)             Requested size: 371.53758pt x 114.6641pt.
  [43 <./figs/frontend_auth.png>]
-<figs/frontend_projects.png, id=782, 1806.75pt x 991.705pt>
+<figs/frontend_projects.png, id=788, 1806.75pt x 991.705pt>
 File: figs/frontend_projects.png Graphic file (type png)
 <use figs/frontend_projects.png>
 Package pdftex.def Info: figs/frontend_projects.png  used on input line 245.
 (pdftex.def)             Requested size: 371.53758pt x 203.92126pt.
  [44 <./figs/frontend_projects.png>]
-<figs/frontend_metrics_1.png, id=788, 1462.46375pt x 476.78125pt>
+<figs/frontend_metrics_1.png, id=794, 1462.46375pt x 476.78125pt>
 File: figs/frontend_metrics_1.png Graphic file (type png)
 <use figs/frontend_metrics_1.png>
 Package pdftex.def Info: figs/frontend_metrics_1.png  used on input line 267.
 (pdftex.def)             Requested size: 371.53758pt x 121.12291pt.
-<figs/frontend_metrics_2.png, id=789, 1496.59125pt x 979.66pt>
+<figs/frontend_metrics_2.png, id=795, 1496.59125pt x 979.66pt>
 File: figs/frontend_metrics_2.png Graphic file (type png)
 <use figs/frontend_metrics_2.png>
 Package pdftex.def Info: figs/frontend_metrics_2.png  used on input line 274.
@@ -2413,46 +2413,60 @@ Chapter 5.
 
 
 ]
-
-LaTeX Warning: Reference `tab:eval_devices' on page 51 undefined on input line 14.
+Overfull \hbox (21.58896pt too wide) in paragraph at lines 20--30
+ [][] 
+ []
 
 [51] [52]
+LaTeX Font Info:    Font shape `T2A/Tempora-TLF/m/it' will be
+(Font)              scaled to size 12.0pt on input line 76.
+LaTeX Font Info:    Font shape `T2A/Tempora-TLF/m/it' will be
+(Font)              scaled to size 8.0pt on input line 76.
+LaTeX Font Info:    Font shape `T2A/Tempora-TLF/m/it' will be
+(Font)              scaled to size 6.0pt on input line 76.
+ [53]
+<figs/overhead_redmi.png, id=884, 867.24pt x 289.08pt>
+File: figs/overhead_redmi.png Graphic file (type png)
+<use figs/overhead_redmi.png>
+Package pdftex.def Info: figs/overhead_redmi.png  used on input line 97.
+(pdftex.def)             Requested size: 222.91971pt x 74.30328pt.
+<figs/overhead_low.png, id=885, 867.24pt x 289.08pt>
+File: figs/overhead_low.png Graphic file (type png)
+<use figs/overhead_low.png>
+Package pdftex.def Info: figs/overhead_low.png  used on input line 102.
+(pdftex.def)             Requested size: 222.91971pt x 74.30328pt.
+<figs/overhead_medium.png, id=886, 867.24pt x 289.08pt>
+File: figs/overhead_medium.png Graphic file (type png)
+<use figs/overhead_medium.png>
+Package pdftex.def Info: figs/overhead_medium.png  used on input line 109.
+(pdftex.def)             Requested size: 222.91971pt x 74.30328pt.
+<figs/overhead_high.png, id=887, 867.24pt x 289.08pt>
+File: figs/overhead_high.png Graphic file (type png)
+<use figs/overhead_high.png>
+Package pdftex.def Info: figs/overhead_high.png  used on input line 114.
+(pdftex.def)             Requested size: 222.91971pt x 74.30328pt.
+ [54 <./figs/overhead_redmi.png> <./figs/overhead_low.png> <./figs/overhead_medium.png> <./figs/overhead_high.png>] [55] [56]
 
-LaTeX Warning: Reference `tab:eval_overhead' on page 53 undefined on input line 56.
+LaTeX Warning: Reference `tab:eval_regression' on page 57 undefined on input line 153.
 
-
-LaTeX Warning: Reference `tab:eval_overhead' on page 53 undefined on input line 78.
-
-
-LaTeX Warning: Reference `tab:eval_accuracy' on page 53 undefined on input line 85.
-
-[53] [54]
-
-LaTeX Warning: Reference `tab:eval_regression' on page 55 undefined on input line 120.
-
-[55] [56] [57]) [58]
+[57] [58] [59] [60]) [61]
 \openout2 = `chapters/chapter6.aux'.
 
  (./chapters/chapter6.tex
 Chapter 6.
-[59
+[62
 
 
 
 
-] [60] [61] [62] [63]) [64] [65
+] [63] [64] [65] [66]) [67] [68
 
 
 
-] [66] [67] [68] [69]
+] [69] [70] [71] [72]
 \openout2 = `chapters/appex.aux'.
 
- (./chapters/appex.tex)
-
-Package caption Warning: Unused \captionsetup[table] on input line 113.
-See the caption package documentation for explanation.
-
-(./thesis.aux (./chapters/abstract.aux) (./chapters/chapter1.aux) (./chapters/chapter2.aux) (./chapters/chapter3.aux) (./chapters/chapter4.aux) (./chapters/chapter5.aux) (./chapters/chapter6.aux) (./chapters/appex.aux))
+ (./chapters/appex.tex) (./thesis.aux (./chapters/abstract.aux) (./chapters/chapter1.aux) (./chapters/chapter2.aux) (./chapters/chapter3.aux) (./chapters/chapter4.aux) (./chapters/chapter5.aux) (./chapters/chapter6.aux) (./chapters/appex.aux))
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
@@ -2464,25 +2478,42 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 LaTeX Warning: There were undefined references.
 
-Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 813A4B275C281BC39F07213A9E75D146;11551.
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `thesis.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `thesis.out':
+(rerunfilecheck)             Before: 3F300E03BE9CEB6E5699AA8FDCCD7CD9;11353
+(rerunfilecheck)             After:  1711821D5999641ABA26901547E957E8;11760.
+
+Package biblatex Warning: Please (re)run Biber on the file:
+(biblatex)                thesis
+(biblatex)                and rerun LaTeX afterwards.
+
 Package logreq Info: Writing requests to 'thesis.run.xml'.
 \openout1 = `thesis.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 32387 strings out of 474116
- 567760 string characters out of 5743682
- 2031187 words of memory out of 5000000
- 53837 multiletter control sequences out of 15000+600000
- 604326 words of font info for 87 fonts, out of 8000000 for 9000
+ 32494 strings out of 474116
+ 569671 string characters out of 5743682
+ 2032187 words of memory out of 5000000
+ 53918 multiletter control sequences out of 15000+600000
+ 620044 words of font info for 126 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 94i,17n,117p,1590b,2320s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 94i,17n,117p,1534b,2320s stack positions out of 10000i,1000n,20000p,200000b,200000s
+
+pdfTeX warning (dest): name{chapter*.22} has been referenced but does not exist, replaced by a fixed one
+
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/tempora/Tempora-Bold.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/tempora/Tempora-Italic.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/tempora/Tempora-Regular.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfrm1440.pfb>
-Output written on thesis.pdf (70 pages, 1072386 bytes).
+Output written on thesis.pdf (73 pages, 1326439 bytes).
 PDF statistics:
- 1122 PDF objects out of 1200 (max. 8388607)
- 995 compressed objects within 10 object streams
- 319 named destinations out of 1000 (max. 500000)
- 596 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1157 PDF objects out of 1200 (max. 8388607)
+ 1018 compressed objects within 11 object streams
+ 330 named destinations out of 1000 (max. 500000)
+ 608 words of extra memory for PDF output out of 10000 (max. 10000000)
 

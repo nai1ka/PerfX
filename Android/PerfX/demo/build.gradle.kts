@@ -20,6 +20,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Defaults — override per flavor or in local.properties
+        buildConfigField("String", "PROJECT_ID",    "\"\"")
+        buildConfigField("String", "ENDPOINT_URL",  "\"http://10.0.2.2:8080/\"")
     }
 
     flavorDimensions += "monitoring"
@@ -27,10 +31,13 @@ android {
         create("withSdk") {
             dimension = "monitoring"
             buildConfigField("boolean", "SDK_ENABLED", "true")
+            // ← paste your project UUID from the PerfX dashboard here
+            buildConfigField("String", "PROJECT_ID", "\"c0fabf43-bbd4-4f9e-bdab-ee5019727b00\"")
         }
         create("noSdk") {
             dimension = "monitoring"
             buildConfigField("boolean", "SDK_ENABLED", "false")
+            buildConfigField("String", "PROJECT_ID", "\"\"")
         }
     }
 

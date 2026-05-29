@@ -1,5 +1,4 @@
 clickhouse-connect
 pandas
-scipy
 psycopg2-binary
 requests

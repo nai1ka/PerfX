@@ -79,10 +79,11 @@ class ClickHouseClient(
                     put("metric_type", m.metricType)
                     put("screen_name", m.screenName)
                     put("value", m.value)
-                    put("app_version", batch.appInfo.appVersion)
+                    put("version_name", batch.appInfo.versionName)
+                    put("version_code", batch.appInfo.versionCode)
                     put("os_version", batch.appInfo.osVersion)
                     put("device_model", batch.appInfo.deviceModel)
-                     put("device_cohort", cohort)
+                    put("device_cohort", cohort)
                 }
                 append(obj.toString())
                 append('\n')

@@ -18,7 +18,7 @@ user = st.session_state.get("user")
 if user is not None:
     # st.success(f"Logged in as {user['email']}")
     # st.info("Use the sidebar to open Dashboard, Metrics, Analysis, or Projects.")
-    st.switch_page("pages/dashboard.py")
+    st.switch_page("pages/projects.py")
 
 
 # Login / Signup UI
@@ -50,4 +50,4 @@ with tab_signup:
                 st.error("Signup failed")
             else:
                 save_login(result)
-                st.switch_page("pages/dashboard.py")
+                st.switch_page("pages/projects.py")

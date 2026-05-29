@@ -1,29 +1,36 @@
+import os
+
 # ── ClickHouse ────────────────────────────────────────────────────────────────
 
-CH_HOST = "localhost"
-CH_PORT = 8123
-CH_USER = "metrics_user"
-CH_PASSWORD = "metrics_pass"
-CH_DATABASE = "metrics"
+CH_HOST = os.getenv("CH_HOST", "localhost")
+CH_PORT = int(os.getenv("CH_PORT", "8123"))
+CH_USER = os.getenv("CH_USER", "metrics_user")
+CH_PASSWORD = os.getenv("CH_PASSWORD", "metrics_pass")
+CH_DATABASE = os.getenv("CH_DATABASE", "metrics")
 
 # ── PostgreSQL ────────────────────────────────────────────────────────────────
 
-PG_HOST = "localhost"
-PG_DB = "perfx"
-PG_USER = "perfx_user"
-PG_PASSWORD = "perfx_pass"
+PG_HOST = os.getenv("PG_HOST", "localhost")
+PG_PORT = int(os.getenv("PG_PORT", "5432"))
+PG_DB = os.getenv("PG_DB", "perfx")
+PG_USER = os.getenv("PG_USER", "perfx_user")
+PG_PASSWORD = os.getenv("PG_PASSWORD", "perfx_pass")
 
 # ── Detection parameters ──────────────────────────────────────────────────────
 
-# Baseline window: [now - BASELINE_WINDOW_MINUTES  …  now - CURRENT_WINDOW_MINUTES]
-# Current  window: [now - CURRENT_WINDOW_MINUTES   …  now]
-BASELINE_WINDOW_MINUTES = 10   # 7 days
-CURRENT_WINDOW_MINUTES  = 2        # last 24 h
+# Minimum raw samples per (project, metric, screen, cohort, version) group
+# before that version is considered "mature" and eligible for comparison.
+# Set to a small value for local testing; production intent: 1000.
+MIN_SAMPLES_PER_VERSION = 50
 
-# Default relative P95 degradation threshold (15 %).
-# Per-project/metric overrides come from the Postgres `thresholds` table.
-DEFAULT_P95_THRESHOLD = 0.15
-DEFAULT_P_VALUE       = 0.05
+# Relative median degradation threshold (15 %).
+# A regression is flagged when:
+#   Δ = (median_current − median_baseline) / median_baseline > threshold
+DEFAULT_MEDIAN_THRESHOLD = 0.15
 
-# Minimum raw samples per window required before running Mann-Whitney U test.
-MIN_SAMPLES = 30
+# Hours without any incoming traffic for a version before it is treated as
+# "rolled back" and the corresponding open regression is auto-closed.
+ROLLED_BACK_QUIET_HOURS = 48
+
+# Seconds between detector runs.
+POLL_INTERVAL_SECONDS = 30 # must be 3600

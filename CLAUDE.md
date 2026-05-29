@@ -75,6 +75,32 @@ cd Thesis && latexmk -pdf thesis.tex     # builds thesis.pdf; biblatex with the 
 - `Analysis/regression_detection/config.py` holds detection parameters: baseline vs. current window sizes, default P95 degradation threshold (`DEFAULT_P95_THRESHOLD`), p-value, and `MIN_SAMPLES`. The window values in `config.py` are currently set to small numbers for local testing — comments describe the intended production values.
 - Thresholds resolve in a fallback chain: exact `(project, metric, screen)` → project-wide `(project, metric, None)` → `DEFAULT_P95_THRESHOLD`.
 
+## Evaluation / validation setup
+
+Overhead experiments were run on three AVDs and one physical device:
+
+| Name | Type | Android API | RAM | CPU cores | Cohort |
+|---|---|---|---|---|---|
+| `PerfX_Low` | AVD (arm64-v8a) | 30 (Android 11) | 2 GB | 2 | Low |
+| `PerfX_Medium` | AVD (arm64-v8a) | 33 (Android 13) | 4 GB | 4 | Medium |
+| `PerfX_High` | AVD (arm64-v8a) | 34 (Android 14) | 8 GB | 4 | High |
+| `Redmi_Note_9_Pro` | Physical device | — | — | — | Real device |
+
+Results for each target live in `Android/evaluation/results/<name>/` (four files per run: `noSdk.csv`, `withSdk.csv`, `noSdk_startup.txt`, `withSdk_startup.txt`).
+
+### Evaluation scripts
+
+| Script | Purpose |
+|---|---|
+| `Android/evaluation/utils/generate_emulators.sh` | Create and configure the three AVDs from scratch |
+| `Android/evaluation/run/run_overhead_on_avd.sh <avd-name>` | Launch a named AVD, run both flavors, copy results |
+| `Android/evaluation/measure/measure_overhead.sh <flavor>` | Measure CPU/RAM/startup for one flavor on the running device |
+| `Android/evaluation/measure/measure_accuracy.sh` | Accuracy experiment (ground-truth metric comparison) |
+| `Android/evaluation/run/run_regression_experiments.py` | Regression-detection experiment driver |
+| `Android/evaluation/analysis/` | Python notebooks/scripts that post-process CSVs into charts |
+
+The `noSdk`/`withSdk` flavors are variants of the `:demo` app built with and without the SDK injected, controlled by a Gradle product flavor.
+
 ## Conventions
 
 - SDK and demo code use package `com.ndevelop.*`; backend uses `com.perfx.*`.

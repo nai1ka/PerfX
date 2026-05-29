@@ -1,217 +1,240 @@
-import logging
+"""
+Version-based regression detector.
 
-from scipy.stats import mannwhitneyu
+Algorithm
+---------
+For every (project_id, metric_id, screen_name, device_cohort) group:
+
+1. Pull mature versions (sample_count ≥ MIN_SAMPLES_PER_VERSION) from
+   ClickHouse, together with their per-group medians.
+
+2. Sort versions by version_code.  For each consecutive pair
+   (baseline_version, current_version) compute the relative median shift:
+
+       Δ = (median_current − median_baseline) / median_baseline
+
+   If Δ > DEFAULT_MEDIAN_THRESHOLD → UPSERT an 'open' regression into
+   Postgres (updates stats if the regression already exists and is open;
+   leaves acknowledged/resolved rows untouched).
+
+3. Auto-close — superseded:
+   If a newer mature version exists for the same group, all open regressions
+   whose current_version_code is less than that max are resolved as
+   'superseded'.
+
+4. Auto-close — rolled back:
+   For open regressions older than ROLLED_BACK_QUIET_HOURS, check whether
+   the current version still has any recent traffic in ClickHouse.  If not,
+   resolve as 'rolled_back'.
+"""
+
+import logging
+from collections import defaultdict
 
 from .config import (
-    BASELINE_WINDOW_MINUTES,
-    CURRENT_WINDOW_MINUTES,
-    DEFAULT_P95_THRESHOLD,
-    DEFAULT_P_VALUE,
-    MIN_SAMPLES,
+    DEFAULT_MEDIAN_THRESHOLD,
+    MIN_SAMPLES_PER_VERSION,
+    ROLLED_BACK_QUIET_HOURS,
 )
 from .queries import (
-    PERCENTILE_QUERY,
-    RAW_SAMPLES_QUERY,
-    PG_THRESHOLDS_QUERY,
-    PG_INSERT_REGRESSION,
+    MATURE_MEDIANS_QUERY,
+    RECENT_TRAFFIC_QUERY,
+    PG_UPSERT_REGRESSION,
+    PG_OPEN_REGRESSIONS,
+    PG_CLOSE_SUPERSEDED,
+    PG_CLOSE_ROLLED_BACK,
 )
 
 log = logging.getLogger(__name__)
 
 
-def load_thresholds(pg_conn) -> dict:
-    """
-    Returns a dict keyed by (project_id, metric_id, screen_name) ->
-    p95_threshold (float). screen_name may be None for project-wide rules.
-    """
-    thresholds: dict = {}
-    try:
-        with pg_conn.cursor() as cur:
-            cur.execute(PG_THRESHOLDS_QUERY)
-            for project_id, metric_id, screen_name, value in cur.fetchall():
-                thresholds[(project_id, metric_id, screen_name)] = value
-        log.info("Loaded %d threshold overrides from Postgres.", len(thresholds))
-    except Exception as exc:
-        log.warning("Could not load thresholds: %s - using defaults.", exc)
-    return thresholds
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
+def _fetch_mature_medians(ch_client) -> dict:
+    """
+    Query ClickHouse for all (group, version) combinations that have at least
+    MIN_SAMPLES_PER_VERSION data points.
 
-def resolve_threshold(
-    thresholds: dict,
-    project_id: str,
-    metric_id: str,
-    screen_name: str,
-) -> float:
+    Returns a dict:
+        (project_id, metric_id, screen_name, device_cohort)
+            → sorted list of (version_code, version_name, median, count)
     """
-    Threshold fallback chain:
-      1. exact  (project_id, metric_id, screen_name)
-      2. project-wide (project_id, metric_id, None)
-      3. DEFAULT_P95_THRESHOLD
-    """
-    return (
-        thresholds.get((project_id, metric_id, screen_name))
-        or thresholds.get((project_id, metric_id, None))
-        or DEFAULT_P95_THRESHOLD
+    query = MATURE_MEDIANS_QUERY.format(min_samples=MIN_SAMPLES_PER_VERSION)
+    rows = ch_client.query(query).result_rows
+
+    groups: dict = defaultdict(list)
+    for (project_id, metric_id, screen_name, device_cohort,
+         version_code, version_name, med, cnt) in rows:
+        key = (str(project_id), str(metric_id), str(screen_name), str(device_cohort))
+        groups[key].append((int(version_code), str(version_name), float(med), int(cnt)))
+
+    # Sort each group by version_code ascending (ClickHouse ORDER BY already
+    # does this, but enforce it here for safety).
+    for key in groups:
+        groups[key].sort(key=lambda x: x[0])
+
+    log.info(
+        "ClickHouse: %d mature (group, version) entries across %d groups.",
+        sum(len(v) for v in groups.values()),
+        len(groups),
     )
+    return groups
 
 
-def fetch_raw_values(
-    ch_client,
-    project_id: str,
-    metric_id: str,
-    screen_name: str,
-    device_cohort: str,
-    window_minutes: int,
-    extra_filter: str = "",
-) -> list[float]:
-    query = RAW_SAMPLES_QUERY.format(
-        project_id=project_id,
-        metric_id=metric_id,
-        screen_name=screen_name,
-        device_cohort=device_cohort,
-        window_minutes=window_minutes,
-        extra_filter=extra_filter,
-    )
-    return [row[0] for row in ch_client.query(query).result_rows]
-
-
-def validate_regression(
-    baseline_values: list[float],
-    current_values: list[float],
-    baseline_p95: float,
-    current_p95: float,
-    p95_threshold: float,
-) -> tuple[bool, float | None]:
-    """
-    Step 1 - Rolling Window Percentile Shift:
-        Flags if relative P95 degradation exceeds p95_threshold.
-    Step 2 - Mann-Whitney U test:
-        Statistically confirms the shift is not random noise (a = 0.05).
-
-    Returns (is_regression, p_value).
-    """
-    delta = (current_p95 - baseline_p95) / baseline_p95
-    if delta <= p95_threshold:
-        return False, None
-
-    if len(baseline_values) < MIN_SAMPLES or len(current_values) < MIN_SAMPLES:
-        log.debug(
-            "Percentile shift flagged but not enough samples "
-            "(baseline=%d, current=%d) - skipping Mann-Whitney.",
-            len(baseline_values),
-            len(current_values),
-        )
-        return False, None
-
-    _, p_value = mannwhitneyu(
-        current_values, baseline_values, alternative="greater"
-    )
-    return (p_value < DEFAULT_P_VALUE), p_value
-
-
-def save_regression(
-    pg_conn,
-    project_id: str,
-    metric_id: str,
-    screen_name: str,
-    device_cohort: str,
-    baseline_p95: float,
-    current_p95: float,
-    degradation_percent: float,
-    p_value: float,
-) -> None:
+def _upsert_regression(pg_conn, project_id, metric_id, screen_name,
+                       device_cohort, baseline_vc, baseline_vn,
+                       current_vc, current_vn,
+                       baseline_med, current_med, delta_pct,
+                       baseline_cnt, current_cnt) -> None:
     with pg_conn.cursor() as cur:
-        cur.execute(PG_INSERT_REGRESSION, (
-            project_id,
-            metric_id,
-            screen_name,
-            device_cohort,
-            float(baseline_p95),
-            float(current_p95),
-            float(degradation_percent),
-            float(p_value),
+        cur.execute(PG_UPSERT_REGRESSION, (
+            project_id, metric_id, screen_name, device_cohort,
+            baseline_vc, baseline_vn,
+            current_vc, current_vn,
+            baseline_med, current_med, delta_pct,
+            baseline_cnt, current_cnt,
         ))
     pg_conn.commit()
 
 
-def run_detection(ch_client, pg_conn) -> None:
-    log.info("Starting regression detection run.")
-    thresholds = load_thresholds(pg_conn)
+# ── Detection pass ────────────────────────────────────────────────────────────
 
-    agg_rows = ch_client.query(PERCENTILE_QUERY).result_rows
-    log.info("Aggregation returned %d cohort groups.", len(agg_rows))
-
+def _detect_regressions(ch_client, pg_conn, groups: dict) -> None:
+    """
+    Iterate all consecutive version pairs per group and UPSERT regressions
+    when the median shift exceeds the threshold.
+    """
+    total_pairs = 0
     regressions_found = 0
 
-    for row in agg_rows:
-        (
-            project_id, metric_id, screen_name, device_cohort,
-            baseline_p95, current_p95, _baseline_count, _current_count,
-        ) = row
-
-        p95_thr = resolve_threshold(
-            thresholds, project_id, metric_id, screen_name
-        )
-        delta_p95 = (current_p95 - baseline_p95) / baseline_p95
-
-        log.debug(
-            "%s | %s | %s | %s  baseline=%.2f current=%.2f delta=%.1f%%",
-            project_id, metric_id, screen_name, device_cohort,
-            baseline_p95, current_p95, delta_p95 * 100,
-        )
-
-        if delta_p95 <= p95_thr:
+    for (project_id, metric_id, screen_name, device_cohort), versions in groups.items():
+        if len(versions) < 2:
             continue
 
-        log.info(
-            "P95 shift %+.1f%% for %s / %s / %s / %s - fetching raw samples.",
-            delta_p95 * 100, project_id, metric_id, screen_name, device_cohort,
-        )
+        for i in range(len(versions) - 1):
+            baseline_vc, baseline_vn, baseline_med, baseline_cnt = versions[i]
+            current_vc,  current_vn,  current_med,  current_cnt  = versions[i + 1]
+            total_pairs += 1
 
-        baseline_values = fetch_raw_values(
-            ch_client, project_id, metric_id, screen_name, device_cohort,
-            window_minutes=BASELINE_WINDOW_MINUTES,
-            extra_filter=(
-                f"AND ts < now() - INTERVAL {CURRENT_WINDOW_MINUTES} MINUTE"
-            ),
-        )
-        current_values = fetch_raw_values(
-            ch_client, project_id, metric_id, screen_name, device_cohort,
-            window_minutes=CURRENT_WINDOW_MINUTES,
-        )
+            if baseline_med <= 0:
+                continue
 
-        is_regression, p_value = validate_regression(
-            baseline_values, current_values,
-            baseline_p95, current_p95,
-            p95_thr,
-        )
+            delta = (current_med - baseline_med) / baseline_med
 
-        if is_regression and p_value is not None:
-            regressions_found += 1
-            log.warning(
-                "REGRESSION CONFIRMED: %s | %s | %s | %s  "
-                "delta_p95=%.1f%%  p_value=%.4f",
+            log.debug(
+                "%s | %s | %s | %s  v%d→v%d  baseline=%.2f  current=%.2f  Δ=%.1f%%",
                 project_id, metric_id, screen_name, device_cohort,
-                delta_p95 * 100, p_value,
+                baseline_vc, current_vc,
+                baseline_med, current_med, delta * 100,
             )
-            save_regression(
-                pg_conn,
+
+            if delta > DEFAULT_MEDIAN_THRESHOLD:
+                regressions_found += 1
+                log.warning(
+                    "REGRESSION: %s | %s | %s | %s  v%d→v%d  Δ=+%.1f%%",
+                    project_id, metric_id, screen_name, device_cohort,
+                    baseline_vc, current_vc, delta * 100,
+                )
+                _upsert_regression(
+                    pg_conn,
+                    project_id, metric_id, screen_name, device_cohort,
+                    baseline_vc, baseline_vn,
+                    current_vc,  current_vn,
+                    baseline_med, current_med, round(delta * 100, 2),
+                    baseline_cnt, current_cnt,
+                )
+
+    log.info(
+        "Detection: %d regression(s) found out of %d consecutive version pairs.",
+        regressions_found, total_pairs,
+    )
+
+
+# ── Auto-close: superseded ────────────────────────────────────────────────────
+
+def _close_superseded(pg_conn, groups: dict) -> None:
+    """
+    For each group, find the latest mature version_code.  Any open regression
+    in that group whose current_version_code is strictly less than that max is
+    now superseded by a newer release.
+    """
+    closed = 0
+    with pg_conn.cursor() as cur:
+        for (project_id, metric_id, screen_name, device_cohort), versions in groups.items():
+            if not versions:
+                continue
+            max_vc = versions[-1][0]   # already sorted ascending
+            cur.execute(PG_CLOSE_SUPERSEDED, (
+                project_id, metric_id, screen_name, device_cohort, max_vc,
+            ))
+            closed += cur.rowcount
+    pg_conn.commit()
+    if closed:
+        log.info("Auto-closed %d regression(s) as superseded.", closed)
+
+
+# ── Auto-close: rolled back ───────────────────────────────────────────────────
+
+def _close_rolled_back(ch_client, pg_conn) -> None:
+    """
+    For every open regression that is older than ROLLED_BACK_QUIET_HOURS,
+    check whether its current version still has recent ClickHouse traffic.
+    If not, resolve it as 'rolled_back'.
+    """
+    with pg_conn.cursor() as cur:
+        cur.execute(PG_OPEN_REGRESSIONS, (ROLLED_BACK_QUIET_HOURS,))
+        open_regressions = cur.fetchall()
+
+    if not open_regressions:
+        return
+
+    log.info(
+        "Rolled-back check: %d open regression(s) older than %dh.",
+        len(open_regressions), ROLLED_BACK_QUIET_HOURS,
+    )
+
+    closed = 0
+    with pg_conn.cursor() as cur:
+        for (reg_id, project_id, metric_id,
+             screen_name, device_cohort, current_vc) in open_regressions:
+
+            traffic_query = RECENT_TRAFFIC_QUERY.format(
                 project_id=project_id,
                 metric_id=metric_id,
                 screen_name=screen_name,
                 device_cohort=device_cohort,
-                baseline_p95=baseline_p95,
-                current_p95=current_p95,
-                degradation_percent=delta_p95 * 100,
-                p_value=p_value,
+                version_code=current_vc,
+                quiet_hours=ROLLED_BACK_QUIET_HOURS,
             )
-        else:
-            log.debug(
-                "No regression for %s / %s / %s / %s (p_value=%s).",
-                project_id, metric_id, screen_name, device_cohort, p_value,
-            )
+            result = ch_client.query(traffic_query).result_rows
+            recent_count = result[0][0] if result else 0
 
-    log.info(
-        "Run complete - %d regression(s) confirmed out of %d cohort groups.",
-        regressions_found, len(agg_rows),
-    )
+            if recent_count == 0:
+                cur.execute(PG_CLOSE_ROLLED_BACK, (reg_id,))
+                closed += 1
+                log.info(
+                    "Auto-closed regression %s as rolled_back (v%d silent for %dh).",
+                    reg_id, current_vc, ROLLED_BACK_QUIET_HOURS,
+                )
+
+    pg_conn.commit()
+    if closed:
+        log.info("Auto-closed %d regression(s) as rolled_back.", closed)
+
+
+# ── Entry point ───────────────────────────────────────────────────────────────
+
+def run_detection(ch_client, pg_conn) -> None:
+    log.info("Starting regression detection run.")
+
+    groups = _fetch_mature_medians(ch_client)
+
+    if not groups:
+        log.info("No mature versions found — skipping.")
+        return
+
+    _detect_regressions(ch_client, pg_conn, groups)
+    _close_superseded(pg_conn, groups)
+    _close_rolled_back(ch_client, pg_conn)
+
+    log.info("Detection run complete.")

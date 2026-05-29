@@ -11,8 +11,11 @@ data class AppInfo(
     @SerialName("package_name")
     val packageName: String,
 
-    @SerialName("app_version")
-    val appVersion: String,
+    @SerialName("version_name")
+    val versionName: String,
+
+    @SerialName("version_code")
+    val versionCode: Int,
 
     @SerialName("os_version")
     val osVersion: String,

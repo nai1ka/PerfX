@@ -2412,11 +2412,10 @@
     <bcf:citekey order="36" intorder="1">KotlinFirst</bcf:citekey>
     <bcf:citekey order="37" intorder="1">AndroidVitals</bcf:citekey>
     <bcf:citekey order="38" intorder="1">schulze2024clickhouse</bcf:citekey>
-    <bcf:citekey order="39" intorder="1">AndroidTracing</bcf:citekey>
-    <bcf:citekey order="40" intorder="1">Panappticon</bcf:citekey>
-    <bcf:citekey order="41" intorder="1">FirebasePerf</bcf:citekey>
-    <bcf:citekey order="42" intorder="1">FBDetect</bcf:citekey>
-    <bcf:citekey order="43" intorder="1">Saraiva</bcf:citekey>
+    <bcf:citekey order="39" intorder="1">Panappticon</bcf:citekey>
+    <bcf:citekey order="40" intorder="1">FirebasePerf</bcf:citekey>
+    <bcf:citekey order="41" intorder="1">FBDetect</bcf:citekey>
+    <bcf:citekey order="42" intorder="1">Saraiva</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="none">

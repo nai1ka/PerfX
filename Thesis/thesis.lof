@@ -11,4 +11,5 @@
 \contentsline {figure}{\numberline {4.4}{\ignorespaces Metrics Explorer — filter selection}}{45}{figure.caption.16}%
 \contentsline {figure}{\numberline {4.5}{\ignorespaces Metrics Explorer - frame time chart with a detected regression}}{45}{figure.caption.17}%
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces SDK overhead charts for all four test devices. Each chart shows mean CPU usage, PSS memory, and cold-start time without and with the SDK enabled.}}{54}{figure.caption.21}%
 \addvspace {10\p@ }

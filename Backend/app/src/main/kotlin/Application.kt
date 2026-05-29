@@ -1,5 +1,7 @@
 package com.perfx
 
+import com.perfx.data.ClickHouseClient
+import com.perfx.jobs.VersionSyncJob
 import com.perfx.plugins.configureDatabases
 import com.perfx.plugins.configureSecurity
 import configureSerialization
@@ -15,6 +17,7 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     val authRepository = PostgresAuthRepository()
+
     install(StatusPages) {
         exception<Throwable> { call, cause ->
             cause.printStackTrace()
@@ -26,4 +29,17 @@ fun Application.module() {
     configureSerialization()
     configureSecurity()
     configureRouting(authRepository)
+
+    // Background job: sync version catalogue from ClickHouse → Postgres
+    val clickHouseClient = ClickHouseClient(
+        baseUrl  = System.getenv("CLICKHOUSE_URL")      ?: "http://localhost:8123",
+        db       = System.getenv("CLICKHOUSE_DB")       ?: "metrics",
+        user     = System.getenv("CLICKHOUSE_USER")     ?: "metrics_user",
+        password = System.getenv("CLICKHOUSE_PASSWORD") ?: "metrics_pass",
+    )
+    VersionSyncJob(
+        clickHouseClient = clickHouseClient,
+        authRepository   = authRepository,
+        scope            = this,
+    ).start()
 }

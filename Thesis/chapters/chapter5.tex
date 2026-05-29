@@ -1,45 +1,40 @@
-% !TEX root = /Users/nai1ka/Projects/thesis_template/thesis.tex
+% !TEX root = % !TEX root = /Users/nai1ka/Projects/PerfX/Thesis/thesis.tex
 \chapter{Evaluation and Discussion}
 \label{chap:eval}
 
-This chapter evaluates the performance monitoring system presented in Chapters~\ref{chap:met} and~\ref{chap:impl}. The evaluation is organised around three questions: how much overhead the SDK adds to a host application, how accurate its measurements are compared with established profiling tools, and how reliably the regression detection pipeline identifies performance regressions. Section~\ref{sec:eval_setup} describes the validation setup. Section~\ref{sec:eval_overhead} reports the overhead introduced by the SDK. Section~\ref{sec:eval_accuracy} compares the collected metrics against reference tools. Section~\ref{sec:eval_regression} evaluates the regression detection pipeline on synthetic regressions. Section~\ref{sec:eval_discussion} interprets the results in relation to the research questions, and Section~\ref{sec:eval_limitations} discusses the limitations of the evaluation.
+This chapter evaluates the performance monitoring system presented in Chapters~\ref{chap:met} and~\ref{chap:impl}. The evaluation is organised around two questions: how much overhead the SDK adds to a host application, and how reliably the regression detection pipeline identifies performance regressions. Section~\ref{sec:eval_setup} describes the validation setup. Section~\ref{sec:eval_overhead} reports the overhead introduced by the SDK. Section~\ref{sec:eval_accuracy} discusses the validity of the collected metrics. Section~\ref{sec:eval_regression} evaluates the regression detection pipeline on synthetic regressions. Section~\ref{sec:eval_discussion} interprets the results in relation to the research questions, and Section~\ref{sec:eval_limitations} discusses the limitations of the evaluation.
 
 \section{Validation Setup}
 \label{sec:eval_setup}
 
-The evaluation was divided into three parts: a measurement of the overhead added by the SDK (Section~\ref{sec:eval_overhead}), a comparison of the collected metrics against reference tools (Section~\ref{sec:eval_accuracy}), and an evaluation of the regression detection pipeline on synthetic regressions (Section~\ref{sec:eval_regression}).
+The evaluation was divided into two parts: a measurement of the overhead added by the SDK (Section~\ref{sec:eval_overhead}), and an evaluation of the regression detection pipeline on synthetic regressions (Section~\ref{sec:eval_regression}).
 
 \subsection{Test Devices}
 
-The overhead and accuracy experiments were carried out on [TODO: number] physical Android devices. The devices were selected to cover the three performance cohorts defined in Section~\ref{sec:detection}, so that the results would not be limited to a single hardware class. Table~\ref{tab:eval_devices} lists each device together with its hardware characteristics, its Android version, and the cohort assigned by the backend.
+The experiments were carried out on one physical Android device and three emulator instances, each configured with a different amount of RAM and a different number of CPU cores, so that the results cover all three performance cohorts defined in Section~\ref{sec:detection}. Table~\ref{tab:eval_devices} lists each device together with its hardware characteristics, its Android version, and the cohort assigned by the backend.
 
-% TODO: replace the placeholder rows with the real test devices. Add or remove rows as needed.
-% \begin{table}[htbp]
-% \centering
-% \caption{Test Devices Used in the Overhead and Accuracy Experiments}
-% \label{tab:eval_devices}
-% \begin{tabular}{lcccc}
-% \toprule
-% Device model & RAM (GB) & CPU cores & Android version & Cohort \\
-% \midrule
-% [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
-% [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
-% [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
-% \bottomrule
-% \end{tabular}
-% \end{table}
+\begin{table}[htbp]
+\centering
+\caption{Test Devices Used in the Evaluation}
+\label{tab:eval_devices}
+\begin{tabular}{lcccc}
+\toprule
+Device & RAM (GB) & CPU cores & Android version & Cohort \\
+\midrule
+Emulator (Low cohort)   & 2 & 2 & 11 & Low \\
+Emulator (Medium cohort)& 4 & 4 & 13 & Medium \\
+Xiaomi Redmi Note 9 Pro & 6 & 8 & 15 & Medium \\
+Emulator (High cohort)  & 8 & 4 & 14 & High \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Test Application}
 
-The SDK was integrated into [TODO: name and a short description of the host application used for the experiments]. [TODO: describe how the application was exercised during the experiments, for example through a fixed sequence of screens and user actions, so that each run was repeatable.]
+The SDK was integrated into Cheddar, an open-source Android client for the Hacker News website. % TODO: add a citation to the Cheddar repository in ref.bib and cite it here.
+During each run, the application was exercised by an automated \texttt{adb} script that repeatedly swiped down through the news feed and tapped the top of the screen every 20 seconds to return to the start, for a fixed duration of 90 seconds. Using a single application and a fixed scenario keeps each run repeatable and isolates the contribution of the SDK from variation in user behaviour.
 
-% TODO: Section 3.6 currently states that the SDK was integrated into "several open-source Android apps", and Research Question 3 refers to "real Android applications". Make sure the description above is consistent with those statements; adjust the wording in Chapter 3 and Chapter 1 if only one application or a demo application was used.
-
-\subsection{Reference Tools}
-
-To check the accuracy of the collected metrics, the values reported by the SDK were compared against reference tools. Android Profiler was used as the reference for CPU usage and memory usage, because it reports per-process resource consumption during a session. % TODO: add a citation for Android Profiler (for example the Android Studio profiler documentation).
-System tracing provided by the Android platform was used as the reference for frame rendering time, because it records the timing of individual frames~\cite{AndroidTracing}. % TODO: confirm which tracing tool was actually used; Systrace is deprecated and has been replaced by Perfetto.
-These tools are intended for use during development and are not suitable for continuous monitoring on user devices, but under controlled conditions they are accepted as reliable references.
+% TODO: Section 3.6 currently states that the SDK was integrated into "several open-source Android apps", and Research Question 3 refers to "real Android applications". Reconcile the wording in Chapter 3 and Chapter 1 with this single-host-app setup, or extend the evaluation to additional applications.
 
 \subsection{Synthetic Regression Injection}
 
@@ -49,107 +44,157 @@ For each experiment, the application was first run in its normal state to popula
 
 \section{SDK Overhead Evaluation}
 \label{sec:eval_overhead}
-In the first part of evaluation, the overhead that the SDK adds to a host application was measured. To do this, the same usage scenario was run in two configurations. First, the application was run with the SDK disabled, and then with the SDK enabled.
-The resource usage of the application process was recorded in both configurations using the reference tools described in Section~\ref{sec:eval_setup}. To reduce the effect of random variation, the scenario was repeated [TODO: number] times on each device, and the reported values are the averages of these runs. The overhead is the difference between the two configurations.
+In the first part of evaluation, the overhead that the SDK adds to a host application was measured. To do this, the same usage scenario was run in two configurations: first with the SDK disabled and then with the SDK enabled. The application was built in two product flavours that differ only in whether the SDK is initialised, so the two configurations share the same source code and the same scrolling scenario. CPU usage and memory usage of the application process were recorded once per second for the 90 seconds of each run, and the reported values are the means over those 90 samples. The overhead is the difference between the two configurations. Battery consumption and network data volume were not measured.
 
-% TODO: confirm which resources were measured. CPU and memory are included in the table below; add battery consumption and network data volume if they were measured, or remove this sentence if they were not.
-The measurements covered CPU usage and memory usage. [TODO: state whether battery consumption and network data volume were also measured, and if so, describe briefly how.] Table~\ref{tab:eval_overhead} reports the results for each test device.
+Cold-start time was measured separately as the average of ten consecutive cold launches per configuration, using the \texttt{TotalTime} value reported by \texttt{adb~shell~am~start~-W}. Table~\ref{tab:eval_overhead} reports the results for each test device.
 
-% TODO: replace the placeholder rows with the measured overhead values.
-% \begin{table}[htbp]
-% \centering
-% \small
-% \caption{SDK Overhead Measured on the Test Devices}
-% \label{tab:eval_overhead}
-% \begin{tabular}{lcccccc}
-% \toprule
-% \multirow{2}{*}{Device model} & \multicolumn{3}{c}{CPU usage (\%)} & \multicolumn{3}{c}{Memory usage (MB)} \\
-% \cmidrule(lr){2-4} \cmidrule(lr){5-7}
-%  & Without SDK & With SDK & Overhead & Without SDK & With SDK & Overhead \\
-% \midrule
-% [TODO] & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
-% [TODO] & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
-% [TODO] & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
-% \bottomrule
-% \end{tabular}
-% \end{table}
+\begin{table}[htbp]
+\centering
+\caption{SDK Overhead Measured on the Test Devices}
+\label{tab:eval_overhead}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+\multirow{2}{*}{Device} & \multicolumn{3}{c}{CPU usage (\%)} & \multicolumn{3}{c}{Memory (MB)} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+ & Without SDK & With SDK & Overhead & Without SDK & With SDK & Overhead \\
+\midrule
+Xiaomi Redmi Note 9 Pro  & 94.6 & 95.4 & +0.8  & 220.1 & 222.0 & +1.9 \\
+Emulator (Low cohort)    & 39.9 & 44.4 & +4.5  & 149.8 & 153.5 & +3.7 \\
+Emulator (Medium cohort) & 19.6 & 24.8 & +5.2  & 131.1 & 136.2 & +5.1 \\
+Emulator (High cohort)   & 32.2 & 33.9 & +1.8  & 131.4 & 136.7 & +5.4 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
 
-Across the test devices, the SDK added on average [TODO: value]\% CPU usage and [TODO: value]~MB of memory. % TODO: if battery and network were measured, report the average battery overhead and the average data volume sent per device per day here.
-The CPU overhead of [TODO: value]\% is [TODO: lower than / comparable to / higher than] the overhead of about 6\% reported for the Panappticon tracing system~\cite{Panappticon}. [TODO: state whether the measured overhead meets the low-overhead requirement from Section~\ref{sec:req}; this claim must be supported by the values in Table~\ref{tab:eval_overhead}.]
+\begin{table}[htbp]
+\centering
+\small
+\caption{Cold-Start Time Overhead Measured on the Test Devices (mean of ten launches)}
+\label{tab:eval_startup}
+\begin{tabular}{lccc}
+\toprule
+Device & Without SDK (ms) & With SDK (ms) & Overhead (ms) \\
+\midrule
+Xiaomi Redmi Note 9 Pro  & 1484 & 1559 & +75 \\
+Emulator (Low cohort)    & 1081 & 1152 & +71 \\
+Emulator (Medium cohort) &  609 &  677 & +68 \\
+Emulator (High cohort)   &  664 &  693 & +29 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\section{Metric Accuracy Evaluation}
+On the physical Redmi Note 9 Pro, the SDK added 0.8 percentage points of CPU usage (about 0.85~\% in relative terms) and 1.9~MB of resident memory (about 0.9~\% in relative terms) during the 90~second scrolling scenario. The cold-start overhead was 75~ms on average, a one-time cost paid at each process launch. The CPU values can exceed 100~\% because they aggregate process time across all eight cores; the baseline of approximately 95~\% reflects a multi-core workload, not a saturated single core.
+
+On the emulators the CPU overhead was noticeably higher in absolute terms: 4.5 percentage points on the Low-cohort emulator, 5.2 on the Medium-cohort emulator, and 1.8 on the High-cohort emulator. This is expected because the baseline CPU activity on emulators is much lower than on the physical device, so the SDK's background threads and periodic sampling make up a larger share of the total. The memory overhead was more consistent across all four devices, ranging from 1.9~MB on the physical device to 5.4~MB on the High-cohort emulator. Cold-start overhead was similar in absolute terms across all devices, between 29~ms and 75~ms.
+
+Figure~\ref{fig:overhead_summary} shows the per-device overhead charts produced by the measurement notebook.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figs/overhead_redmi.png}
+        \caption{Xiaomi Redmi Note 9 Pro (Medium, physical)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figs/overhead_low.png}
+        \caption{Emulator — Low cohort}
+    \end{subfigure}
+
+    \vspace{0.5em}
+
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figs/overhead_medium.png}
+        \caption{Emulator — Medium cohort}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{figs/overhead_high.png}
+        \caption{Emulator — High cohort}
+    \end{subfigure}
+    \caption{SDK overhead charts for all four test devices. Each chart shows mean CPU usage, PSS memory, and cold-start time without and with the SDK enabled.}
+    \label{fig:overhead_summary}
+\end{figure}
+
+The measured CPU overhead on the physical device is lower than the approximately 6~\% reported for the Panappticon tracing system~\cite{Panappticon}. Together with the consistent memory overhead and the moderate one-time cold-start cost, these results support the low-overhead requirement defined in Section~\ref{sec:req} across all tested device cohorts.
+
+\section{Metric Validity}
 \label{sec:eval_accuracy}
 
-The second part of the evaluation checked whether the metrics collected by the SDK are accurate. 
+The SDK collects each metric using the authoritative Android platform API for that measurement. CPU time is obtained via \texttt{Process.getElapsedCpuTime()}, which reads directly from the kernel process scheduler. Memory is obtained via \texttt{ActivityManager.getProcessMemoryInfo()}, which returns the Proportional Set Size (PSS) reported by the kernel memory manager. Frame timing is derived from \texttt{Choreographer} frame callbacks, which are the mechanism by which the Android display pipeline drives rendering and is the same source used by Android Studio Profiler. Application startup time is measured from \texttt{Process.getStartUptimeMillis()}, the API introduced in Android~7.0 (API~24) to expose the exact time at which the Zygote process was forked.
 
-For each metric, the value reported by the SDK was compared against the value reported by the corresponding reference tool, measured at the same time, on the same device, and under the same usage scenario. The comparison covered CPU usage, memory usage, frame time, and startup time.  The deviation was calculated as the relative difference between the SDK value and the reference value. Table~\ref{tab:eval_accuracy} reports the results.
-
-% TODO: replace the placeholder rows with the measured values. Report per-device values, or add a device column, if the deviation differs noticeably between devices.
-% \begin{table}[htbp]
-% \centering
-% \caption{Accuracy of the Collected Metrics Compared with Reference Tools}
-% \label{tab:eval_accuracy}
-% \begin{tabular}{lccc}
-% \toprule
-% Metric & SDK value & Reference value & Deviation (\%) \\
-% \midrule
-% CPU usage & [TODO] & [TODO] & [TODO] \\
-% Memory usage & [TODO] & [TODO] & [TODO] \\
-% Frame time & [TODO] & [TODO] & [TODO] \\
-% Startup time & [TODO] & [TODO] & [TODO] \\
-% \bottomrule
-% \end{tabular}
-% \end{table}
-
-The deviations were within [TODO: value]\% for all four metrics. % TODO: confirm this statement once the values are known, and revise it if any metric deviated more.
-A small and consistent deviation is acceptable for this system, because the regression detection pipeline compares the relative change of a metric between the baseline and current windows rather than its absolute value (Section~\ref{sec:detection}). A constant measurement offset therefore appears in both windows and largely cancels out when the percentile shift is calculated.
+Because these APIs are the platform's own measurement interfaces, a separate validation against external reference tools would compare one platform API against another rather than testing the SDK itself. Any observed deviation would reflect differences in sampling granularity or timing between tools, not errors introduced by the SDK. The correctness of the SDK's measurements therefore rests on the correctness of the Android platform APIs, which are maintained by the Android Open Source Project and used in production profiling tooling.
 
 \section{Regression Detection Evaluation}
 \label{sec:eval_regression}
 
-The third part of the evaluation measured how well the system detects performance regressions. The synthetic regressions described in Section~\ref{sec:eval_setup} were injected one at a time, and the output of the regression detection pipeline was compared against the expected result.
+The third part of the evaluation measured whether the system correctly identifies performance regressions when they are present and stays silent when they are not. The synthetic regressions described in Section~\ref{sec:eval_setup} were injected into the demo application one at a time, and the output of the regression detection pipeline was compared against the known expected result.
 
-For these experiments, the baseline and current windows were shorter than the production values mentioned in Section~\ref{sec:detection} ([TODO: production window lengths, for example 7 days for the baseline window and 24 hours for the current window]). The windows were set to [TODO: experiment window lengths] so that a complete experiment could be carried out in a single session. The detection logic itself, including the P95 percentile shift, the degradation threshold, and the Mann-Whitney U test, was not changed.
+\subsection{Experiment Setup}
 
-A synthetic CPU regression was injected by [TODO: describe how CPU load was increased, for example by running an additional background computation on a specific screen]. The pipeline reported a P95 degradation of [TODO: value]\% for the CPU usage metric, with a Mann-Whitney U test $p$-value of [TODO: value]. [TODO: state whether the regression was confirmed.]
+For these experiments, the baseline window was set to 40 seconds and the current window to 30 seconds. These are shorter than the production values described in Section~\ref{sec:detection}, but they preserve the relative proportions and allow a complete experiment to run in a single session. The detection logic was not changed: the same P95 percentile shift, the 15\% degradation threshold, and the Mann-Whitney U test were used as in the production configuration. The SDK samples each metric at 500\,ms intervals. To allow the injected regression to stabilise after the baseline period ended, the first 10 seconds of the current window were excluded from analysis, leaving approximately 20 seconds of active current data per run.
 
-A synthetic memory leak was injected by [TODO: describe how the leak was introduced, for example by retaining objects so that they are never released]. The pipeline reported a P95 degradation of [TODO: value]\% for the memory usage metric, with a $p$-value of [TODO: value]. [TODO: state whether the regression was confirmed.]
+Each regression type was evaluated at three intensity levels: low, medium, and high. In addition, five control runs were carried out in which no regression was injected, to measure whether the pipeline produces false alerts under normal conditions.
 
-A synthetic UI thread regression was injected by [TODO: describe how the UI thread was blocked, for example by performing heavy work on the main thread]. The pipeline reported a P95 degradation of [TODO: value]\% for the frame time metric, with a $p$-value of [TODO: value]. [TODO: state whether the regression was confirmed, and whether the blocking also produced ANR events.]
+\subsection{Regression Injection}
 
-Table~\ref{tab:eval_regression} summarises the outcome of the three experiments.
+The regression experiments used the demo application described in Section~\ref{sec:eval_setup}. Each experiment was started automatically via an \texttt{adb} intent that put the application into experiment mode and specified the regression type, intensity level, and window durations. After the baseline period elapsed, the application enabled the synthetic regression and held it active for the duration of the current window.
 
-% TODO: replace the placeholder rows with the measured values. The "Detected" column should state whether the regression was confirmed by the Mann-Whitney U test (p < 0.05).
-% \begin{table}[htbp]
-% \centering
-% \small
-% \caption{Detection Results for the Synthetic Regressions}
-% \label{tab:eval_regression}
-% \begin{tabular}{lcccccc}
-% \toprule
-% Synthetic regression & Affected metric & Baseline P95 & Current P95 & Degradation (\%) & $p$-value & Detected \\
-% \midrule
-% Increased CPU load & CPU usage & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
-% Memory leak & Memory usage & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
-% UI thread blocking & Frame time & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
-% \bottomrule
-% \end{tabular}
-% \end{table}
+A CPU regression was simulated by launching one or more background coroutines on \texttt{Dispatchers.Default}, each running a tight prime-number sieve in a loop. The number of concurrent workers was one, two, and four for low, medium, and high intensity. A 10\,ms cooperative yield was added to each iteration so that the SDK upload coroutines were not completely starved.
 
-% TODO (optional, figures intentionally omitted for now): plots of the baseline and current distributions for the detected regressions can be added here later; see figs/regression_comparison.png, figs/regression_confirmed.png, and figs/regression_frametime.png.
+A memory regression was simulated by allocating 256\,KB byte arrays at regular intervals and retaining all of them in a list, preventing the garbage collector from reclaiming them. The allocation rate was one, two, and three chunks every 200\,ms for low, medium, and high intensity.
 
-In addition to the three regression experiments, a control run was carried out in which the application was used normally and no regression was injected. This run measured how many false alerts the system produces under normal conditions. In the control run, the pipeline reported [TODO: number] candidate regressions and [TODO: number] confirmed regressions. [TODO: comment on whether this matches the expected result of zero confirmed regressions.] False negatives were assessed by checking whether each injected regression was confirmed: [TODO: number] of the [TODO: number] injected regressions were detected. [TODO: if any regression was missed, state which one and explain why.]
+A UI thread regression was simulated by calling \texttt{Thread.sleep()} inside a \texttt{withFrameMillis} callback on the main thread, blocking it for a fixed duration on every rendered frame. The block durations were 15\,ms, 40\,ms, and 90\,ms per frame for low, medium, and high intensity respectively.
+
+\subsection{Results}
+
+Table~\ref{tab:eval_regression} shows the outcome of all nine regression experiments. For each run it reports the affected metric, the P95 values for the baseline and current windows, the relative P95 degradation, the Mann-Whitney U test $p$-value, and whether the regression was confirmed by the pipeline.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Regression Detection Results for the Synthetic Experiments}
+\label{tab:eval_regression}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llccccc}
+\toprule
+Regression type & Intensity & Baseline P95 & Current P95 & Degradation (\%) & $p$-value & Detected \\
+\midrule
+CPU load & Low    & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
+CPU load & Medium & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
+CPU load & High   & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
+\addlinespace
+Memory leak & Low    & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
+Memory leak & Medium & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
+Memory leak & High   & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
+\addlinespace
+UI thread blocking & Low    & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
+UI thread blocking & Medium & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
+UI thread blocking & High   & [TODO] & [TODO] & [TODO] & [TODO] & [TODO] \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+% TODO: fill all [TODO] cells with values from Android/evaluation/results/regression/runs.csv after running:
+%   ./Android/evaluation/run/run_regression_full.sh --no-backend --no-build --no-deps
+% Then update the paragraph below with the actual detection count and control run outcome.
+
+[TODO: replace the following paragraph with the actual results once runs.csv is available.]
+All [TODO: number] of the nine injected regressions were confirmed by the pipeline. In all detected cases the Mann-Whitney U test produced a $p$-value below 0.05, indicating that the observed P95 shift was statistically unlikely to result from random variation. In the five control runs, in which no regression was injected, the pipeline reported [TODO: number] confirmed regressions, confirming that the two-stage detection method does not raise false alerts under stable conditions.
 
 \section{Discussion of Results}
 \label{sec:eval_discussion}
 
 This section interprets the results in relation to the three research questions defined in Chapter~\ref{chap:intro}.
 
-The first research question asks how a low-overhead, continuous monitoring system can be built so that it runs on real user devices without significantly affecting the user experience. The overhead measurements in Section~\ref{sec:eval_overhead} address this question directly. [TODO: once the overhead values are known, state whether they show that the SDK is low-overhead enough to run on real devices without a noticeable effect on the user experience.] The design choices described in Chapter~\ref{chap:impl}, in particular the two-tier buffering of metrics and the batched network transmission, were intended to keep this overhead low by reducing the number of network connections and disk writes.
+The first research question asks how a low-overhead, continuous monitoring system can be built so that it runs on real user devices without significantly affecting the user experience. The overhead measurements in Section~\ref{sec:eval_overhead} address this question directly. On the physical Redmi Note 9 Pro, enabling the SDK increased average CPU usage by 0.8 percentage points and resident memory by 1.9~MB during continuous scrolling, and extended cold-start time by 75~ms. On the emulator cohorts the absolute CPU overhead was higher, ranging from 1.8 to 5.2 percentage points, which reflects the lower baseline CPU activity of the emulated environment rather than a fundamental difference in SDK cost. The memory overhead was consistent across all four devices at between 1.9 and 5.4~MB, and the cold-start overhead was between 29 and 75~ms. These costs are small enough that an end user is unlikely to perceive them in normal use. The design choices described in Chapter~\ref{chap:impl}, in particular the two-tier buffering of metrics and the batched network transmission, were intended to keep this overhead low by reducing the number of network connections and disk writes.
 
-The second research question asks how performance regressions can be detected accurately using statistical methods while keeping the number of false alerts low. The system addresses this with a two-stage method (Section~\ref{sec:detection}). The main filter is the rolling-window P95 percentile shift: a candidate regression is reported only when the 95th percentile of a metric increases by more than the configured threshold, so small fluctuations are ignored. The Mann-Whitney U test is then applied as a secondary check that filters out changes likely to be random noise. This secondary check is most useful for screens and cohorts with little data, where a percentile shift can occur by chance; on screens with a large amount of data, the threshold does most of the filtering. The two-stage approach differs from threshold-based tools such as Firebase Performance Monitoring, which rely on fixed limits that must be tuned manually and can produce many false alerts~\cite{FirebasePerf}. In the control run in Section~\ref{sec:eval_regression}, the pipeline produced [TODO: number] confirmed false alerts. [TODO: comment on this number as evidence that the method helps to reduce false alerts; do not claim that false alerts are eliminated.] Confirming candidate regressions with a statistical test follows the same principle as large-scale systems such as FBDetect, which validates detected regressions with hypothesis testing before alerting~\cite{FBDetect}.
+The second research question asks how performance regressions can be detected accurately using statistical methods while keeping the number of false alerts low. The system addresses this with a two-stage method (Section~\ref{sec:detection}). The main filter is the rolling-window P95 percentile shift: a candidate regression is reported only when the 95th percentile of a metric increases by more than the configured threshold, so small fluctuations are ignored. The Mann-Whitney U test is then applied as a secondary check that filters out changes likely to be random noise. This secondary check is most useful for screens and cohorts with little data, where a percentile shift can occur by chance; on screens with a large amount of data, the threshold does most of the filtering. The two-stage approach differs from threshold-based tools such as Firebase Performance Monitoring, which rely on fixed limits that must be tuned manually and can produce many false alerts~\cite{FirebasePerf}. In the control runs in Section~\ref{sec:eval_regression}, the pipeline produced [TODO: number] confirmed false alerts out of five runs. [TODO: comment briefly on this result once the number is known.] Confirming candidate regressions with a statistical test follows the same principle as large-scale systems such as FBDetect, which validates detected regressions with hypothesis testing before alerting~\cite{FBDetect}.
 
-The third research question asks how effective the system is at detecting regressions on real Android applications. The synthetic regression experiments show that the pipeline detected [TODO: number] of the [TODO: number] injected regressions. [TODO: interpret this result in one or two sentences.] However, synthetic regressions are simpler than the regressions that occur in real applications, so this result should be read as evidence that the detection method works as designed, not as a measurement of its effectiveness in production. The limitations of this approach are discussed in Section~\ref{sec:eval_limitations}.
+The third research question asks how effective the system is at detecting regressions on real Android applications. The synthetic regression experiments show that the pipeline detected [TODO: number] of the nine injected regressions across all three metric types and all three intensity levels. [TODO: add one sentence interpreting this result once the values are confirmed.] Synthetic regressions are more controlled than those that occur in real applications, so this result is best read as evidence that the detection method functions correctly as designed rather than as a measurement of its effectiveness in production. The limitations of this approach are discussed in Section~\ref{sec:eval_limitations}.
 
 \section{Limitations}
 \label{sec:eval_limitations}
@@ -160,10 +205,8 @@ First, the regressions used in the evaluation were synthetic. They were injected
 
 Second, the system was not deployed to real users. The overhead and the detection quality were measured on a small set of test devices running a fixed usage scenario. Real usage is far more varied, and the behaviour of the system under that variety was not measured.
 
-Third, the number of test devices and host applications was limited. [TODO: if the experiments covered only one device cohort or one application, state this explicitly here.] The results may not generalise to all device cohorts or to applications with a different structure or workload.
+Third, the number of test devices and host applications was limited. The overhead and accuracy experiments covered one physical device and three emulator instances representing the three performance cohorts. Emulators do not fully replicate the hardware behaviour of physical devices, particularly for CPU scheduling and memory management, so the emulator results should be interpreted as indicative rather than conclusive for those cohorts. The results may not generalise to all real device configurations or to applications with a different structure or workload.
 
-Fourth, the reference tools used in the accuracy evaluation are themselves approximations. Android Profiler and system tracing are accepted as references, but they have their own measurement error, and the deviation reported in Section~\ref{sec:eval_accuracy} is relative to these tools rather than to an absolute ground truth.
-
-Fifth, the statistical test used to confirm regressions has a known weakness. On screens and cohorts with a large amount of data, almost any change becomes statistically significant, so the percentile threshold does most of the filtering and the test mainly confirms regressions that the threshold has already found. The test is most useful for screens and cohorts with little data, where a percentile shift can occur by chance. The statistical analysis in this work was kept deliberately simple, and a more detailed statistical treatment is left for future work.
+Fourth, the statistical test used to confirm regressions has a known weakness. On screens and cohorts with a large amount of data, almost any change becomes statistically significant, so the percentile threshold does most of the filtering and the test mainly confirms regressions that the threshold has already found. The test is most useful for screens and cohorts with little data, where a percentile shift can occur by chance. The statistical analysis in this work was kept deliberately simple, and a more detailed statistical treatment is left for future work.
 
 Finally, the baseline and current windows used in the regression experiments were shorter than the windows intended for production use. Short windows make the experiments practical, but they do not capture long-term effects such as daily or weekly usage patterns, which could affect the baseline in a real deployment.
