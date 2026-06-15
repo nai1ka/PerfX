@@ -60,8 +60,8 @@ def authenticated_menu():
     )
     st.sidebar.page_link(
         "pages/analysis.py",
-        label="Analysis",
-        icon="🧪",
+        label="Regressions",
+        icon="⚠️",
     )
     st.sidebar.page_link(
         "pages/projects.py",

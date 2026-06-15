@@ -274,13 +274,13 @@ fun Application.configureRouting(authRepository: AuthRepository) {
                 val userId    = call.principal<JWTPrincipal>()!!.payload.subject
                 val projectId = call.parameters["project_id"]
                     ?: return@get call.respond(HttpStatusCode.BadRequest, "project_id is required")
-                val status    = call.parameters["status"]  // open | acknowledged | resolved | null = all
+                val status    = call.parameters["status"]  // open | closed | null = all
 
                 if (!authRepository.isProjectOwnedByUser(projectId, userId)) {
                     return@get call.respond(HttpStatusCode.Forbidden, "Access denied")
                 }
 
-                val validStatuses = setOf("open", "acknowledged", "resolved")
+                val validStatuses = setOf("open", "closed")
                 if (status != null && status !in validStatuses) {
                     return@get call.respond(
                         HttpStatusCode.BadRequest,
@@ -305,19 +305,11 @@ fun Application.configureRouting(authRepository: AuthRepository) {
 
                 val request = call.receive<PatchRegressionRequest>()
 
-                val validStatuses = setOf("open", "acknowledged", "resolved")
+                val validStatuses = setOf("open", "closed")
                 if (request.status != null && request.status !in validStatuses) {
                     return@patch call.respond(
                         HttpStatusCode.BadRequest,
                         "status must be one of: ${validStatuses.joinToString()}"
-                    )
-                }
-
-                val validResolutionTypes = setOf("fixed", "rolled_back", "superseded", "expected", "false_positive")
-                if (request.resolutionType != null && request.resolutionType !in validResolutionTypes) {
-                    return@patch call.respond(
-                        HttpStatusCode.BadRequest,
-                        "resolution_type must be one of: ${validResolutionTypes.joinToString()}"
                     )
                 }
 
@@ -402,7 +394,7 @@ fun Application.configureRouting(authRepository: AuthRepository) {
                 call.respond(HttpStatusCode.OK, rows)
             }
 
-            // Drill-down: daily p50 for two version codes side by side
+            // Drill-down: daily p95 for two version codes side by side
             get("/metrics/compare") {
                 val userId               = call.principal<JWTPrincipal>()!!.payload.subject
                 val projectId            = call.parameters["project_id"]
@@ -426,7 +418,7 @@ fun Application.configureRouting(authRepository: AuthRepository) {
                     SELECT
                         toDate(ts)           AS date,
                         version_code,
-                        quantile(0.50)(value) AS p50,
+                        quantile(0.95)(value) AS p95,
                         count()               AS cnt
                     FROM metric_records
                     WHERE project_id   = '$projectId'
@@ -447,7 +439,7 @@ fun Application.configureRouting(authRepository: AuthRepository) {
                     val code  = row["version_code"]?.jsonPrimitive?.content?.toIntOrNull() ?: continue
                     val point = DailyMetricPoint(
                         date  = row["date"]!!.jsonPrimitive.content,
-                        p50   = row["p50"]!!.jsonPrimitive.doubleOrNull  ?: 0.0,
+                        p95   = row["p95"]!!.jsonPrimitive.doubleOrNull  ?: 0.0,
                         count = row["cnt"]!!.jsonPrimitive.longOrNull    ?: 0,
                     )
                     when (code) {
@@ -459,7 +451,7 @@ fun Application.configureRouting(authRepository: AuthRepository) {
                 call.respond(HttpStatusCode.OK, VersionCompareResponse(baseline, current))
             }
 
-            // Drill-down: raw values for CDF
+            // Drill-down: time-series (ts + value) for a specific version code
             get("/metrics/raw-values") {
                 val userId       = call.principal<JWTPrincipal>()!!.payload.subject
                 val projectId    = call.parameters["project_id"]
@@ -478,19 +470,19 @@ fun Application.configureRouting(authRepository: AuthRepository) {
                 }
 
                 val sql = """
-                    SELECT value
+                    SELECT ts, value
                     FROM metric_records
                     WHERE project_id    = '$projectId'
                       AND metric_id     = '$metricId'
                       AND screen_name   = '$screenName'
                       AND device_cohort = '$deviceCohort'
                       AND version_code  = $versionCode
+                    ORDER BY ts ASC
                     LIMIT 10000
                 """.trimIndent()
 
-                val rows   = clickHouseClient.query(sql)
-                val values = rows.mapNotNull { it["value"]?.jsonPrimitive?.doubleOrNull }
-                call.respond(HttpStatusCode.OK, values)
+                val rows = clickHouseClient.query(sql)
+                call.respond(HttpStatusCode.OK, rows)
             }
         }
     }

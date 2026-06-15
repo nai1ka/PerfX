@@ -47,6 +47,35 @@ cd Analysis && pip install -r requirements.txt && python regression_detector.py 
 cd Frontend && pip install -r requirements.txt && streamlit run app.py            # dashboard at :8501
 ```
 
+### Docker images (publish to Docker Hub)
+
+Images are built with **Docker Buildx** (builder name `perfx-builder`, registry `nai1ka/`). Always use `buildx build --push`, never plain `docker build`.
+
+```bash
+# Ensure the builder is active (created once, reused after)
+docker buildx inspect perfx-builder &>/dev/null || docker buildx create --name perfx-builder --use
+docker buildx use perfx-builder
+
+# Build and push a single image
+docker buildx build --platform linux/amd64 --push -t nai1ka/perfx-frontend  Frontend/
+docker buildx build --platform linux/amd64 --push -t nai1ka/perfx-detector  Analysis/
+docker buildx build --platform linux/amd64 --push -t nai1ka/perfx-backend   Backend/app
+docker buildx build --platform linux/amd64 --push -t nai1ka/perfx-postgres  Backend/postgres
+docker buildx build --platform linux/amd64 --push -t nai1ka/perfx-clickhouse Backend/clickhouse
+
+# Or use the helper script to build all at once
+bash scripts/build-and-push.sh nai1ka
+```
+
+Image → source directory mapping:
+| Image | Source |
+|---|---|
+| `nai1ka/perfx-backend` | `Backend/app` |
+| `nai1ka/perfx-frontend` | `Frontend/` |
+| `nai1ka/perfx-detector` | `Analysis/` |
+| `nai1ka/perfx-postgres` | `Backend/postgres` |
+| `nai1ka/perfx-clickhouse` | `Backend/clickhouse` |
+
 ### Thesis (LaTeX)
 ```bash
 cd Thesis && latexmk -pdf thesis.tex     # builds thesis.pdf; biblatex with the biber backend
@@ -56,7 +85,7 @@ cd Thesis && latexmk -pdf thesis.tex     # builds thesis.pdf; biblatex with the 
 ## Architecture
 
 ### Data flow
-1. The SDK's `PerfX` object (`Android/PerfX/sdk/.../PerfX.kt`) registers `PerformanceCollector`s (CPU, frame time, RAM, one-shot startup time). Metrics are buffered in a local Room DB and batch-uploaded to the backend `POST /ingest` (default endpoint `http://10.0.2.2:8080/` — the emulator alias for host localhost). The in-repo `:demo` module depends on `:sdk` directly via `project(":sdk")`; external host apps (e.g. the `Demo/` apps) consume the published `com.ndevelop:perfx-sdk` artifact from Maven Local instead.
+1. The SDK's `PerfX` object (`Android/PerfX/sdk/.../PerfX.kt`) registers `PerformanceCollector`s (CPU, frame time, RAM, one-shot startup time). Metrics are buffered in a local Room DB and batch-uploaded to the backend `POST /ingest` (default endpoint `https://api.perfx.ru/` — the emulator alias for host localhost). The in-repo `:demo` module depends on `:sdk` directly via `project(":sdk")`; external host apps (e.g. the `Demo/` apps) consume the published `com.ndevelop:perfx-sdk` artifact from Maven Local instead.
 2. The Ktor backend (`Backend/app`) writes raw metrics into ClickHouse table `metrics.metric_records` and serves authenticated query endpoints. Users, projects, thresholds and confirmed regressions live in Postgres.
 3. The regression detector (`Analysis/`) reads recent windows from ClickHouse, runs a Rolling Window Percentile Shift comparison plus a Mann-Whitney U test, and inserts confirmed regressions into Postgres.
 4. The Streamlit dashboard calls the backend REST API to render metrics, custom plots, and regression reports.
@@ -88,7 +117,7 @@ Overhead experiments were run on three AVDs and one physical device:
 
 Results for each target live in `Android/evaluation/results/<name>/` (four files per run: `noSdk.csv`, `withSdk.csv`, `noSdk_startup.txt`, `withSdk_startup.txt`).
 
-### Evaluation scripts
+### Overhead evaluation scripts
 
 | Script | Purpose |
 |---|---|
@@ -96,10 +125,72 @@ Results for each target live in `Android/evaluation/results/<name>/` (four files
 | `Android/evaluation/run/run_overhead_on_avd.sh <avd-name>` | Launch a named AVD, run both flavors, copy results |
 | `Android/evaluation/measure/measure_overhead.sh <flavor>` | Measure CPU/RAM/startup for one flavor on the running device |
 | `Android/evaluation/measure/measure_accuracy.sh` | Accuracy experiment (ground-truth metric comparison) |
-| `Android/evaluation/run/run_regression_experiments.py` | Regression-detection experiment driver |
-| `Android/evaluation/analysis/` | Python notebooks/scripts that post-process CSVs into charts |
 
 The `noSdk`/`withSdk` flavors are variants of the `:demo` app built with and without the SDK injected, controlled by a Gradle product flavor.
+
+### Regression-detection validation (Chapter 5 thesis evaluation)
+
+Build-time regression injection lets each APK bake in a synthetic regression via Gradle properties:
+
+```bash
+cd Android/PerfX
+./gradlew :demo:assembleWithSdkDebug \
+  -PsyntheticVersionCode=1001 -PsyntheticVersionName=1.0.1-clean \
+  -PregressionType=none -PregressionIntensity=0 -PtargetScreen=cpu_load
+
+./gradlew :demo:assembleWithSdkDebug \
+  -PsyntheticVersionCode=1002 -PsyntheticVersionName=1.0.2-cpu-med \
+  -PregressionType=cpu -PregressionIntensity=2 -PtargetScreen=cpu_load
+```
+
+Regression types: `cpu` | `memory` | `ui` | `startup` | `interaction` | `none`
+Intensity: `1` (low) · `2` (medium) · `3` (high)
+
+The baked regression activates in `DemoApp.onCreate()` via `RegressionInjector`.
+The `navigate_to` intent extra controls which screen the app opens on launch.
+
+#### Experiment driver
+
+```bash
+cd Android/evaluation/run
+
+# Full matrix on one device (~12 h at 15 min/version)
+python3 run_release_pair_experiments.py \
+  --project-id c0fabf43-bbd4-4f9e-bdab-ee5019727b00 --device PerfX_Medium
+
+# Quick smoke test — one experiment (~8 min at 2 min/version)
+python3 run_release_pair_experiments.py \
+  --project-id c0fabf43-bbd4-4f9e-bdab-ee5019727b00 \
+  --device PerfX_Medium --experiments e1_cpu_high
+```
+
+Experiment matrix: `Android/evaluation/run/experiments.yaml`
+Results: `Android/evaluation/results/release_pair/<timestamp>_<device>.csv`
+
+The Docker Compose `detector` service handles detection automatically (polls every 30 s).
+
+**Test-mode settings** (smoke tests):
+- `experiments.yaml`: `run_duration_minutes: 2`, `flush_wait_seconds: 15`
+- `Analysis/regression_detection/config.py`: `MIN_SAMPLES_PER_VERSION: 10`
+
+**Production settings** (thesis data):
+- `experiments.yaml`: `run_duration_minutes: 15`, `flush_wait_seconds: 60`
+- `config.py`: `MIN_SAMPLES_PER_VERSION: 50`
+
+#### Analysis scripts
+
+```bash
+cd Android/evaluation/analysis
+python3 aggregate_results.py     # → summary_e1/e2/e6.csv
+python3 threshold_sweep.py       # → summary_e3.csv
+python3 sample_size_sweep.py \   # → summary_e5.csv
+  --project-id ... --baseline-vc 1003 --current-vc 1004 \
+  --metric-id cpuUsage --screen-name "compose/cpu_load"
+python3 plots.py                 # → analysis/figs/*.pdf
+python3 tables.py                # prints LaTeX \begin{table} blocks
+```
+
+Use the `/run-validation` skill for step-by-step guidance on running the full pipeline.
 
 ## Conventions
 

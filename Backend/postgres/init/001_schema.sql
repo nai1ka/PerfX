@@ -46,8 +46,8 @@ CREATE TABLE regressions (
     current_version_name  TEXT NOT NULL,
 
     -- Statistics (filled by detector; NULL until then)
-    baseline_p50      DOUBLE PRECISION,
-    current_p50       DOUBLE PRECISION,
+    baseline_p95      DOUBLE PRECISION,
+    current_p95       DOUBLE PRECISION,
     degradation_percent DOUBLE PRECISION,
 
     baseline_ci_lower DOUBLE PRECISION,
@@ -59,14 +59,11 @@ CREATE TABLE regressions (
     sample_count_current  INT,
 
     -- Lifecycle
-    status          TEXT NOT NULL DEFAULT 'open'
-        CHECK (status IN ('open', 'acknowledged', 'resolved')),
-    resolution_type TEXT
-        CHECK (resolution_type IN ('fixed', 'rolled_back', 'superseded', 'expected', 'false_positive')),
+    status      TEXT NOT NULL DEFAULT 'open'
+        CHECK (status IN ('open', 'closed')),
 
-    acknowledged_at TIMESTAMP WITH TIME ZONE,
-    resolved_at     TIMESTAMP WITH TIME ZONE,
-    detected_at     TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    closed_at   TIMESTAMP WITH TIME ZONE,
+    detected_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
     -- One open regression per (project, metric, screen, cohort, version pair)
     UNIQUE (project_id, metric_id, screen_name, device_cohort,

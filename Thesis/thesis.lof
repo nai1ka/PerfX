@@ -3,13 +3,17 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {3.1}{\ignorespaces High-Level System Architecture}}{22}{figure.caption.4}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Sequence Diagram of SDK Data Collection and Transmission}}{26}{figure.caption.5}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Sequence Diagram of SDK Data Collection and Transmission}}{27}{figure.caption.5}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Relational data model used by the backend}}{29}{figure.caption.6}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces PostgreSQL database schema}}{40}{figure.caption.13}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Login page of the dashboard}}{43}{figure.caption.14}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Project list page}}{44}{figure.caption.15}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Metrics Explorer — filter selection}}{45}{figure.caption.16}%
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Metrics Explorer - frame time chart with a detected regression}}{45}{figure.caption.17}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Login page of the dashboard}}{46}{figure.caption.7}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Project list page}}{47}{figure.caption.8}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Metrics Explorer: filter selection}}{47}{figure.caption.9}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Metrics Explorer: frame time chart with a detected regression}}{48}{figure.caption.10}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Regressions page of the dashboard}}{49}{figure.caption.11}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Regression alert delivered to a messaging app}}{49}{figure.caption.12}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces SDK overhead charts for all four test devices. Each chart shows mean CPU usage, PSS memory, and cold-start time without and with the SDK enabled.}}{54}{figure.caption.21}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces SDK overhead charts for all four test devices. Each chart shows mean CPU usage, PSS memory, and cold-start time without and with the SDK enabled.}}{54}{figure.caption.16}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Detection rate by metric, injection intensity, and device cohort. Each bar shows the fraction of runs in that cell that the detector flagged as a regression at the 15\% threshold.}}{58}{figure.caption.18}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Detector quality as a function of the relative-shift threshold. TPR and FPR are computed on the 30 injected runs and 15 control runs respectively. The vertical dashed line marks the default threshold of 15\%.}}{60}{figure.caption.20}%
 \addvspace {10\p@ }

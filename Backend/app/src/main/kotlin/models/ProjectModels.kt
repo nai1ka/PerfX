@@ -43,8 +43,8 @@ data class RegressionDto(
     @SerialName("current_version_code")  val currentVersionCode: Int,
     @SerialName("current_version_name")  val currentVersionName: String,
 
-    @SerialName("baseline_p50")        val baselineP50: Double?,
-    @SerialName("current_p50")         val currentP50: Double?,
+    @SerialName("baseline_p95")        val baselineP95: Double?,
+    @SerialName("current_p95")         val currentP95: Double?,
     @SerialName("degradation_percent") val degradationPercent: Double?,
 
     @SerialName("baseline_ci_lower") val baselineCiLower: Double?,
@@ -56,16 +56,13 @@ data class RegressionDto(
     @SerialName("sample_count_current")  val sampleCountCurrent: Int?,
 
     val status: String,
-    @SerialName("resolution_type")  val resolutionType: String?,
-    @SerialName("acknowledged_at")  val acknowledgedAt: String?,
-    @SerialName("resolved_at")      val resolvedAt: String?,
-    @SerialName("detected_at")      val detectedAt: String?,
+    @SerialName("closed_at")   val closedAt: String?,
+    @SerialName("detected_at") val detectedAt: String?,
 )
 
 @Serializable
 data class PatchRegressionRequest(
     val status: String? = null,
-    @SerialName("resolution_type") val resolutionType: String? = null,
 )
 
 // ── Metrics / plots ───────────────────────────────────────────────────────────
@@ -104,7 +101,7 @@ data class PlotPointDto(
 @Serializable
 data class DailyMetricPoint(
     val date: String,
-    val p50: Double,
+    val p95: Double,
     val count: Long,
 )
 

@@ -1,0 +1,2 @@
+experiment_id,device,cohort,baseline_version_code,current_version_code,metric_id,screen_name,baseline_median,current_median,delta_pct,ground_truth_regression,detected,threshold,regression_type,intensity,run_duration_minutes,timestamp
+e1_cpu_low,PerfX_Medium,Medium,1001,1002,cpuUsage,compose/cpu_load,7.784431137724551,9.362549800796813,20.27,True,True,0.15,cpu,1,15,2026-05-30T23:17:30.183640

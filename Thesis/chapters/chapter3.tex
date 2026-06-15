@@ -3,34 +3,29 @@
 \chapter{Methodology}
 \label{chap:met}
 
-This chapter describes the design of the proposed performance monitoring system. Section~\ref{sec:req} lists the requirements that influenced the design choices. Section~\ref{sec:arch} gives a high-level overview of the architecture and shows how the components work together. Sections~\ref{sec:sdk},~\ref{sec:backend} describe the details of the mobile SDK and the backend server. Section~\ref{sec:detection} discusses the regression detection methods that were considered and highlights the selected one.
+This chapter describes the design of the proposed performance monitoring system. Section~\ref{sec:req} lists the requirements that influenced the design choices. Section~\ref{sec:arch} gives a high-level overview of the architecture and shows how the components work together. Sections~\ref{sec:sdk},~\ref{sec:backend} describe the details of the mobile SDK and the Backend. Section~\ref{sec:detection} discusses the regression detection methods that were considered and highlights the selected one.
 
 \section{System requirements and constraints}
 \label{sec:req}
 
-Since the SDK (Software Development Kit) runs on real user devices, it must be lightweight so that it doesnt affect the user experience of the host application. Moreover, the system must be robust across different Android devices. Finally, regression detection must be reliable and resilient to outliers, as production data is often noisy.
+Since the SDK (Software Development Kit) runs on real user devices, it must be lightweight so that it doesn't affect the user experience of the host application. Moreover, the system must be robust across different Android devices. Finally, regression detection must be reliable and resilient to outliers, as production data is often noisy.
+
+% TODO не нравится последнее предложение: resilient to outliers, as production data is often noisy.
 
 \section{High-Level System Architecture}
 \label{sec:arch}
 
-The system consists of four components: the mobile SDK (client), the backend server, the frontend, and the regression detection engine. Figure~\ref{fig:system_architecture} shows how they are connected.
+The system consists of four components: the mobile SDK (client), the Backend, the frontend, and the regression detection engine. Figure~\ref{fig:system_architecture} shows how they are connected.
 
 The mobile SDK is a library that developers integrate into their Android applications. It collects performance metrics on users' devices and sends them to the backend for further analysis.
 
-The backend receives metrics from user devices, stores them efficiently, and provides REST APIs for the frontend. It is also responsible for user authentication and project management.
+Metrics from user devices arrive at the backend, which stores them efficiently and serves them to the frontend through REST APIs. The backend is also where user authentication and project management happen.
 
-The frontend is a web application that lets developers manage projects, browse metrics, configure alerts, and review detected regressions. It interacts with the backend through REST APIs to retrieve data and present it in a user-friendly way.
+The frontend is a web application for developers. Through it they manage their projects, explore the collected metrics, and look over any regressions that were found. It pulls all of this from the backend through the same REST APIs and lays the data out in a readable form.
 
-The regression detection engine continuously analyses the incoming metrics to find signs of performance degradation. If such a regression is detected, it sends an alert to developers using the configured notification channels.
+The regression detection engine continuously analyses the incoming metrics to find signs of performance degradation. If such a regression is detected, it can notify developers in a messaging app.
 
-% \begin{figure}[htbp]
-%     \centering
-%     \includegraphics[width=0.8\textwidth]{figs/system_architecture.png}
-%     \caption{High-Level System Architecture}
-%     \label{fig:system_architecture}
-% \end{figure}
-
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{figs/system_architecture_new.png}
     \caption{High-Level System Architecture}
@@ -42,7 +37,9 @@ The regression detection engine continuously analyses the incoming metrics to fi
 
 \subsection{Metrics Selection and Collection}
 
-Metrics selection was based on the literature review. They are divided into two major categories: continuous metrics and discrete events. Continuous metrics, such as CPU usage and frame time, are sampled at regular intervals. Discrete events, such as crashes, ANRs, and app startups, are recorded immediately when they happen. This approach allows the system to capture both the ongoing performance of the application and the rare but critical events that can significantly affect user experience.
+The metrics were selected based on the literature review in Chapter~\ref{chap:lr}. The guiding criterion was that the collected metrics should reflect how the user actually perceives the application, rather than only describe low-level system behaviour. As discussed in the review, performance metrics fall into two kinds: resource metrics, such as CPU and memory usage, that explain where a problem originates, and user-perceived metrics, such as frame time, startup time, and interaction delay, that show how strongly that problem affects the user. The two are linked, because resource pressure usually surfaces as a slower or less responsive interface. The SDK therefore collects user-perceived metrics as the primary signal of experienced performance, together with resource metrics that help explain the cause of a perceived slowdown.
+
+These metrics are collected in two ways: as continuous metrics and as discrete events. Continuous metrics, such as CPU usage and frame time, are sampled at regular intervals. Discrete events, such as crashes, ANRs, and app startups, are recorded immediately when they happen. This approach allows the system to capture both the ongoing performance of the application and the rare but critical events that strongly affect user experience.
 
 \subsection{UI performance metrics}
 
@@ -92,22 +89,21 @@ This metric is important, because it helps to detect memory leaks and excessive 
 
 \subsection{Data Aggregation and Transmission}
 
-The metrics collected on the device are not sent immediately. Instead, they are first stored in a local buffer and then transmitted in batches. Batching was chosen because opening a network connection is an energy-intensive operation, and reducing the number of network calls helps to minimize battery consumption. In addition, batching allows to reduce load on the backend.
+The metrics collected on the device are not sent immediately. Instead, they are first stored in a local buffer and then transmitted in batches. Batching was chosen because the radio interface stays in a high-power state for several seconds after each transmission, so frequent network calls are disproportionately energy-intensive~\cite{Balasubramanian2009}. Sending metrics in batches reduces this cost and also lowers the load on the backend.
 
 A batch is sent when one of two conditions is satisfied: either the number of metrics in the buffer reaches a predefined value $N$, or the time since the last transmission exceeds a time window $W$.
 
 Figure~\ref{fig:sdk_sequence} shows the sequence of operations performed by the SDK during data collection and transmission.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{figs/sequence_diagram.png}
     \caption{Sequence Diagram of SDK Data Collection and Transmission}
     \label{fig:sdk_sequence}
 \end{figure}
 
-\section{Backend Server Design}
+\section{Backend Design}
 \label{sec:backend}
-
 
 The backend has four jobs: it receives metrics from the devices, authenticates users, exposes APIs for the frontend, and runs the regression detection algorithms.
 
@@ -116,50 +112,39 @@ After that, the frontend can query the stored metrics through REST endpoints, an
 
 \subsection{Database Design}
 
-The backend uses two types of databases: a time-series database for performance metrics, and a relational database for information about users, their projects and settings.
-A dedicated time-series store was chosen because it is optimized to handle large volumes of time-stamped data \cite{jensen-time-series}.
+The backend relies on two kinds of database. A time-series database stores the performance metrics, and a relational database stores the rest: the users, their projects, and the regressions found for those projects. The time-series store was chosen because it handles large volumes of time-stamped data efficiently \cite{jensen-time-series}, whereas the relational store fits the structured, interconnected records that describe accounts and their projects.
 
-In addition, metrics are stored only for a limited period of time. Older data is removed automatically, which helps to keep only relevant data and also reduces storage costs.
+The relational side holds four entities, shown in Figure~\ref{fig:postgres_schema}. A \emph{user} owns one or more \emph{projects}, each identified by its Android package name. A project, in turn, owns a catalogue of \emph{version releases} and its detected \emph{regressions}. The \emph{version releases} entity records each application version observed for a project, together with when it was first seen and how many samples it has accumulated. This catalogue is refreshed periodically from the time-series store and is used to list the releases of a project. The \emph{regressions} entity records each confirmed regression: the affected metric, screen, and device cohort, the baseline and current versions with their P95 values, and a status that marks it as open or closed. This ownership structure also enforces tenancy isolation, since every query can be scoped to the projects that belong to the requesting user.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figs/postgres_schema.png}
+    \caption{Relational data model used by the backend}
+    \label{fig:postgres_schema}
+\end{figure}
+
+Performance metrics are kept separately in the time-series store and are not modelled as relational entities. For this purpose the system uses ClickHouse, a column-oriented database. A column-oriented layout fits the metric workload well: ingestion is append-only and write-heavy, while analysis reads only a few columns at a time and aggregates them over large ranges, such as computing a percentile per version~\cite{schulze2024clickhouse}. Each metric record carries a value, its timestamp, and the dimensions along which it is later grouped, namely the project, the metric type, the screen, the device cohort, and the application version. The data is organised so that a query restricted to a recent period and to a single project and metric scans only the relevant subset, which keeps the regression-detection queries efficient as the volume of data grows.
+
+Metrics are also retained only for a limited period of time. Older data is removed automatically, which keeps the working set relevant and reduces storage cost. The physical layout of both stores, including table definitions and indexing, is described in Chapter~\ref{chap:impl}.
 
 
-\subsection{Performance Regression Detection Methods}
-\label{sec:detection}
+\subsection{Data Partitioning and Cohorts}
 
-Since the system works on production data without any labelled examples, the selected detection methods must not rely on supervised training. They must also be computationally efficient, easy to interpret, and suitable for continuous execution inside the backend database.
-
-\subsubsection{Data Partitioning and Cohorts}
 Before applying any detection model, the incoming data must be grouped into meaningful subsets. Comparing high-end devices directly with low-end devices could easily produce false positives, because the natural hardware limits of a low-end device might be interpreted as a software regression. To avoid this, the data is partitioned along three dimensions: the metric type (for example, CPU usage or frame time), the application screen, and the device performance cohort (Low, Medium, or High). The detection algorithms are then executed independently on each subset.
 
-\subsubsection{Threshold-based Methods}
-Threshold-based detection relies on predefined Service Level Agreements (SLAs). A cohort is flagged as abnormal if its aggregated value exceeds a fixed upper limit defined by the developer:
-\begin{equation}
-    AggregatedValue > T_{\text{max}}
-\end{equation}
-This approach is very simple to implement and has a low computational cost. However, it requires manual configuration for each metric and each application, and the static thresholds do not adapt to natural changes in application behaviour. As a result, this method produces a high number of false positives and is not suitable for this system.
+\subsection{Performance Regression Detection}
+\label{sec:detection}
 
-\subsubsection{Mean Shift Detection}
-Mean shift detection is a statistical method that looks for regressions by comparing the mean of a current time window with the mean of a historical baseline window. A regression is reported if the current mean deviates from the baseline mean ($\mu_{\text{baseline}}$) by more than a given multiple of the baseline standard deviation:
-\begin{equation}
-    \mu_{\text{current}} - \mu_{\text{baseline}} > k \cdot \sigma_{\text{baseline}}
-\end{equation}
-This method works well for metrics that follow a normal distribution. However, mobile performance metrics are often highly skewed and contain many outliers, which can easily distort the mean value. For this reason, the method is not very reliable for metrics such as frame rendering time.
+The regression detection pipeline compares consecutive application releases using a release-pair P95 shift. Samples are grouped by version code rather than by a fixed time window, and each release is compared against the one that precedes it. Fixed absolute thresholds were rejected because each one must be calibrated by hand for every metric and application, and a fixed limit does not move as baseline performance shifts over time. A mean-based comparison was avoided as well, since the mean is easily pulled by outliers and copes badly with the heavy-tailed, non-normal distributions that frame time and startup time usually follow. Heavier methods such as ARIMA forecasting or machine-learning models were ruled out too, because they need labelled training data or careful tuning that a lightweight production system cannot justify.
 
-\subsubsection{Rolling Window Percentile Shift}
-Percentile-based detection focuses on the overall user experience, because it evaluates the behaviour of the worst cases rather than the average behaviour~\cite{Nguyen2012}. The system collects data into two windows: a baseline window (for example, the previous 7 days) and a current window (for example, the last 24 hours). A high percentile, such as the 95th percentile ($P_{95}$), is then calculated for both windows. A regression is reported if the relative change exceeds a predefined percentage threshold:
+A version is only eligible for comparison after it has accumulated a minimum number of samples. This maturity gate prevents comparisons based on a handful of early measurements, where a single noisy observation could shift the P95 far enough to cross the threshold and produce a false alert.
+
+For each mature version group, the 95th percentile ($P_{95}$) of the metric is computed. A regression is reported when the relative increase from the baseline version to the current version exceeds a configurable threshold:
 \begin{equation}
     \frac{P_{95}(\text{current}) - P_{95}(\text{baseline})}{P_{95}(\text{baseline})} > Threshold
 \end{equation}
-This method is robust to non-normal and skewed distributions. It is especially effective for metrics such as frame rendering time and startup time, where the tail of the distribution represents the worst user experiences.
-
-\subsubsection{Statistical Hypothesis Testing}
-To confirm that an observed performance drop is a real regression and not just random noise, a non-parametric statistical hypothesis test can be applied. In this work, the Mann-Whitney U test~\cite{mann1947test} was considered, because it compares the distributions of two samples without assuming that the data follows a normal distribution. If the resulting $p$-value is lower than the chosen significance level ($\alpha = 0.05$), the null hypothesis is rejected and the change can be considered statistically significant. This step gives high confidence in the detected regression and helps to reduce the number of false alarms.
-
-\subsubsection{Machine Learning and Forecasting}
-More advanced methods, such as ARIMA forecasting or machine learning clustering, can also be used to model complex seasonal trends in the data. However, these methods usually require a large amount of labelled data, careful parameter tuning, and significant computational resources. Considering the dynamic and bursty nature of mobile telemetry, these approaches introduce unnecessary complexity and were not selected for this lightweight system.
-
-\subsubsection{Selected Approach}
-Taking the system requirements into account, the final approach combines the \textbf{Rolling Window Percentile Shift} method with a \textbf{Statistical Hypothesis Test}, both executed on partitioned device cohorts. This hybrid approach ignores brief spikes, adapts automatically to different hardware tiers, and provides a reliable way of detecting continuous performance degradation in production environments.
+Using $P_{95}$ rather than the mean focuses detection on the worst user experiences rather than the average, and makes the result robust to skewed distributions~\cite{Nguyen2012}. The threshold expresses a directly interpretable criterion: a given percentage of degradation. Unlike the absolute, per-metric limits used by the threshold-based tools discussed in Chapter~\ref{chap:lr}, it is a relative value that compares each release against the previous one, so a single default (15\%) applies across all metrics, screens, and device cohorts. The developer therefore does not have to choose or calibrate a threshold for every metric and application. The system uses this default out of the box. This avoids the main drawback of fixed absolute thresholds, where each limit must be set and maintained by hand. The pipeline runs on production data without any labelled examples, and its core comparison is expressed as a single aggregation query, making it computationally efficient and suitable for continuous execution.
 
 \section{Summary}
 
-This chapter presented the methodology behind the proposed performance monitoring system. The design was driven by the requirements from the literature review, with an emphasis on low overhead, energy efficiency, and robustness across devices. The mobile SDK collects metrics on the user's device and sends them to the backend in batches; the backend stores them, exposes them through an API, and runs statistical regression detection on user cohorts. Together, these parts give developers automated insight into how their applications perform in production. The next chapter moves from design to implementation and discusses the technical challenges met during the development.
+This chapter presented the methodology behind the proposed performance monitoring system. The design was driven by the requirements from the literature review, with an emphasis on low overhead, energy efficiency, and robustness across devices. The mobile SDK collects metrics on the user's device and sends them to the backend in batches. The backend stores them, exposes them through an API, and runs statistical regression detection on user cohorts. Together, these parts give developers automated insight into how their applications perform in production. The next chapter turns this design into a working system and describes the technical problems that came up along the way.

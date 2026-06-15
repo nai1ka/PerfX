@@ -1,12 +1,12 @@
 import streamlit as st
+from PIL import Image
 
-from api_client import login, signup, get_me
-from auth import save_login, logout
-from cookies import get_token
+from api_client import login, signup
+from auth import save_login
 from menu import menu
 from session_restore import restore_session
 
-st.set_page_config(page_title="PerfX", layout="wide")
+st.set_page_config(page_title="PerfX", page_icon=Image.open("favicon.png"), layout="wide")
 
 restore_session()
 menu()
@@ -34,7 +34,7 @@ with tab_login:
             st.error("Invalid credentials")
         else:
             save_login(result)
-            st.switch_page("pages/projects.py")
+            st.rerun()
 
 with tab_signup:
     email = st.text_input("Email", key="signup_email")
@@ -50,4 +50,4 @@ with tab_signup:
                 st.error("Signup failed")
             else:
                 save_login(result)
-                st.switch_page("pages/projects.py")
+                st.rerun()

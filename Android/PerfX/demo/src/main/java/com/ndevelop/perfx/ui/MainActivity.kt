@@ -39,11 +39,13 @@ class MainActivity : ComponentActivity() {
         if (experiment != null) {
             Log.i("PerfXExperiment", "Experiment mode: $experiment")
         }
+        // navigate_to overrides both experiment-based nav and BuildConfig.TARGET_SCREEN.
+        val navigateTo = intent.getStringExtra("navigate_to")
         setContent {
             PerfXTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
                     Box(modifier = Modifier.padding(paddingValues)) {
-                        NavHostApp(experiment)
+                        NavHostApp(experiment, navigateTo)
                     }
                 }
             }
@@ -52,18 +54,18 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun NavHostApp(experiment: ExperimentConfig? = null) {
+fun NavHostApp(experiment: ExperimentConfig? = null, navigateTo: String? = null) {
     val navController = rememberNavController()
 
     LaunchedEffect(navController) {
         PerfX.attachNavController(navController)
     }
 
-    val startDestination = when (experiment?.type) {
+    val startDestination = navigateTo ?: when (experiment?.type) {
         RegressionType.CPU, RegressionType.CONTROL -> "cpu_load"
         RegressionType.MEMORY -> "ram_load"
         RegressionType.UI -> "ui_responsiveness"
-        null -> "home"
+        null -> com.ndevelop.perfx.BuildConfig.TARGET_SCREEN
     }
 
     NavHost(

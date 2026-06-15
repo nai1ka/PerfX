@@ -1,0 +1,6 @@
+n_samples,baseline_median,current_median,delta_pct,detected
+50,12.402,13.393,8.0,False
+100,9.263,10.259,10.75,False
+200,8.782,9.571,8.98,False
+500,6.753,9.344,38.37,True
+1000,4.464,9.36,109.68,True

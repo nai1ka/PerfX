@@ -130,10 +130,9 @@ Claude should preserve this framing unless explicitly asked to revise the resear
 
 The thesis addresses the following research questions:
 
-1. How can a low-overhead continuous performance monitoring system for Android applications be implemented so that it can run on real user devices without significantly affecting user experience?
-2. Which metrics are most relevant for detecting performance regressions in Android applications under real-world conditions?
-3. How can performance regressions be accurately detected using statistical methods while minimizing false alerts?
-4. How effective is the proposed system at detecting performance regressions when tested on real Android applications?
+1. How can Android application performance be monitored continuously with low runtime overhead?
+2. How can performance regression introduced by application updates be detected automatically?
+3. How accurate is the proposed system in detecting performance regressions?
 
 When editing, keep these questions consistent across the introduction, methodology, implementation, results, and discussion.
 
@@ -146,10 +145,9 @@ The main contribution is a low-overhead monitoring system for Android applicatio
 - collects performance metrics from real devices;
 - groups data by metric, screen, and device performance cohort;
 - stores large-scale telemetry efficiently;
-- compares current performance against a historical baseline;
-- uses percentile-based regression detection;
-- validates regressions using statistical hypothesis testing;
-- alerts developers when confirmed regressions are detected.
+- compares consecutive application releases using a P95-based relative shift;
+- uses a configurable degradation threshold to flag regressions;
+- alerts developers when regressions are detected.
 
 Avoid overstating the contribution. Do not claim that the system is the first in all contexts unless this is carefully qualified as applying to the specific combination of Android post-release monitoring and automated server-side regression detection.
 
@@ -177,13 +175,13 @@ The thesis structure is:
    - System requirements and constraints
    - High-level system architecture
    - Mobile SDK design
-   - Backend server design
+   - Backend design
    - Regression detection methods
    - Validation plan
 
 4. **Implementation**
    - Mobile SDK implementation
-   - Backend server implementation
+   - Backend implementation
    - Frontend implementation
    - Performance regression detection implementation
    - Automated alerting
@@ -216,7 +214,7 @@ The proposed system contains four main components:
    - Collects performance metrics on real user devices.
    - Buffers metrics locally and sends them to the backend in batches.
 
-2. **Backend server**
+2. **Backend**
    - Implemented in Kotlin using Ktor.
    - Receives metric batches from SDKs.
    - Handles authentication, project management, ingestion, and API access.
@@ -231,10 +229,11 @@ The proposed system contains four main components:
 4. **Regression detection pipeline**
    - Implemented as a Python service.
    - Uses ClickHouse aggregation queries.
-   - Calculates P95 values for baseline and current windows.
-   - Applies relative degradation thresholds.
-   - Confirms regressions using the Mann-Whitney U test.
-   - Saves confirmed regressions and sends alerts.
+   - Groups samples by version code; a version is eligible for comparison only after reaching a minimum sample count.
+   - For each consecutive release pair, computes the relative P95 shift per (metric, screen, cohort) group.
+   - Flags a regression when the shift exceeds the configured threshold (default 15%).
+   - Auto-closes regressions when superseded by a newer release or when the affected version stops receiving traffic.
+   - Saves detected regressions to PostgreSQL and sends alerts.
 
 ## Key technologies
 
@@ -253,8 +252,6 @@ Use these technology names consistently:
 - Streamlit
 - Plotly
 - Python
-- SciPy
-- Mann-Whitney U test
 - JWT
 - BCrypt
 - Telegram
@@ -282,26 +279,29 @@ When discussing regression detection, emphasize population-level degradation ove
 
 ## Regression detection method
 
-The selected regression detection approach combines:
+The selected regression detection approach is a **release-pair P95 shift comparison**:
 
-1. data partitioning by:
+1. Data partitioning by:
    - metric type;
    - application screen;
-   - device performance cohort: Low, Medium, or High;
+   - device performance cohort: Low, Medium, or High.
 
-2. rolling-window percentile shift:
-   - baseline window: previous historical period, e.g. previous 7 days;
-   - current window: recent period, e.g. last 24 hours;
-   - percentile: P95;
-   - degradation is calculated as the relative increase from baseline P95 to current P95;
+2. Version maturity gate:
+   - a version is eligible for comparison only after accumulating a minimum number of samples (`MIN_SAMPLES_PER_VERSION`).
 
-3. statistical validation:
-   - Mann-Whitney U test;
-   - non-parametric test;
-   - significance threshold: p-value < 0.05;
-   - used to reduce false alerts.
+3. Release-pair comparison:
+   - samples are grouped by version code, not by time window;
+   - for each consecutive pair (baseline version, current version), the P95 of each group is computed;
+   - a regression is flagged when the relative P95 shift exceeds the configured threshold (default 15%):
+     `Δ = (P95_current − P95_baseline) / P95_baseline > threshold`
 
-Preserve the distinction between a candidate regression and a statistically confirmed regression.
+4. Auto-close logic:
+   - open regressions are resolved as "superseded" when a newer mature version exists;
+   - open regressions are resolved as "rolled back" when the affected version stops receiving traffic.
+
+Do not describe the method as rolling-window or time-based — the grouping is by version code, not by time period.
+
+Do not add statistical hypothesis testing (e.g. Mann-Whitney) unless explicitly asked. It was considered but not implemented; the threshold and maturity gate serve as the noise filter.
 
 Do not replace the selected method with machine learning, ARIMA, clustering, or supervised models unless explicitly asked. These were considered but rejected because they add complexity, require tuning or labelled data, and are less suitable for a lightweight system.
 
@@ -347,12 +347,12 @@ Use these terms consistently:
 - **pre-release profiling**: detailed analysis during development or testing under controlled conditions.
 - **post-release monitoring**: collection of performance data from real user devices after deployment.
 - **performance regression**: degradation in performance compared with a previous baseline, while functionality may still remain correct.
-- **baseline window**: historical period used as the reference for normal performance.
-- **current window**: recent period compared against the baseline.
-- **P95**: 95th percentile of a metric distribution.
-- **device cohort**: group of devices with similar performance characteristics.
-- **candidate regression**: degradation that exceeds the configured threshold.
-- **confirmed regression**: candidate regression validated by statistical hypothesis testing.
+- **baseline version**: the older of the two consecutive releases used as the reference.
+- **current version**: the newer release being compared against the baseline.
+- **P95**: 95th percentile of a metric distribution within a version group.
+- **device cohort**: group of devices with similar performance characteristics (Low, Medium, or High).
+- **mature version**: a version that has accumulated at least `MIN_SAMPLES_PER_VERSION` samples and is eligible for comparison.
+- **regression**: a relative P95 shift between consecutive versions that exceeds the configured threshold.
 - **false positive**: an alert reported when no real regression exists.
 - **false negative**: a real regression that the system fails to detect.
 
@@ -367,7 +367,7 @@ Be careful with the following claims:
 - The system should not be described as universally accurate unless the evaluation proves it.
 - The system should not be described as replacing existing profiling tools.
 - The system should not claim to detect all regressions.
-- The system should not imply that percentile shift alone confirms regressions; statistical validation is part of the selected approach.
+- The system should not imply that a hypothesis test is used; the threshold on the P95 shift is the sole detection criterion.
 
 ## Writing priorities
 

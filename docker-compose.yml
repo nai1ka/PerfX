@@ -106,10 +106,38 @@ services:
       PG_DB: perfx
       PG_USER: perfx_user
       PG_PASSWORD: perfx_pass
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      HTTPS_PROXY: socks5://host.docker.internal:10818
+      NO_PROXY: postgres,clickhouse
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       postgres:
         condition: service_healthy
       clickhouse:
+        condition: service_healthy
+    restart: unless-stopped
+
+
+  telegram-bot:
+    build:
+      context: ./Analysis
+      dockerfile: Dockerfile
+    container_name: perfx-telegram-bot
+    command: python telegram_bot.py
+    environment:
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DB: perfx
+      PG_USER: perfx_user
+      PG_PASSWORD: perfx_pass
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      HTTPS_PROXY: socks5://host.docker.internal:10818
+      NO_PROXY: postgres,clickhouse
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
         condition: service_healthy
     restart: unless-stopped
 

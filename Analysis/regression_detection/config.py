@@ -21,16 +21,12 @@ PG_PASSWORD = os.getenv("PG_PASSWORD", "perfx_pass")
 # Minimum raw samples per (project, metric, screen, cohort, version) group
 # before that version is considered "mature" and eligible for comparison.
 # Set to a small value for local testing; production intent: 1000.
-MIN_SAMPLES_PER_VERSION = 50
+MIN_SAMPLES_PER_VERSION = 10
 
-# Relative median degradation threshold (15 %).
+# Relative P95 degradation threshold (15 %).
 # A regression is flagged when:
-#   Δ = (median_current − median_baseline) / median_baseline > threshold
-DEFAULT_MEDIAN_THRESHOLD = 0.15
-
-# Hours without any incoming traffic for a version before it is treated as
-# "rolled back" and the corresponding open regression is auto-closed.
-ROLLED_BACK_QUIET_HOURS = 48
+#   Δ = (P95_current − P95_baseline) / P95_baseline > threshold
+DEFAULT_P95_THRESHOLD = 0.15
 
 # Seconds between detector runs.
 POLL_INTERVAL_SECONDS = 30 # must be 3600

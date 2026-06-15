@@ -13,5 +13,10 @@ class DemoApp : Application() {
                 endpointUrl = BuildConfig.ENDPOINT_URL,
             )
         }
+        val bakedType = BuildConfig.BAKED_REGRESSION_TYPE
+        val bakedIntensity = BuildConfig.BAKED_REGRESSION_INTENSITY
+        if (bakedType != "none" && bakedIntensity > 0) {
+            RegressionInjector.activate(this, bakedType, bakedIntensity)
+        }
     }
 }

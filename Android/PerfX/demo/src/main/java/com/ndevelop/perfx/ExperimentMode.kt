@@ -49,7 +49,7 @@ fun cpuWorkers(intensity: Int): Int = when (intensity) {
     else -> 4
 }
 
-/** Megabytes allocated per 100 ms tick for the memory-leak regression. */
+/** Megabytes allocated per 500 ms tick for the memory regression (capped at 15/80/130 MB). */
 fun memoryMbPerTick(intensity: Int): Int = when (intensity) {
     1 -> 1
     2 -> 2

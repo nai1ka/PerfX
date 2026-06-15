@@ -195,27 +195,20 @@ class PostgresAuthRepository : AuthRepository {
             }
             .firstOrNull() ?: return@suspendTransaction null
 
-        val newStatus         = request.status         ?: existing[RegressionsTable.status]
-        val newResolutionType = request.resolutionType ?: existing[RegressionsTable.resolutionType]
+        val newStatus = request.status ?: existing[RegressionsTable.status]
 
-        val nowInstant = Instant.now()
-        val newAcknowledgedAt = when {
-            newStatus == "acknowledged" && existing[RegressionsTable.acknowledgedAt] == null -> nowInstant
-            else -> existing[RegressionsTable.acknowledgedAt]
-        }
-        val newResolvedAt = when {
-            newStatus == "resolved" && existing[RegressionsTable.resolvedAt] == null -> nowInstant
-            else -> existing[RegressionsTable.resolvedAt]
+        val newClosedAt = when {
+            newStatus == "closed" && existing[RegressionsTable.closedAt] == null -> Instant.now()
+            newStatus == "open" -> null
+            else -> existing[RegressionsTable.closedAt]
         }
 
         RegressionsTable.update({
             (RegressionsTable.id        eq regressionUuid) and
             (RegressionsTable.projectId eq projectUuid)
         }) {
-            it[RegressionsTable.status]         = newStatus
-            it[RegressionsTable.resolutionType] = newResolutionType
-            it[RegressionsTable.acknowledgedAt] = newAcknowledgedAt
-            it[RegressionsTable.resolvedAt]     = newResolvedAt
+            it[RegressionsTable.status]   = newStatus
+            it[RegressionsTable.closedAt] = newClosedAt
         }
 
         // Re-fetch to return the updated row
@@ -260,8 +253,8 @@ class PostgresAuthRepository : AuthRepository {
         baselineVersionName = row[RegressionsTable.baselineVersionName],
         currentVersionCode  = row[RegressionsTable.currentVersionCode],
         currentVersionName  = row[RegressionsTable.currentVersionName],
-        baselineP50         = row[RegressionsTable.baselineP50],
-        currentP50          = row[RegressionsTable.currentP50],
+        baselineP95         = row[RegressionsTable.baselineP95],
+        currentP95          = row[RegressionsTable.currentP95],
         degradationPercent  = row[RegressionsTable.degradationPercent],
         baselineCiLower     = row[RegressionsTable.baselineCiLower],
         baselineCiUpper     = row[RegressionsTable.baselineCiUpper],
@@ -269,10 +262,8 @@ class PostgresAuthRepository : AuthRepository {
         currentCiUpper      = row[RegressionsTable.currentCiUpper],
         sampleCountBaseline = row[RegressionsTable.sampleCountBaseline],
         sampleCountCurrent  = row[RegressionsTable.sampleCountCurrent],
-        status              = row[RegressionsTable.status],
-        resolutionType      = row[RegressionsTable.resolutionType],
-        acknowledgedAt      = row[RegressionsTable.acknowledgedAt]?.toString(),
-        resolvedAt          = row[RegressionsTable.resolvedAt]?.toString(),
-        detectedAt          = row[RegressionsTable.detectedAt]?.toString(),
+        status     = row[RegressionsTable.status],
+        closedAt   = row[RegressionsTable.closedAt]?.toString(),
+        detectedAt = row[RegressionsTable.detectedAt]?.toString(),
     )
 }

@@ -45,7 +45,7 @@ object PerfX {
     fun initialize(
         application: Application,
         projectId: String,
-        endpointUrl: String = "http://10.0.2.2:8080/",
+        endpointUrl: String = "https://api.perfx.ru",
     ) {
         if (isRunning) return
 

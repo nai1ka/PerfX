@@ -1,0 +1,4 @@
+regression_type,intensity,device,cohort,n_reps,mean_delta_pct,std_delta_pct,detection_rate,cv
+cpu,2.0,PerfX_High,High,5,102.514,69.216,1.0,0.675
+cpu,2.0,PerfX_Low,Low,5,68.244,42.59,1.0,0.624
+cpu,2.0,PerfX_Medium,Medium,5,90.168,94.354,1.0,1.046

@@ -1,0 +1,126 @@
+run_duration_minutes: 1         # collection time per version; must exceed MIN_SAMPLES_PER_VERSION
+flush_wait_seconds: 45          # must exceed POLL_INTERVAL_SECONDS (30 s) so the detector fires at least once after flush
+
+devices:
+  - PerfX_Low
+  - PerfX_Medium
+  - PerfX_High
+
+# Version-code scheme: each experiment gets a unique pair so ClickHouse rows
+# from different runs never collide.  Encoding: 1000 * experiment_index + run_id.
+
+experiments:
+  # ── E1: per-metric injection detection ──────────────────────────────────────
+  - id: e1_cpu_low
+    description: "CPU regression, intensity 1 (low)"
+    type: cpu
+    intensity: 1
+    target_screen: cpu_load
+    baseline_version_code: 1001
+    current_version_code:  1002
+
+  - id: e1_cpu_med
+    description: "CPU regression, intensity 2 (medium)"
+    type: cpu
+    intensity: 2
+    target_screen: cpu_load
+    baseline_version_code: 1003
+    current_version_code:  1004
+
+  - id: e1_cpu_high
+    description: "CPU regression, intensity 3 (high)"
+    type: cpu
+    intensity: 3
+    target_screen: cpu_load
+    baseline_version_code: 1005
+    current_version_code:  1006
+
+  - id: e1_memory_low
+    description: "Memory regression, intensity 1 (low)"
+    type: memory
+    intensity: 1
+    target_screen: ram_load
+    baseline_version_code: 1011
+    current_version_code:  1012
+
+  - id: e1_memory_med
+    description: "Memory regression, intensity 2 (medium)"
+    type: memory
+    intensity: 2
+    target_screen: ram_load
+    baseline_version_code: 1013
+    current_version_code:  1014
+
+  - id: e1_memory_high
+    description: "Memory regression, intensity 3 (high)"
+    type: memory
+    intensity: 3
+    target_screen: ram_load
+    baseline_version_code: 1015
+    current_version_code:  1016
+
+  - id: e1_ui_low
+    description: "UI-thread regression, intensity 1 (low)"
+    type: ui
+    intensity: 1
+    target_screen: ui_responsiveness
+    baseline_version_code: 1021
+    current_version_code:  1022
+
+  - id: e1_ui_med
+    description: "UI-thread regression, intensity 2 (medium)"
+    type: ui
+    intensity: 2
+    target_screen: ui_responsiveness
+    baseline_version_code: 1023
+    current_version_code:  1024
+
+  - id: e1_ui_high
+    description: "UI-thread regression, intensity 3 (high)"
+    type: ui
+    intensity: 3
+    target_screen: ui_responsiveness
+    baseline_version_code: 1025
+    current_version_code:  1026
+
+  # ── E2: false-positive control (identical clean APKs) ────────────────────────
+  - id: e2_control_1
+    description: "Control run 1 — no regression injected"
+    type: none
+    intensity: 0
+    target_screen: cpu_load
+    baseline_version_code: 2001
+    current_version_code:  2002
+
+  - id: e2_control_2
+    description: "Control run 2 — no regression injected"
+    type: none
+    intensity: 0
+    target_screen: cpu_load
+    baseline_version_code: 2003
+    current_version_code:  2004
+
+  - id: e2_control_3
+    description: "Control run 3 — no regression injected"
+    type: none
+    intensity: 0
+    target_screen: cpu_load
+    baseline_version_code: 2005
+    current_version_code:  2006
+
+  - id: e2_control_4
+    description: "Control run 4 — no regression injected"
+    type: none
+    intensity: 0
+    target_screen: cpu_load
+    baseline_version_code: 2007
+    current_version_code:  2008
+
+  - id: e2_control_5
+    description: "Control run 5 — no regression injected"
+    type: none
+    intensity: 0
+    target_screen: cpu_load
+    baseline_version_code: 2009
+    current_version_code:  2010
+

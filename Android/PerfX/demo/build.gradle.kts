@@ -8,6 +8,17 @@ kotlin {
     jvmToolchain(17)
 }
 
+val syntheticVersionCode: Int =
+    (project.findProperty("syntheticVersionCode") as? String)?.toIntOrNull() ?: 1
+val syntheticVersionName: String =
+    (project.findProperty("syntheticVersionName") as? String) ?: "1.0"
+val regressionType: String =
+    (project.findProperty("regressionType") as? String) ?: "none"
+val regressionIntensity: Int =
+    (project.findProperty("regressionIntensity") as? String)?.toIntOrNull() ?: 0
+val targetScreen: String =
+    (project.findProperty("targetScreen") as? String) ?: "home"
+
 android {
     namespace = "com.ndevelop.perfx"
     compileSdk = 36
@@ -16,14 +27,18 @@ android {
         applicationId = "com.ndevelop.perfx"
         minSdk = 28
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+
+        versionCode = 3
+        versionName = "3.0"
+        buildConfigField("String", "BAKED_REGRESSION_TYPE", "\"$regressionType\"")
+        buildConfigField("int",    "BAKED_REGRESSION_INTENSITY", "$regressionIntensity")
+        buildConfigField("String", "TARGET_SCREEN", "\"$targetScreen\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // Defaults — override per flavor or in local.properties
         buildConfigField("String", "PROJECT_ID",    "\"\"")
-        buildConfigField("String", "ENDPOINT_URL",  "\"http://10.0.2.2:8080/\"")
+        buildConfigField("String", "ENDPOINT_URL",  "\"https://api.perfx.ru/\"")
     }
 
     flavorDimensions += "monitoring"
@@ -32,7 +47,7 @@ android {
             dimension = "monitoring"
             buildConfigField("boolean", "SDK_ENABLED", "true")
             // ← paste your project UUID from the PerfX dashboard here
-            buildConfigField("String", "PROJECT_ID", "\"c0fabf43-bbd4-4f9e-bdab-ee5019727b00\"")
+            buildConfigField("String", "PROJECT_ID", "\"632af5b7-43bc-4fa0-bb26-ac82e381d541\"")
         }
         create("noSdk") {
             dimension = "monitoring"

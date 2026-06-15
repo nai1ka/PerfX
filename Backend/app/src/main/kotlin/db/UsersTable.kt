@@ -49,8 +49,8 @@ object RegressionsTable : UUIDTable("regressions") {
     val currentVersionName  = text("current_version_name")
 
     // Statistics (filled by detector; nullable until then)
-    val baselineP50        = double("baseline_p50").nullable()
-    val currentP50         = double("current_p50").nullable()
+    val baselineP95        = double("baseline_p95").nullable()
+    val currentP95         = double("current_p95").nullable()
     val degradationPercent = double("degradation_percent").nullable()
 
     val baselineCiLower = double("baseline_ci_lower").nullable()
@@ -62,12 +62,10 @@ object RegressionsTable : UUIDTable("regressions") {
     val sampleCountCurrent  = integer("sample_count_current").nullable()
 
     // Lifecycle
-    val status         = text("status").default("open")
-    val resolutionType = text("resolution_type").nullable()
+    val status    = text("status").default("open")
 
-    val acknowledgedAt = timestamp("acknowledged_at").nullable()
-    val resolvedAt     = timestamp("resolved_at").nullable()
-    val detectedAt     = timestamp("detected_at").nullable()
+    val closedAt  = timestamp("closed_at").nullable()
+    val detectedAt = timestamp("detected_at").nullable()
 
     init {
         uniqueIndex(

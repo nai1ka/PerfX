@@ -1,0 +1,4 @@
+device,cohort,n_runs,false_positives,fp_rate,mean_delta_pct,std_delta_pct
+PerfX_High,High,5,2,0.4,1.448,12.2565
+PerfX_Low,Low,5,1,0.2,2.062,2.2667
+PerfX_Medium,Medium,5,0,0.0,-3.49,2.3221

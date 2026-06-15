@@ -1,0 +1,176 @@
+version: "3.9"
+
+
+services:
+  traefik:
+    image: traefik
+    container_name: perfx-traefik
+    networks:
+      - perfx-net
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      # HTTP entrypoint — redirects everything to HTTPS
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      # HTTPS entrypoint
+      - "--entrypoints.websecure.address=:443"
+      # Let's Encrypt
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=nail.minnemullin@gmail.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_certs:/letsencrypt
+    restart: unless-stopped
+
+  postgres:
+    image: nai1ka/perfx-postgres
+    container_name: perfx-postgres
+    networks:
+      - perfx-net
+    environment:
+      POSTGRES_DB: perfx
+      POSTGRES_USER: perfx_user
+      POSTGRES_PASSWORD: perfx_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U perfx_user -d perfx"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  clickhouse:
+    image: nai1ka/perfx-clickhouse
+    container_name: clickhouse
+    networks:
+      - perfx-net
+    environment:
+      CLICKHOUSE_DB: metrics
+      CLICKHOUSE_USER: metrics_user
+      CLICKHOUSE_PASSWORD: metrics_pass
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  ktor-app:
+    image: nai1ka/perfx-backend
+    container_name: perfx-backend
+    networks:
+      - perfx-net
+    environment:
+      APP_PORT: 8080
+      CLICKHOUSE_URL: http://clickhouse:8123
+      CLICKHOUSE_DB: metrics
+      CLICKHOUSE_USER: metrics_user
+      CLICKHOUSE_PASSWORD: metrics_pass
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: perfx
+      POSTGRES_USER: perfx_user
+      POSTGRES_PASSWORD: perfx_pass
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`api.perfx.ru`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.backend.loadbalancer.server.port=8080"
+
+  frontend:
+    image: nai1ka/perfx-frontend
+    container_name: perfx-frontend
+    networks:
+      - perfx-net
+    environment:
+      API_BASE: http://perfx-backend:8080   # internal Docker network
+    depends_on:
+      ktor-app:
+        condition: service_healthy
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`perfx.ru`) || Host(`www.perfx.ru`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.frontend.loadbalancer.server.port=8501"
+
+
+  detector:
+    image: nai1ka/perfx-detector
+    container_name: perfx-detector
+    networks:
+      - perfx-net
+    environment:
+      CH_HOST: clickhouse
+      CH_PORT: 8123
+      CH_USER: metrics_user
+      CH_PASSWORD: metrics_pass
+      CH_DATABASE: metrics
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DB: perfx
+      PG_USER: perfx_user
+      PG_PASSWORD: perfx_pass
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      HTTPS_PROXY: socks5://host.docker.internal:10818
+      NO_PROXY: postgres,clickhouse
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    restart: unless-stopped
+
+
+  telegram-bot:
+    image: nai1ka/perfx-detector
+    container_name: perfx-telegram-bot
+    command: python telegram_bot.py
+    networks:
+      - perfx-net
+    environment:
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DB: perfx
+      PG_USER: perfx_user
+      PG_PASSWORD: perfx_pass
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      HTTPS_PROXY: socks5://host.docker.internal:10818
+      NO_PROXY: postgres,clickhouse
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  clickhouse_data:
+  traefik_certs:
+
+networks:
+  perfx-net:
+    driver: bridge
