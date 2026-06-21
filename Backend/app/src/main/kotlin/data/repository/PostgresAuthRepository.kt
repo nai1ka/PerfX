@@ -63,6 +63,7 @@ class PostgresAuthRepository : AuthRepository {
         ProjectsTable
             .selectAll()
             .where { ProjectsTable.userId eq UUID.fromString(userId) }
+            .orderBy(ProjectsTable.name)
             .map(::rowToProjectDto)
     }
 

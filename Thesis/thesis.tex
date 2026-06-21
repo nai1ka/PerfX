@@ -4,7 +4,7 @@
 
 \usepackage{vmargin}
 \setpapersize{A4}
-\setmarginsrb{2.5cm}{2.2cm}{2.2cm}{2.2cm}{0pt}{10mm}{0pt}{13mm}
+\setmarginsrb{2.5cm}{2.0cm}{2.0cm}{2.0cm}{0pt}{10mm}{0pt}{13mm}
 \usepackage{setspace}
 \setstretch{1.5}
 \usepackage{indentfirst}
@@ -51,7 +51,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{hyperref}
-\hypersetup{colorlinks=true, linkcolor=black, citecolor=black}
+\hypersetup{colorlinks=true, allcolors=black}
 \usepackage{paralist}
 \usepackage{listings}
 \usepackage{zed-csp}
@@ -110,11 +110,19 @@
 }
 
 % \setcounter{secnumdepth}{4}
-\captionsetup[table]{labelfont={normalfont}, name={TABLE}, labelsep={newline}}
-\setlength{\parindent}{2em} 
+\captionsetup[table]{labelfont={normalfont}, name={TABLE}, labelsep={newline}, justification=centering, singlelinecheck=false}
+\setlength{\parindent}{1.25cm}
 \DeclareCaptionLabelSeparator{figSep}{.\quad}
-\captionsetup[figure]{labelfont={normalfont}, name={Fig.}, labelsep=period}
-\counterwithin{figure}{chapter}
+\captionsetup[figure]{labelfont={normalfont}, name={Fig.}, labelsep=period, justification=raggedright, singlelinecheck=false}
+% Figures: continuous arabic numbering (Fig. 1, 2, ...)
+\counterwithout{figure}{chapter}
+\renewcommand{\thefigure}{\arabic{figure}}
+% Tables: continuous Roman numbering (TABLE I, II, ...)
+\counterwithout{table}{chapter}
+\renewcommand{\thetable}{\Roman{table}}
+% Equations: continuous arabic numbering (1), (2), ...
+\counterwithout{equation}{chapter}
+\renewcommand{\theequation}{\arabic{equation}}
 
 % \usepackage{titlesec}
 % \titleformat{\section}[hang]{\fontsize{20}{24}\selectfont\filcenter}{\Roman{section}}{1em}{}

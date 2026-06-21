@@ -15,12 +15,12 @@
   url    = {https://developer.android.com/topic/performance/tracing}
 }
 
-@online{AndroidANR,
-  title  = {ANRs},
-  author = {{Google Android}},
-  year   = {2025},
-  note   = {Accessed: 30 Oct 2025},
-  url    = {https://developer.android.com/topic/performance/vitals/anr}
+@online{AndroidVitals,
+  title  = {Android Vitals: App Startup Time, Slow Rendering, and {ANRs}},
+  author = {{Android Developers}},
+  year   = {2026},
+  note   = {Accessed: 19 April 2026},
+  url    = {https://developer.android.com/topic/performance/vitals}
 }
 
 
@@ -98,6 +98,14 @@
   year   = {2025},
   note   = {Accessed: 30 Oct 2025},
   url    = {https://play.google.com/console/about/vitals/}
+}
+
+@online{GooglePlayDeviceCatalog,
+  title  = {Device catalog},
+  author = {{Google Play Console}},
+  year   = {2026},
+  note   = {Accessed: 21 Jun 2026},
+  url    = {https://play.google.com/console/about/devicecatalog/}
 }
 
 @inproceedings{GuiWatcher,
@@ -201,17 +209,6 @@
   keywords   = {Performance, Empirical, Mobile, Testing}
 }
 
-@inproceedings{Schmidt,
-  author  = {Schmidt, Aubrey-Derrick and Peters, Frank and Lamour, Florian and Albayrak, Sahin and Camtepe, Seyit},
-  year    = {2008},
-  month   = {02},
-  pages   = {40},
-  title   = {Monitoring Smartphones for Anomaly Detection},
-  volume  = {14},
-  journal = {Mobile Networks and Applications - MONET},
-  doi     = {10.1007/s11036-008-0113-x}
-}
-
 
 @article{Tang,
   author     = {Tang, Yutian and Wang, Haoyu and Zhan, Xian and Luo, Xiapu and Zhou, Yajin and Zhou, Hao and Yan, Qiben and Sui, Yulei and Keung, Jacky},
@@ -291,24 +288,6 @@
   url           = {https://arxiv.org/abs/2509.16864},
 }
 
-@article{jensen-time-series,
-  author  = {Jensen, S{\o}ren Kejser and Pedersen, Torben Bach and Thomsen, Christian},
-  title   = {Time Series Management Systems: A Survey},
-  journal = {IEEE Transactions on Knowledge and Data Engineering},
-  volume  = {29},
-  number  = {11},
-  pages   = {2581--2600},
-  year    = {2017},
-  doi     = {10.1109/TKDE.2017.2740932}
-}
-
-@online{android_slow_rendering,
-  title  = {Slow rendering},
-  author = {{Android Developers}},
-  year   = {2026},
-  note   = {Accessed: 19 April 2026},
-  url    = {https://developer.android.com/topic/performance/vitals/render}
-}
 
 @online{KotlinFirst,
   title  = {Android's Kotlin-first approach},
@@ -355,13 +334,6 @@
   doi     = {10.1109/MS.2014.50}
 }
 
-@online{AndroidStartup,
-  title  = {App startup time},
-  author = {{Google Android}},
-  year   = {2025},
-  note   = {Accessed: 30 Oct 2025},
-  url    = {https://developer.android.com/topic/performance/vitals/launch-time}
-}
 
 @online{Datadog,
   author = {{Datadog}},
@@ -380,3 +352,70 @@
   address   = {New York, NY, USA},
   doi       = {10.1145/1644893.1644927}
 }
+
+@article{DeanTailAtScale,
+  author  = {Dean, Jeffrey and Barroso, Luiz Andr{\'e}},
+  title   = {The Tail at Scale},
+  journal = {Communications of the ACM},
+  volume  = {56},
+  number  = {2},
+  pages   = {74--80},
+  year    = {2013},
+  doi     = {10.1145/2408776.2408794}
+}
+
+@inproceedings{AgingOrGlitching,
+  author    = {Li, Zhenhua and Liu, Yunhao and Liu, Chi and Li, Zhiyun and Qian, Feng
+               and Liu, Hao and Sun, Ning and Xu, Tianyin},
+  title     = {Experience: {Aging} or {Glitching}? {Why} Does {Android} Stop
+               Responding and What Can We Do About It?},
+  booktitle = {Proceedings of the 26th Annual International Conference on
+               Mobile Computing and Networking (MobiCom '20)},
+  year      = {2020},
+  pages     = {1--14},
+  doi       = {10.1145/3372224.3380897},
+  publisher = {ACM}
+}
+
+@inproceedings{LindonRapidRegression,
+  author    = {Lindon, Michael and Sanden, Chris and Shirikian, Vach{\'e}},
+  title     = {Rapid Regression Detection in Software Deployments through Sequential Testing},
+  booktitle = {Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining},
+  year      = {2022},
+  pages     = {3336--3346},
+  doi       = {10.1145/3534678.3539099},
+  publisher = {ACM}
+}
+
+@inproceedings{FooHeterogeneousICPE,
+  author    = {Foo, King Chun and Jiang, Zhen Ming and Adams, Bram and Hassan, Ahmed E.
+               and Zou, Ying and Flora, Parminder},
+  title     = {An Industrial Case Study on the Automated Detection of Performance
+               Regressions in Heterogeneous Environments},
+  booktitle = {Proceedings of the 37th IEEE/ACM International Conference on Software
+               Engineering (ICSE '15)},
+  year      = {2015},
+  pages     = {159--168},
+  doi       = {10.1109/ICSE.2015.144},
+  publisher = {IEEE}
+}
+
+@inproceedings{LiHttpEnergy,
+  author    = {Li, Ding and Lyu, Yingjun and Gui, Jiaping and Halfond, William G. J.},
+  title     = {Automated Energy Optimization of {HTTP} Requests for Mobile Applications},
+  booktitle = {Proceedings of the 38th International Conference on Software Engineering
+               (ICSE '16)},
+  year      = {2016},
+  pages     = {249--260},
+  doi       = {10.1145/2884781.2884867},
+  publisher = {ACM}
+}
+
+@online{NielsenResponseTimes,
+  author = {Nielsen, Jakob},
+  title  = {Response Times: The 3 Important Limits},
+  year   = {1993},
+  url    = {https://www.nngroup.com/articles/response-times-3-important-limits/},
+  note   = {Accessed: 2026-06-15}
+}
+

@@ -27,6 +27,7 @@ import com.ndevelop.perfx.ExperimentConfig
 import com.ndevelop.perfx.RegressionType
 import com.ndevelop.perfx.ui.screens.AnimationTestScreen
 import com.ndevelop.perfx.ui.screens.CpuLoadScreen
+import com.ndevelop.perfx.ui.screens.InputLatencyTestScreen
 import com.ndevelop.perfx.ui.screens.MemoryLeakTestScreen
 import com.ndevelop.perfx.ui.theme.PerfXTheme
 import com.ndevelop.sdk.PerfX
@@ -38,6 +39,13 @@ class MainActivity : ComponentActivity() {
         val experiment = ExperimentConfig.fromIntent(intent)
         if (experiment != null) {
             Log.i("PerfXExperiment", "Experiment mode: $experiment")
+        }
+        // Calibration override: drive the FRAME regression iteration count directly,
+        // so candidate values can be swept without rebuilding the APK. Used only by the
+        // frame-calibration harness; the baked experiment path is unaffected.
+        val frameIterations = intent.getIntExtra("frame_iterations", 0)
+        if (frameIterations > 0) {
+            com.ndevelop.perfx.RegressionInjector.startFrameCpuLoad(frameIterations)
         }
         // navigate_to overrides both experiment-based nav and BuildConfig.TARGET_SCREEN.
         val navigateTo = intent.getStringExtra("navigate_to")
@@ -64,7 +72,7 @@ fun NavHostApp(experiment: ExperimentConfig? = null, navigateTo: String? = null)
     val startDestination = navigateTo ?: when (experiment?.type) {
         RegressionType.CPU, RegressionType.CONTROL -> "cpu_load"
         RegressionType.MEMORY -> "ram_load"
-        RegressionType.UI -> "ui_responsiveness"
+        RegressionType.UI, RegressionType.FRAME -> "ui_responsiveness"
         null -> com.ndevelop.perfx.BuildConfig.TARGET_SCREEN
     }
 
@@ -85,6 +93,9 @@ fun NavHostApp(experiment: ExperimentConfig? = null, navigateTo: String? = null)
         }
         composable("ram_load") {
             MemoryLeakTestScreen(experiment?.takeIf { it.type == RegressionType.MEMORY })
+        }
+        composable("input_latency") {
+            InputLatencyTestScreen()
         }
     }
 }
@@ -113,6 +124,11 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
                 navController.navigate("ram_load")
             }, modifier = Modifier.width(200.dp)) {
                 Text(text = "RAM")
+            }
+            Button(onClick = {
+                navController.navigate("input_latency")
+            }, modifier = Modifier.width(200.dp)) {
+                Text(text = "Input Latency")
             }
         }
     }

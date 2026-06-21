@@ -103,7 +103,7 @@ User interaction delay is measured by intercepting touch events on the root view
 
 \textbf{6. ANR Detector}
 
-The SDK detects ANR events using a watchdog pattern. A background thread posts a short task to the main thread's \texttt{Handler} and waits for it. If the task does not run within the timeout (5 seconds by default, matching the official Android documentation~\cite{AndroidANR}), the watchdog treats the main thread as blocked and records an ANR. The approach needs no special permissions and works on every Android version.
+The SDK detects ANR events using a watchdog pattern. A background thread posts a short task to the main thread's \texttt{Handler} and waits for it. If the task does not run within the timeout (5 seconds by default, matching the official Android documentation~\cite{AndroidVitals}), the watchdog treats the main thread as blocked and records an ANR. The approach needs no special permissions and works on every Android version.
 
 \begin{lstlisting}[language=Kotlin, caption={ANR Watchdog: detection logic}]
 val mainHandler = Handler(Looper.getMainLooper())

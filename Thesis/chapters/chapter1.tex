@@ -4,29 +4,35 @@
 
 \section{Background and motivation}
 Mobile applications are now an essential part of everyday life, and users expect them to be fast, responsive, and
-stable. Poor performance (e.g. slow startup, high CPU usage, or freezing UI) can quickly degrade the user experience and result in negative reviews \cite{Tang, FirebasePerf}. Because of this, performance monitoring has become a crucial part of modern software development. Applications are also updated frequently, and any new release can unintentionally degrade performance on users' devices. This kind of release-to-release degradation, known as a performance regression, may stay invisible during development and appear only after the update reaches real users.
+stable. Poor performance (e.g. slow startup, high CPU usage, or freezing UI) can quickly degrade the user experience and result in negative reviews \cite{Tang, FirebasePerf}. Due to this reason, performance monitoring has become a crucial part of modern software development. Applications are also updated frequently, and any new release can unintentionally degrade performance on users' devices. This kind of release-to-release degradation, known as a performance regression, may stay invisible during development and appear only after the update reaches real users.
 
-A main challenge in measuring Android application performance is fragmentation: the large variety of devices, operating system versions, and hardware configurations. The same application may perform differently across devices, so the most reliable way to understand its real-world behaviour is to observe it on real user devices under real usage conditions \cite{Zikan, Fragmentation}. Monitoring performance in this way raises two further difficulties. First, because it runs on real user devices, the monitoring must add little runtime overhead, so that measuring performance does not itself harm the user experience it is meant to protect. Second, such tools often lack automated alerting: they either provide no alerting at all or rely on thresholds that must be set manually for each metric and application and can easily lead to inaccurate detection. As a result, developers need a way to monitor how an application behaves on real devices continuously and with low overhead, and to detect automatically when a new release degrades performance.
+What makes Android performance monitoring particularly challenging is the wide variety of devices, operating system versions, and hardware configurations, a problem known as fragmentation \cite{Fragmentation}. The same application may perform differently across devices, so the most reliable way to understand its real-world behaviour is to observe it on real user devices under real usage conditions \cite{Zikan}. Monitoring performance in this way must address three challenges. First, because it runs on real user devices, it must add little runtime overhead, so that collecting metrics does not itself degrade the user experience. Second, it must account for the different performance levels of devices, so that a regression appearing only on lower-end devices is not hidden by stronger hardware when all devices are measured together. Third, it must detect regressions automatically, instead of relying on thresholds that a developer sets by hand for each metric and screen. Existing Android tools address some of these challenges individually but not all of them together.
 
 \section{Research Gap}
 
-Existing Android performance tools do not combine continuous monitoring on real devices with automated regression detection. Tools that do provide alerting, such as Firebase Performance Monitoring, rely on fixed absolute thresholds that a developer must set manually for each metric, which can lead to a large number of false positives or false negatives \cite{FirebasePerf}. At the same time, studies on regression detection are developed independently and are not connected with continuous monitoring of Android applications. As a result, there is no existing solution that combines continuous post-release performance monitoring with server-side regression detection. This gap is what the current work aims to address.
+No existing Android solution combines automatic release-to-release comparison with cohort stratification. Most tools rely on fixed thresholds set by hand instead of detecting regressions automatically, and the few that do automate the comparison still do not run it separately within each device cohort. As a result, a regression that affects only weaker devices can be hidden among the stronger ones when every device is measured at once. This gap is what the current work aims to address.
 
 \section{Research Questions and Aim}
 
+The object of study is the runtime performance of Android applications on real user devices, in particular how it changes between consecutive releases.
+
 The aim of this thesis is to develop a system that continuously collects performance metrics from
-running Android applications and detects performance regressions introduced by new releases. It gathers key metrics directly from users' devices, sends the data to a backend, and notifies developers when a regression is detected.
+running Android applications and automatically detects performance regressions introduced by new releases, while accounting for the different performance levels of user devices. It gathers key metrics directly from users' devices, sends the data to a backend, and notifies developers when a regression is detected.
 
 The study addresses the following research questions:
 \begin{enumerate}
-    \item How can Android application performance be monitored continuously with low runtime overhead?
-    \item How can performance regressions introduced by new application releases be detected automatically?
-    \item How accurate is the proposed system in detecting performance regressions?
+    \item How can Android application performance be monitored with low runtime overhead?
+    \item How to develop a system that automatically detects performance regressions introduced by new application releases?
+    \item Can performance cohorts help detect regressions that affect only specific classes of Android devices?
 \end{enumerate}
 
 \section{Novelty and Contribution}
 
-The novelty of this work is in combining post-release Android performance monitoring with automated performance regression detection in a single tool. The proposed solution is a low-overhead, continuous monitoring system designed for Android's fragmented device ecosystem. Instead of relying on static thresholds tuned per metric, the system detects regressions by comparing performance metrics between consecutive application releases, stratifying the comparison by metric, screen, and device performance cohort. As a result, developers receive notifications that are attributed to a specific release and that account for hardware heterogeneity, allowing them to address performance issues before they affect a significant number of users.
+The main contribution of this thesis is a complete system for Android performance monitoring and regression detection. It covers the full pipeline, from on-device metric collection to developer alerts. The system is open source\footnote{\url{https://github.com/nai1ka/PerfX}} and already deployed\footnote{\url{https://perfx.ru}}, so developers can integrate the SDK into their own applications. 
+
+% Old novelty text (removed, kept for reference):
+% The system also detects regressions automatically. Automatic detection already exists in server-side monitoring, for example anomaly detection in Datadog, but Android tools that alert, such as Firebase Performance Monitoring, still use fixed thresholds that a developer sets by hand for each metric and screen.
+The novel element is that the regression comparison is stratified by device performance cohort. Each release is compared with the previous one within groups of devices of similar capability, so a regression that affects only weaker devices is detected instead of being averaged away.
 
 \section{Structure}
 

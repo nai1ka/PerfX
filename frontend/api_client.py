@@ -8,6 +8,25 @@ import streamlit as st
 API_BASE = os.getenv("API_BASE", "http://localhost:8080")
 
 
+class ApiError(Exception):
+    """Raised when the backend returns a non-success status code."""
+
+    def __init__(self, status_code: int, message: str):
+        self.status_code = status_code
+        super().__init__(f"HTTP {status_code}: {message}")
+
+
+def _raise_for_status(response, action: str):
+    """Surface a backend error instead of silently treating it as 'no data'."""
+    if response.status_code == 200:
+        return
+    try:
+        detail = response.text.strip() or "(no response body)"
+    except Exception:
+        detail = "(unreadable response body)"
+    raise ApiError(response.status_code, f"{action} failed — {detail}")
+
+
 def login(email: str, password: str):
     response = requests.post(
         f"{API_BASE}/auth/login",
@@ -104,8 +123,7 @@ def get_releases(project_id: str):
         headers=_auth_headers(),
         timeout=10,
     )
-    if response.status_code != 200:
-        return []
+    _raise_for_status(response, "Loading releases")
     return response.json()
 
 
@@ -121,8 +139,7 @@ def get_regressions(project_id: str, status: str | None = None):
         headers=_auth_headers(),
         timeout=10,
     )
-    if response.status_code != 200:
-        return []
+    _raise_for_status(response, "Loading regressions")
     return response.json()
 
 

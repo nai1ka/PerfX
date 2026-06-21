@@ -13,6 +13,7 @@ import com.ndevelop.sdk.data.SyncManager
 import com.ndevelop.sdk.models.AppInfo
 import com.ndevelop.sdk.trackers.CpuCollector
 import com.ndevelop.sdk.trackers.FrameTimeCollector
+import com.ndevelop.sdk.trackers.InputLatencyCollector
 import com.ndevelop.sdk.trackers.PerformanceCollector
 import com.ndevelop.sdk.trackers.RamCollector
 import com.ndevelop.sdk.trackers.StartupTimeCollector
@@ -36,6 +37,7 @@ object PerfX {
     private var resumedCount = 0
 
     private var collectors: List<PerformanceCollector> = emptyList()
+    private var inputLatencyCollector: InputLatencyCollector? = null
 
     private var activityLifecycleCallbacks: Application.ActivityLifecycleCallbacks? = null
 
@@ -67,14 +69,18 @@ object PerfX {
         isRunning = true
     }
 
-    private fun startCollectors(context: Context) {
-        val allMetrics = collectors.map { it.collect(500) }.merge()
-        metricsRepository.observeCollector(flow = allMetrics, db = db, context = context)
-        SyncManager.startPeriodicSync(context)
+    private fun startCollectors(activity: Activity) {
+        inputLatencyCollector = InputLatencyCollector(activity.window)
+        val allMetrics = (collectors.map { it.collect(500) } +
+                listOf(inputLatencyCollector!!.collect(0))).merge()
+        metricsRepository.observeCollector(flow = allMetrics, db = db, context = activity)
+        SyncManager.startPeriodicSync(activity)
     }
 
     private fun stopCollectors() {
         collectors.forEach { it.stop() }
+        inputLatencyCollector?.stop()
+        inputLatencyCollector = null
         metricsRepository.stopObserving()
         SyncManager.stopPeriodicSync()
     }
@@ -131,7 +137,7 @@ object PerfX {
 
                 resumedCount++
                 if (resumedCount == 1) {
-                    startCollectors(activity.applicationContext)
+                    startCollectors(activity)
                 }
             }
 

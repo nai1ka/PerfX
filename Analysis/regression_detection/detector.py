@@ -26,6 +26,7 @@ from typing import Optional
 from .config import (
     DEFAULT_P95_THRESHOLD,
     MIN_SAMPLES_PER_VERSION,
+    PERCEIVED_METRICS,
 )
 from .notifier import send_regression_alert
 from .queries import (
@@ -62,7 +63,10 @@ def _fetch_mature_medians(ch_client) -> dict:
         (project_id, metric_id, screen_name, device_cohort)
             → sorted list of (version_code, version_name, p95, count)
     """
-    query = MATURE_MEDIANS_QUERY.format(min_samples=MIN_SAMPLES_PER_VERSION)
+    query = MATURE_MEDIANS_QUERY.format(
+        min_samples=MIN_SAMPLES_PER_VERSION,
+        perceived_metrics=PERCEIVED_METRICS,
+    )
     rows = ch_client.query(query).result_rows
 
     groups: dict = defaultdict(list)

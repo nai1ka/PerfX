@@ -1,0 +1,4 @@
+experiment_id,app,device,cohort,baseline_version_code,current_version_code,metric_id,screen_name,baseline_p95,current_p95,delta_pct,exceeds_threshold,threshold,run_duration_minutes,timestamp
+cheddar_noise_1,cheddar,46182cd4,46182cd4,9001,9002,cpuUsage,MainActivity,213.29341317365265,200.4835890349478,-6.01,False,0.15,1,2026-06-16T12:03:02.438862
+cheddar_noise_1,cheddar,46182cd4,46182cd4,9001,9002,memoryUsage,MainActivity,250.20390625,234.06289062500002,-6.45,False,0.15,1,2026-06-16T12:03:02.494834
+cheddar_noise_1,cheddar,46182cd4,46182cd4,9001,9002,frameTime,MainActivity,20.797262729833324,19.81762722692307,-4.71,False,0.15,1,2026-06-16T12:03:02.528566

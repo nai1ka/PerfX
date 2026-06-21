@@ -109,47 +109,51 @@ No prompt can guarantee a specific AI detector score. However, Claude should avo
 
 ## Thesis aim
 
-The aim of the thesis is to develop a system for continuous collection of performance metrics from running Android applications and to detect performance regressions using server-side statistical methods.
+The aim of the thesis is to develop a system that continuously collects performance metrics from running Android applications and automatically detects performance regressions introduced by new releases, while accounting for the different performance levels of user devices.
 
-The system collects performance metrics from real user devices, sends the data to a backend, stores and analyses the data, and notifies developers when performance regressions are detected.
+The system collects performance metrics from real user devices, sends the data to a backend, stores and analyses the data grouped by device performance cohort, and notifies developers when a regression is detected. The detection is a deterministic release-to-release comparison, **not** a statistical method.
 
 ## Research gap
 
-The thesis argues that existing work usually focuses on either:
+Automatic regression detection is already established in server-side monitoring, and some Android tools (e.g. Firebase Performance Monitoring) provide alerting too. The problem is that Android tools that alert rely on fixed thresholds a developer must set by hand for each metric and screen, and they compare all devices together without accounting for device performance levels.
 
-1. pre-release profiling under controlled conditions;
-2. post-release monitoring and tracing in production.
+The identified gap is the absence of automatic **release-to-release** regression detection that is **stratified by device performance cohort**, so that a regression affecting only one class of devices is not hidden among stronger hardware.
 
-The identified gap is that existing Android monitoring tools do not combine continuous low-overhead post-release performance monitoring with automated server-side performance regression detection.
-
-Tools with alerting often rely on static thresholds. Statistical regression detection methods are usually studied separately from Android production monitoring.
-
-Claude should preserve this framing unless explicitly asked to revise the research argument.
+**Do NOT** frame the gap as "no automatic detection exists" (it does, server-side and partly on Android) or as "no tool segments devices by performance level". Device segmentation and device tiers already exist (Facebook `device-year-class`, Android Performance Class, Google Play device tiers), and dashboards let developers filter by device manually. The novelty is using a performance cohort as the **unit of automatic release-to-release detection**, not the idea of tiers itself. Prefer citing the prior tiering work when justifying cohorts.
 
 ## Research questions
 
 The thesis addresses the following research questions:
 
 1. How can Android application performance be monitored continuously with low runtime overhead?
-2. How can performance regression introduced by application updates be detected automatically?
-3. How accurate is the proposed system in detecting performance regressions?
+2. How to develop a system that automatically detects performance regressions introduced by new application releases?
+3. Can performance cohorts help detect regressions that affect only specific classes of Android devices?
 
 When editing, keep these questions consistent across the introduction, methodology, implementation, results, and discussion.
 
+**RQ3 is a verification / value question** ("do cohorts help?"), NOT a statistical-accuracy question. Do not reword it as "how reliable/accurate", and do not answer it with statistical tests (no bootstrap, no Mann-Whitney). It is answered by the deterministic demonstration (the injected hardware-sensitive regression is flagged on the Low cohort and not on Medium/High) plus the qualitative argument that comparing all devices together would dilute or hide a class-specific regression. The author does not want statistical methods and wants the focus on the system, not the method.
+
 ## Novelty and contribution
 
-The novelty of the work is the integration of post-release Android performance monitoring with automated performance regression detection in one system.
+**Lead with the system as the main contribution.** The main contribution is a complete, working, open-source system (not a prototype), already deployed and usable by developers, with a running instance at https://perfx.ru. It covers the full pipeline from on-device metric collection to developer alerts.
 
-The main contribution is a low-overhead monitoring system for Android applications that:
+The **novel element inside the system** is that the release-to-release comparison is **stratified by device performance cohort**. Automatic release-to-release detection itself is adapted from server-side monitoring and is **not** claimed as novel.
+
+The system:
 
 - collects performance metrics from real devices;
 - groups data by metric, screen, and device performance cohort;
-- stores large-scale telemetry efficiently;
-- compares consecutive application releases using a P95-based relative shift;
+- compares consecutive releases using a P95-based relative shift **within each cohort**;
 - uses a configurable degradation threshold to flag regressions;
-- alerts developers when regressions are detected.
+- alerts developers in real time when a regression is detected.
 
-Avoid overstating the contribution. Do not claim that the system is the first in all contexts unless this is carefully qualified as applying to the specific combination of Android post-release monitoring and automated server-side regression detection.
+Avoid overstating. Do not claim the system is "the first" without qualifying it to the specific combination (automatic release-to-release detection stratified by performance cohort). Keep "already deployed" and the perfx.ru link only while the instance is actually live.
+
+## Canonical abstract (narrative and tone reference)
+
+This is the current, author-approved abstract. Treat it as the canonical statement of the narrative and as the **tone example** for the rest of the thesis: simple B2-level words, formal but human (not AI-sounding), no semicolons, no dashes. When editing other chapters, keep them consistent with this framing (cohorts as the new element, automatic detection adapted from the server side, deterministic end-to-end verification, overhead reported with relative percentages).
+
+> Each new release of a mobile application can introduce a performance regression, for example through added features or updated dependencies. On Android these regressions are difficult to detect, because user devices vary widely in hardware and operating system, so the same release can run differently from one device to another. Regression detection is well established on the server side, but Android tools usually rely on fixed thresholds that a developer sets by hand and do not account for this device variety. This thesis adapts automatic release-to-release detection to Android. Instead of comparing all devices together, the system groups devices with similar capabilities into performance cohorts and compares each new release against the previous one within each cohort, so that a regression appearing only on weaker devices is not hidden among the stronger ones. The system has three parts: a mobile SDK on the device, a backend, and a frontend. Moreover, it alerts developers in real time when a regression is found. Because the SDK runs continuously on the user's device, its overhead must remain low. Across all tested devices it added at most 5.2 percentage points of CPU usage, 5.4 MB (4.1%) of memory, and 75 ms (5.1%) of cold-start time. The whole system was tested end to end, which it successfully passed. These results show that continuous monitoring and automatic, cohort-aware regression detection can be applied to Android applications on real devices at a low cost to the user and with little setup for the developer.
 
 ## Thesis structure
 
@@ -232,8 +236,7 @@ The proposed system contains four main components:
    - Groups samples by version code; a version is eligible for comparison only after reaching a minimum sample count.
    - For each consecutive release pair, computes the relative P95 shift per (metric, screen, cohort) group.
    - Flags a regression when the shift exceeds the configured threshold (default 15%).
-   - Auto-closes regressions when superseded by a newer release or when the affected version stops receiving traffic.
-   - Saves detected regressions to PostgreSQL and sends alerts.
+   - Saves detected regressions to PostgreSQL with status `open` or `closed` (closed manually from the dashboard; there is no automatic close). Sends a Telegram alert when a regression is confirmed.
 
 ## Key technologies
 
@@ -295,9 +298,7 @@ The selected regression detection approach is a **release-pair P95 shift compari
    - a regression is flagged when the relative P95 shift exceeds the configured threshold (default 15%):
      `Δ = (P95_current − P95_baseline) / P95_baseline > threshold`
 
-4. Auto-close logic:
-   - open regressions are resolved as "superseded" when a newer mature version exists;
-   - open regressions are resolved as "rolled back" when the affected version stops receiving traffic.
+Regression lifecycle: a regression has status `open` or `closed` only, and is closed **manually** from the dashboard. There is **no** automatic close — the superseded/rolled-back logic was removed from both the code and the thesis, so do not mention it. CPU usage is `process CPU time / wall-clock time × 100` (can exceed 100% on multi-core devices; not normalised by system CPU or core count); cross-device fairness comes from cohort stratification and the relative comparison, not from the formula.
 
 Do not describe the method as rolling-window or time-based — the grouping is by version code, not by time period.
 
@@ -428,6 +429,8 @@ Avoid:
 
 Do not end sections with dramatic or inflated concluding sentences. End with the actual implication, transition, limitation, or next technical step.
 
+**Punctuation (author preference):** never use semicolons in thesis prose, and avoid dashes (em dash and en dash). Rewrite a semicolon-joined clause as two sentences or rejoin with "and"/", while". This applies to prose only, not to code listings (e.g. the SQL `ORDER BY ...;`).
+
 ## Editing behaviour
 
 When asked to revise text:
@@ -483,6 +486,26 @@ When adding or revising literature-review text, distinguish between:
 ## LaTeX rules
 
 Preserve valid LaTeX structure.
+
+### Formatting conventions (already configured in `thesis.tex`, keep them)
+
+These satisfy the university methodological requirements — do not undo them:
+
+- Figures: continuous arabic numbering (`\counterwithout{figure}{chapter}`), caption **below** the figure, **left-aligned** ("Fig. 1" on the left).
+- Tables: continuous **Roman** numbering (`\Roman{table}`), caption **above** the table, **centred**, label name "TABLE".
+- Equations: continuous arabic numbering (`\counterwithout{equation}{chapter}`).
+- Hyperlinks: no colour (`\hypersetup{colorlinks=true, allcolors=black}`).
+- Every `\begin{figure}` uses `[H]` (package `float`) so figures stay in the text and do not float to a separate page.
+- Page margins: left 25 mm, others 20 mm. Paragraph indent 1.25 cm.
+- Regenerate `figs/postgres_schema.png` from `figs/postgres_schema.svg` with `rsvg-convert -f png -d 220 -p 220 -o figs/postgres_schema.png figs/postgres_schema.svg` (the SVG is produced by a small Python generator).
+
+### Evaluation facts (Chapter 5)
+
+- Detection experiment: 30 injected runs + 15 control runs; roughly one device per cohort (Low emulator, Medium emulator + Redmi Note 9 Pro, High emulator).
+- Three injected regression types map to three metrics: CPU load, memory leak, UI thread blocking (frame time).
+- SDK overhead (worst case across tested devices): at most **5.2 percentage points** CPU usage, **5.4 MB (4.1%)** memory, **75 ms (5.1%)** cold-start time. Report memory and cold-start with both the absolute value and the relative percentage (relative values are computed from the without-SDK baselines in the Chapter 5 tables, not invented).
+- Tier experiment: the hardware-sensitive frame-time regression crossed the 15% threshold only on the Low cohort (27%), not Medium (9%) or High (5%). This answers RQ3 (cohorts isolate a class-specific regression).
+- To demonstrate the value of cohorts, the intended argument is a **cohort-vs-pooled** contrast (re-aggregate the same samples without `GROUP BY device_cohort` and show the pooled shift behaves differently). This is arithmetic, not a statistical test. Caveat: for P95, dilution only clearly hides a regression when the affected cohort is a minority; the population-mix false-positive case is the most robust demonstration.
 
 Do not edit generated files such as:
 

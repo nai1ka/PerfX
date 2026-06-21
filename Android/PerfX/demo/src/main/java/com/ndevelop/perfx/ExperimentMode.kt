@@ -14,7 +14,7 @@ import android.content.Intent
  * the synthetic regression at the given intensity and keeps it on. The driver
  * force-stops the process after the windows elapse.
  */
-enum class RegressionType { CPU, MEMORY, UI, CONTROL }
+enum class RegressionType { CPU, MEMORY, UI, FRAME, CONTROL }
 
 data class ExperimentConfig(
     val type: RegressionType,
@@ -29,6 +29,7 @@ data class ExperimentConfig(
                 "cpu" -> RegressionType.CPU
                 "memory" -> RegressionType.MEMORY
                 "ui" -> RegressionType.UI
+                "frame" -> RegressionType.FRAME
                 "control" -> RegressionType.CONTROL
                 else -> return null
             }
@@ -61,4 +62,20 @@ fun uiBlockMs(intensity: Int): Long = when (intensity) {
     1 -> 15L
     2 -> 40L
     else -> 90L
+}
+
+/**
+ * Fixed CPU work (loop iterations) per frame for the tier-sensitive FRAME regression.
+ *
+ * Unlike [uiBlockMs], which adds a fixed delay and so the same wall time on every
+ * device, this is a fixed amount of computation. Its wall-clock cost scales with CPU
+ * speed, so a high-tier device may finish within the frame budget while a low-tier
+ * device overruns it. The iteration counts below are a starting point and must be
+ * calibrated on the target emulators so that the High cohort stays under the frame
+ * budget and the Low cohort exceeds it.
+ */
+fun frameWorkIterations(intensity: Int): Int = when (intensity) {
+    1 -> 5_000_000
+    2 -> 10_000_000
+    else -> 20_000_000
 }

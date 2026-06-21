@@ -4,9 +4,9 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces Test Devices Used in the Evaluation}}{52}{table.caption.13}%
-\contentsline {table}{\numberline {5.2}{\ignorespaces SDK Overhead Measured on the Test Devices}}{53}{table.caption.14}%
-\contentsline {table}{\numberline {5.3}{\ignorespaces Cold-Start Time Overhead Measured on the Test Devices (mean of ten launches)}}{53}{table.caption.15}%
-\contentsline {table}{\numberline {5.4}{\ignorespaces P95 Shift and Detection Outcome for the Injected Regressions (Release-Pair Comparison, 15\% Threshold)}}{57}{table.caption.17}%
-\contentsline {table}{\numberline {5.5}{\ignorespaces Detector Quality vs.\ Regression Threshold}}{59}{table.caption.19}%
+\contentsline {table}{\numberline {I}{\ignorespaces Test Devices Used in the Evaluation}}{52}{table.caption.13}%
+\contentsline {table}{\numberline {II}{\ignorespaces Resource Overhead per SDK}}{53}{table.caption.14}%
+\contentsline {table}{\numberline {III}{\ignorespaces Cold-Start Overhead per SDK (mean of twenty launches)}}{53}{table.caption.15}%
+\contentsline {table}{\numberline {IV}{\ignorespaces Frame-Time P95 Shift on Cheddar With No Code Change}}{57}{table.caption.19}%
+\contentsline {table}{\numberline {V}{\ignorespaces Frame-Time P95 Shift Across Four Runs, Aggregated and Per Cohort}}{58}{table.caption.20}%
 \addvspace {10\p@ }

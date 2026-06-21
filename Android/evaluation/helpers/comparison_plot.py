@@ -31,7 +31,7 @@ from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
+
 import numpy as np
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -97,8 +97,6 @@ def _draw_panel(ax, baseline: np.ndarray, regression: np.ndarray,
 
     sep = len(baseline) - 0.5
     ax.axvline(sep, color="grey", linewidth=0.9, linestyle="--")
-    ax.text(sep + total * 0.01, ax.get_ylim()[1], "regression\ninjected",
-            fontsize=7, va="top", color="grey")
 
     ax.axhline(b_p95, xmax=len(baseline) / total,
                color=BASELINE_COLOR, linewidth=1.2, linestyle=":",
@@ -106,12 +104,6 @@ def _draw_panel(ax, baseline: np.ndarray, regression: np.ndarray,
     ax.axhline(r_p95, xmin=len(baseline) / total,
                color=REGRESSION_COLOR, linewidth=1.2, linestyle=":",
                label=f"regression P95 = {r_p95:.1f}")
-
-    delta = (r_p95 - b_p95) / b_p95 * 100 if b_p95 > 0 else float("nan")
-    ax.set_title(
-        f"{row_title}  —  P95 shift: {b_p95:.1f} → {r_p95:.1f} ({delta:+.1f}%)",
-        fontsize=10,
-    )
     ax.set_xlabel("Sample index")
     ax.set_ylabel(ylabel)
     ax.legend(fontsize=8, loc="upper left")
@@ -166,10 +158,13 @@ def main():
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    ap.add_argument("--project-id",   required=True)
-    ap.add_argument("--baseline-vc",  type=int, required=True,
+    ap.add_argument("--npz", default=None,
+                    help="load data from a saved .npz file instead of querying ClickHouse "
+                         "(e.g. results/comparison_data/e1_ui_low__PerfX_Low.npz)")
+    ap.add_argument("--project-id",   default=None)
+    ap.add_argument("--baseline-vc",  type=int, default=None,
                     help="version_code for the baseline window")
-    ap.add_argument("--current-vc",   type=int, required=True,
+    ap.add_argument("--current-vc",   type=int, default=None,
                     help="version_code for the regression window")
     ap.add_argument("--metric-id",    default="cpuUsage")
     ap.add_argument("--screen-name",  default="compose/cpu_load")
@@ -177,6 +172,20 @@ def main():
     ap.add_argument("--title",        default="",
                     help="optional label added to the figure title")
     args = ap.parse_args()
+
+    if args.npz:
+        d = np.load(args.npz, allow_pickle=True)
+        baseline   = d["baseline"].astype(float)
+        regression = d["regression"].astype(float)
+        metric_id  = str(d["metric_id"]) if "metric_id" in d else args.metric_id
+        title = args.title or Path(args.npz).stem
+        out = Path(args.figs_dir) / f"comparison_{Path(args.npz).stem}.png"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        plot_comparison(baseline, regression, metric_id, title, out)
+        return
+
+    if not args.project_id or args.baseline_vc is None or args.current_vc is None:
+        ap.error("--project-id, --baseline-vc and --current-vc are required unless --npz is used")
 
     ch = clickhouse_connect.get_client(
         host=CH_HOST, port=CH_PORT,

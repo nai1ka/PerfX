@@ -35,7 +35,7 @@ if not rows_raw:
 
 df = pd.DataFrame(rows_raw)
 df["detected_at"] = pd.to_datetime(df["detected_at"], utc=True, errors="coerce")
-for col in ("degradation_percent", "baseline_p50", "current_p50"):
+for col in ("degradation_percent", "baseline_p95", "current_p95"):
     if col in df.columns:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
@@ -118,8 +118,8 @@ col_cfg = {
     "screen_name":         st.column_config.TextColumn("Screen"),
     "device_cohort":       st.column_config.TextColumn("Tier"),
     "version_pair":        st.column_config.TextColumn("Version pair"),
-    "baseline_p50":        st.column_config.NumberColumn("Baseline P50", format="%.2f"),
-    "current_p50":         st.column_config.NumberColumn("Current P50",  format="%.2f"),
+    "baseline_p95":        st.column_config.NumberColumn("Baseline P95", format="%.2f"),
+    "current_p95":         st.column_config.NumberColumn("Current P95",  format="%.2f"),
     "degradation_percent": st.column_config.NumberColumn("Degradation %", format="%.1f%%"),
     "status":              st.column_config.TextColumn("Status"),
     "detected_at":         st.column_config.DatetimeColumn("Detected", format="DD MMM YYYY"),
@@ -127,7 +127,7 @@ col_cfg = {
 
 show_cols = [c for c in [
     "sev", "sts", "metric_id", "screen_name", "device_cohort", "version_pair",
-    "baseline_p50", "current_p50", "degradation_percent",
+    "baseline_p95", "current_p95", "degradation_percent",
     "status", "detected_at",
 ] if c in display_df.columns]
 

@@ -68,6 +68,10 @@ from comparison_plot import (       # noqa: E402
 
 PACKAGE = "com.ndevelop.perfx"
 ACTIVITY = f"{PACKAGE}/.ui.MainActivity"
+
+# Local evaluation project (created in the local dashboard). Used as the default so
+# --project-id can be omitted; the same UUID is baked into the APK via -PprojectId.
+DEFAULT_PROJECT_ID = "2b399c24-e2a9-481a-9f8c-30b1554763e0"
 GRADLE_DIR = REPO_ROOT / "Android" / "PerfX"
 APK_PATH = GRADLE_DIR / "demo/build/outputs/apk/withSdk/debug/demo-withSdk-debug.apk"
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
@@ -146,7 +150,9 @@ def adb(args, serial=None, capture=True, check=True):
 
 def build_apk(version_code: int, version_name: str,
               regression_type: str, regression_intensity: int,
-              target_screen: str, serial=None) -> None:
+              target_screen: str, serial=None,
+              endpoint_url: str | None = None,
+              project_id: str | None = None) -> None:
     env = dict(os.environ)
     if serial:
         env["ANDROID_SERIAL"] = serial
@@ -158,6 +164,12 @@ def build_apk(version_code: int, version_name: str,
         f"-PregressionIntensity={regression_intensity}",
         f"-PtargetScreen={target_screen}",
     ]
+    # Point the app at the backend whose database the scripts read, and report
+    # under the same project UUID the queries use.
+    if endpoint_url:
+        gradle_args.append(f"-PendpointUrl={endpoint_url}")
+    if project_id:
+        gradle_args.append(f"-PprojectId={project_id}")
     print(f"  [build] versionCode={version_code} type={regression_type} "
           f"intensity={regression_intensity} screen={target_screen}")
     subprocess.run(gradle_args, cwd=GRADLE_DIR, env=env, check=True)
@@ -313,7 +325,8 @@ def device_cohort(device_serial: str) -> str:
 def run_experiment(exp: dict, project_id: str, device: str,
                    run_duration_minutes: int, flush_wait_seconds: int,
                    ch_client, pg_conn,
-                   no_build: bool = False) -> dict:
+                   no_build: bool = False,
+                   endpoint_url: str | None = None) -> dict:
     serial = resolve_serial(device)
     exp_id = exp["id"]
     reg_type = exp["type"]
@@ -338,7 +351,8 @@ def run_experiment(exp: dict, project_id: str, device: str,
     # ── Baseline APK (clean) ───────────────────────────────────────────────────
     if not no_build:
         build_apk(baseline_vc, f"{baseline_vc}-clean",
-                  "none", 0, target_screen, serial)
+                  "none", 0, target_screen, serial,
+                  endpoint_url=endpoint_url, project_id=project_id)
     install_apk(serial)
     launch_app(target_screen, serial)
     print(f"  [collect baseline] {run_duration_minutes} min...")
@@ -348,7 +362,8 @@ def run_experiment(exp: dict, project_id: str, device: str,
     # ── Regressed APK ─────────────────────────────────────────────────────────
     if not no_build:
         build_apk(current_vc, f"{current_vc}-{reg_type}-i{intensity}",
-                  reg_type, intensity, target_screen, serial)
+                  reg_type, intensity, target_screen, serial,
+                  endpoint_url=endpoint_url, project_id=project_id)
     install_apk(serial)
     launch_app(target_screen, serial)
     print(f"  [collect regressed] {run_duration_minutes} min...")
@@ -496,8 +511,9 @@ def _generate_comparison_plots(results_dir: Path, figs_dir: Path) -> None:
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--project-id", required=True,
-                    help="project_id UUID the demo app reports under")
+    ap.add_argument("--project-id", default=DEFAULT_PROJECT_ID,
+                    help="project_id UUID the demo app reports under "
+                         f"(default: {DEFAULT_PROJECT_ID})")
     ap.add_argument("--device", required=True,
                     help="adb serial or AVD name of the target device")
     ap.add_argument("--config", default=str(Path(__file__).parent / "experiments.yaml"),
@@ -506,6 +522,9 @@ def main():
                     help="comma-separated experiment IDs to run; empty = all")
     ap.add_argument("--no-build", action="store_true",
                     help="skip Gradle build (APK already installed)")
+    ap.add_argument("--endpoint", default="http://10.0.2.2:8080/",
+                    help="backend URL baked into the APK (default: local stack "
+                         "via the emulator host alias)")
     args = ap.parse_args()
 
     device = args.device.strip()
@@ -552,6 +571,7 @@ def main():
                 run_duration, flush_wait,
                 ch, pg,
                 no_build=args.no_build,
+                endpoint_url=args.endpoint,
             )
             rows.append(row)
 

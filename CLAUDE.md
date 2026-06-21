@@ -86,13 +86,13 @@ cd Thesis && latexmk -pdf thesis.tex     # builds thesis.pdf; biblatex with the 
 
 ### Data flow
 1. The SDK's `PerfX` object (`Android/PerfX/sdk/.../PerfX.kt`) registers `PerformanceCollector`s (CPU, frame time, RAM, one-shot startup time). Metrics are buffered in a local Room DB and batch-uploaded to the backend `POST /ingest` (default endpoint `https://api.perfx.ru/` — the emulator alias for host localhost). The in-repo `:demo` module depends on `:sdk` directly via `project(":sdk")`; external host apps (e.g. the `Demo/` apps) consume the published `com.ndevelop:perfx-sdk` artifact from Maven Local instead.
-2. The Ktor backend (`Backend/app`) writes raw metrics into ClickHouse table `metrics.metric_records` and serves authenticated query endpoints. Users, projects, thresholds and confirmed regressions live in Postgres.
-3. The regression detector (`Analysis/`) reads recent windows from ClickHouse, runs a Rolling Window Percentile Shift comparison plus a Mann-Whitney U test, and inserts confirmed regressions into Postgres.
+2. The Ktor backend (`Backend/app`) writes raw metrics into ClickHouse table `metrics.metric_records` and serves authenticated query endpoints. Users, projects, version releases, and confirmed regressions live in Postgres (there is no `thresholds` table).
+3. The regression detector (`Analysis/`) groups samples by version code and compares each consecutive release pair by the relative P95 shift per (metric, screen, cohort) group — no time windows and no hypothesis test. It inserts confirmed regressions into Postgres, and pushes a Telegram alert via `notifier.py` when the project is linked to a chat (`telegram_bot.py`).
 4. The Streamlit dashboard calls the backend REST API to render metrics, custom plots, and regression reports.
 
 ### Two-database split
 - **ClickHouse** (`metrics` db) — time-series metric data only. Schema in `Backend/clickhouse/init/01_schema.sql`; `metric_records` is a MergeTree partitioned by day, ordered by `(project_id, metric_id, ts)`.
-- **Postgres** (`perfx` db) — relational state: users, projects, per-project regression thresholds, confirmed regressions. Schema in `Backend/postgres/init/`.
+- **Postgres** (`perfx` db) — relational state: users, projects, `version_releases` (version catalogue synced from ClickHouse by `VersionSyncJob` every ~5 min), confirmed regressions. No `thresholds` table. Schema in `Backend/postgres/init/`.
 
 ### Backend (Ktor)
 - Entry point `Application.kt` installs serialization, security (JWT), databases, then `configureRouting`.
@@ -101,8 +101,9 @@ cd Thesis && latexmk -pdf thesis.tex     # builds thesis.pdf; biblatex with the 
 - ClickHouse access goes through `ClickHouseClient` over its HTTP interface; SQL strings are built inline in `Routing.kt`.
 
 ### Regression detection
-- `Analysis/regression_detection/config.py` holds detection parameters: baseline vs. current window sizes, default P95 degradation threshold (`DEFAULT_P95_THRESHOLD`), p-value, and `MIN_SAMPLES`. The window values in `config.py` are currently set to small numbers for local testing — comments describe the intended production values.
-- Thresholds resolve in a fallback chain: exact `(project, metric, screen)` → project-wide `(project, metric, None)` → `DEFAULT_P95_THRESHOLD`.
+- `Analysis/regression_detection/config.py` holds detection parameters: a single global `DEFAULT_P95_THRESHOLD` (0.15) applied to every group, and `MIN_SAMPLES_PER_VERSION`. There is **no** per-project/per-metric threshold table and **no** fallback chain — the old `thresholds` table was removed. Values are small for local testing; comments note the intended production values.
+- A regression is flagged when the relative P95 shift between two consecutive version codes exceeds the threshold. Regression `status` is `open`/`closed` only and is closed **manually** from the dashboard — there is no automatic close (the superseded/rolled-back logic was removed).
+- CPU usage (`Android/PerfX/sdk/.../trackers/CpuCollector.kt`) is `process CPU time / wall-clock time × 100`; it can exceed 100% on multi-core devices and is **not** normalised by system CPU or by core count.
 
 ## Evaluation / validation setup
 

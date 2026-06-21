@@ -33,4 +33,10 @@ internal sealed interface Metric {
         override val timestamp: Long,
         override val value: Double,
     ) : Metric
+
+    data class InputLatency(
+        override val id: String = "inputLatency",
+        override val timestamp: Long,
+        override val value: Double,
+    ) : Metric
 }

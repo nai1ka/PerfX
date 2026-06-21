@@ -13,6 +13,7 @@ SELECT
     quantile(0.95)(value) AS p95,
     count()               AS cnt
 FROM metric_records
+WHERE metric_id IN {perceived_metrics}
 GROUP BY
     project_id, metric_id, screen_name, device_cohort, version_code, version_name
 HAVING cnt >= {min_samples}

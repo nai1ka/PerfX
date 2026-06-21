@@ -28,5 +28,9 @@ MIN_SAMPLES_PER_VERSION = 10
 #   Δ = (P95_current − P95_baseline) / P95_baseline > threshold
 DEFAULT_P95_THRESHOLD = 0.15
 
+# Only user-perceived metrics are scanned for regressions.
+# Resource metrics (cpuUsage, memoryUsage) are excluded.
+PERCEIVED_METRICS = ("frameTime", "startupTime", "inputLatency")
+
 # Seconds between detector runs.
 POLL_INTERVAL_SECONDS = 30 # must be 3600

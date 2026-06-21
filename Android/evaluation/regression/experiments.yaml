@@ -124,3 +124,92 @@ experiments:
     baseline_version_code: 2009
     current_version_code:  2010
 
+  # ── E7: tier-sensitive regression (detected only on low-tier devices) ────────
+  # Fixed CPU work per frame. A fast CPU stays under the frame budget (small shift,
+  # not flagged) while a slow CPU overruns it (large shift, flagged). Run on all
+  # three cohorts. Calibrate `intensity` (frameWorkIterations) so High stays below
+  # the 15% threshold and Low crosses it before collecting the final data.
+  - id: e7_frame_tier
+    description: "Tier-sensitive frame regression — fixed CPU work per frame"
+    type: frame
+    intensity: 2
+    target_screen: ui_responsiveness
+    baseline_version_code: 7001
+    current_version_code:  7002
+
+  # ── E10: signal-vs-noise separation on the physical device (frame time) ──────
+  # Several no-change runs (noise band) and several regression runs (signal) on
+  # the SAME screen, so one plot shows the noise below the 15% threshold and the
+  # regression above it. Run on the Redmi. The "ui" regression adds a fixed
+  # per-frame block, so frame time rises clearly on any device.
+  - id: e10_noise_1
+    description: "Separation: no-change run 1"
+    type: none
+    intensity: 0
+    target_screen: ui_responsiveness
+    baseline_version_code: 10001
+    current_version_code:  10002
+  - id: e10_noise_2
+    description: "Separation: no-change run 2"
+    type: none
+    intensity: 0
+    target_screen: ui_responsiveness
+    baseline_version_code: 10003
+    current_version_code:  10004
+  - id: e10_noise_3
+    description: "Separation: no-change run 3"
+    type: none
+    intensity: 0
+    target_screen: ui_responsiveness
+    baseline_version_code: 10005
+    current_version_code:  10006
+  - id: e10_noise_4
+    description: "Separation: no-change run 4"
+    type: none
+    intensity: 0
+    target_screen: ui_responsiveness
+    baseline_version_code: 10007
+    current_version_code:  10008
+  - id: e10_noise_5
+    description: "Separation: no-change run 5"
+    type: none
+    intensity: 0
+    target_screen: ui_responsiveness
+    baseline_version_code: 10009
+    current_version_code:  10010
+  - id: e10_noise_6
+    description: "Separation: no-change run 6"
+    type: none
+    intensity: 0
+    target_screen: ui_responsiveness
+    baseline_version_code: 10011
+    current_version_code:  10012
+  - id: e10_signal_1
+    description: "Separation: regression run 1 (UI per-frame block)"
+    type: ui
+    intensity: 1
+    target_screen: ui_responsiveness
+    baseline_version_code: 10101
+    current_version_code:  10102
+  - id: e10_signal_2
+    description: "Separation: regression run 2 (UI per-frame block)"
+    type: ui
+    intensity: 1
+    target_screen: ui_responsiveness
+    baseline_version_code: 10103
+    current_version_code:  10104
+  - id: e10_signal_3
+    description: "Separation: regression run 3 (UI per-frame block)"
+    type: ui
+    intensity: 1
+    target_screen: ui_responsiveness
+    baseline_version_code: 10105
+    current_version_code:  10106
+  - id: e10_signal_4
+    description: "Separation: regression run 4 (UI per-frame block)"
+    type: ui
+    intensity: 1
+    target_screen: ui_responsiveness
+    baseline_version_code: 10107
+    current_version_code:  10108
+

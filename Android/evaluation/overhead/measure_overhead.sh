@@ -1,17 +1,21 @@
 #!/bin/bash
 # SDK Overhead Measurement Script
 # Usage:
-#   ./measure_overhead.sh [withSdk|noSdk] [--build] [options]
+#   ./measure_overhead.sh [withSdk|noSdk|withFirebase] [--build] [options]
 #
-#   withSdk|noSdk      flavor to install and measure (default: withSdk)
+#   withSdk|noSdk|withFirebase|withDatadog
+#                      flavor to install and measure (default: withSdk).
+#                      withFirebase and withDatadog ship Firebase Performance
+#                      Monitoring or Datadog RUM respectively instead of the
+#                      PerfX SDK and are used for the SDK comparison study.
 #   --build            build the flavor APK first; without it the script
 #                      reuses the already-built APK and only installs it
 #   --app-dir PATH     host-app project directory (default: Cheddar)
 #   --package NAME     application id of the installed app
 #   --activity NAME    launch activity
 #
-# Results saved to results/withSdk.csv and results/noSdk.csv.
-# Run both flavors, then analyse in overhead_analysis.ipynb.
+# Results saved to results/{withSdk,noSdk,withFirebase}.csv.
+# Run all flavors of interest, then analyse in overhead_analysis.ipynb.
 
 set -e
 
@@ -23,7 +27,7 @@ ACTIVITY="co.adrianblan.cheddar.MainActivity"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        withSdk|noSdk) FLAVOR="$1"; shift ;;
+        withSdk|noSdk|withFirebase|withDatadog) FLAVOR="$1"; shift ;;
         --build)       DO_BUILD=true; shift ;;
         --app-dir)     APP_DIR="$2"; shift 2 ;;
         --package)     PACKAGE="$2"; shift 2 ;;

@@ -26,6 +26,7 @@ object RegressionInjector {
             "cpu"         -> startCpuWorkers(intensity)
             "memory"      -> startMemoryLeak(intensity)
             "ui"          -> startUiJank(intensity)
+            "frame"       -> startFrameCpuLoad(frameWorkIterations(intensity))
             "startup"     -> Thread.sleep(intensity * 200L)
             "interaction" -> interactionDelayMs = intensity * 200L
             // "none", "control" → no-op
@@ -137,4 +138,34 @@ object RegressionInjector {
             })
         }
     }
+
+    // Fixed CPU work per frame on the main thread. Unlike startUiJank (a fixed sleep,
+    // the same wall time on every device), the cost here scales with CPU speed: a fast
+    // device finishes within the frame budget while a slow device overruns it, so the
+    // frame-time regression shows up mainly on low-tier hardware.
+    //
+    // Public so a calibration harness can drive the iteration count directly through an
+    // intent extra (see MainActivity) and sweep candidate values without rebuilding.
+    fun startFrameCpuLoad(iterations: Int) {
+        Handler(Looper.getMainLooper()).post {
+            Choreographer.getInstance().postFrameCallback(object : Choreographer.FrameCallback {
+                override fun doFrame(frameTimeNanos: Long) {
+                    var acc = 0.0
+                    var i = 0
+                    while (i < iterations) {
+                        acc += Math.sqrt((i and 0xFFFF).toDouble() + 1.0)
+                        i++
+                    }
+                    // Publish to a volatile field so the loop is observable and not
+                    // eliminated as dead code.
+                    frameSink = acc
+                    Choreographer.getInstance().postFrameCallback(this)
+                }
+            })
+        }
+    }
+
+    // Volatile sink for startFrameCpuLoad, prevents the per-frame loop from being
+    // optimised away. Never read for its value.
+    @Volatile private var frameSink: Double = 0.0
 }

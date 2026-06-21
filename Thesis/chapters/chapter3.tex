@@ -8,10 +8,7 @@ This chapter describes the design of the proposed performance monitoring system.
 \section{System requirements and constraints}
 \label{sec:req}
 
-Since the SDK (Software Development Kit) runs on real user devices, it must be lightweight so that it doesn't affect the user experience of the host application. Moreover, the system must be robust across different Android devices. Finally, regression detection must be reliable and resilient to outliers, as production data is often noisy.
-
-% TODO не нравится последнее предложение: resilient to outliers, as production data is often noisy.
-
+Since the SDK (Software Development Kit) runs on real user devices, it must be lightweight so that it doesn't affect the user experience of the host application. Moreover, the system must be adaptable to different device performance levels. Finally, regression detection must flag sustained degradation between consecutive releases rather than reacting to momentary spikes.
 \section{High-Level System Architecture}
 \label{sec:arch}
 
@@ -45,7 +42,7 @@ These metrics are collected in two ways: as continuous metrics and as discrete e
 
 For UI performance, the SDK tracks frame time, FPS, startup time, interaction delays, and ANR events.
 
-\textbf{Frame time} is one of the most important metrics for measuring UI responsiveness. It represents the time needed to render a single frame of the user interface. The target frame time depends on the display refresh rate of the device. For example, on a 60 Hz display, the frame time should stay below approximately 16.67 ms in order to keep animations and interactions smooth \cite{android_slow_rendering}.
+\textbf{Frame time} is one of the most important metrics for measuring UI responsiveness. It represents the time needed to render a single frame of the user interface. The target frame time depends on the display refresh rate of the device. For example, on a 60 Hz display, the frame time should stay below approximately 16.67 ms in order to keep animations and interactions smooth \cite{AndroidVitals}.
 
 Frame time is measured by recording the timestamps of two consecutive frames and calculating the difference between them. If $t_i$ and $t_{i-1}$ are the timestamps of two consecutive frames, the frame time is calculated as follows:
 \begin{equation}
@@ -68,11 +65,11 @@ Frame time is measured by recording the timestamps of two consecutive frames and
 
 \subsection{CPU usage}
 
-There are several ways to measure CPU usage on Android. The method selected in this work is based on the ratio between the CPU time used by the application process and the total CPU time of the system during the same interval. The main advantage of this approach is that it does not depend on the number of CPU cores or on their frequencies, which gives a normalized measure of CPU usage. This property is important, because the collected values can be compared across different devices in a fair way. On the other hand, this method may miss short-term spikes that happen between two sampling intervals. However, this is not a problem in the context of this work, because the main goal is to detect long-term performance degradation rather than short spikes of load. It is calculated as follows:
+CPU usage is measured from the CPU time consumed by the application process. The process CPU time is read at the start and end of each sampling interval, and the usage is the increase in process CPU time divided by the elapsed wall-clock time of the interval. A system-wide alternative, which would divide the process CPU time by the total CPU time of all processes, would give a value normalised to the device capacity, but it requires reading \texttt{/proc/stat}, which modern Android versions restrict for security reasons. The process-level measure is used instead, as it relies only on the public platform API and adds little overhead. Because the application can run on several cores at once, this value can exceed 100\%, and it depends on the core count and clock speed of the device. Cross-device comparison is therefore not made by the formula itself, but by the cohort stratification and the release-pair comparison described in Section~\ref{sec:detection}. The method may also miss short spikes that occur between two samples, but this is acceptable here, because the goal is to detect sustained degradation rather than momentary load.
 
-Let $\Delta P$ be the increase in process CPU time and $\Delta S$ be the increase in total system CPU time during the same period. Then the CPU usage of the application is calculated as:
+Let $\Delta CPU_{process}$ be the increase in process CPU time and $\Delta t_{wall}$ the elapsed wall-clock time over the same interval. The CPU usage of the application is calculated as:
 \begin{equation}
-    CPU\% = \frac{\Delta P}{\Delta S} \cdot 100
+    CPU\% = \frac{\Delta CPU_{process}}{\Delta t_{wall}} \cdot 100
 \end{equation}
 
 \subsection{Memory usage}
@@ -89,7 +86,7 @@ This metric is important, because it helps to detect memory leaks and excessive 
 
 \subsection{Data Aggregation and Transmission}
 
-The metrics collected on the device are not sent immediately. Instead, they are first stored in a local buffer and then transmitted in batches. Batching was chosen because the radio interface stays in a high-power state for several seconds after each transmission, so frequent network calls are disproportionately energy-intensive~\cite{Balasubramanian2009}. Sending metrics in batches reduces this cost and also lowers the load on the backend.
+The metrics collected on the device are not sent immediately. Instead, they are first stored in a local buffer and then transmitted in batches. Batching was chosen because the radio interface stays in a high-power state for several seconds after each transmission, so frequent network calls are disproportionately energy-intensive~\cite{Balasubramanian2009, LiHttpEnergy}. Sending metrics in batches reduces this cost and also lowers the load on the backend.
 
 A batch is sent when one of two conditions is satisfied: either the number of metrics in the buffer reaches a predefined value $N$, or the time since the last transmission exceeds a time window $W$.
 
@@ -112,7 +109,7 @@ After that, the frontend can query the stored metrics through REST endpoints, an
 
 \subsection{Database Design}
 
-The backend relies on two kinds of database. A time-series database stores the performance metrics, and a relational database stores the rest: the users, their projects, and the regressions found for those projects. The time-series store was chosen because it handles large volumes of time-stamped data efficiently \cite{jensen-time-series}, whereas the relational store fits the structured, interconnected records that describe accounts and their projects.
+The backend relies on two kinds of database. A time-series database stores the performance metrics, and a relational database stores the rest: the users, their projects, and the regressions found for those projects. The time-series store was chosen because it handles large volumes of time-stamped data efficiently, whereas the relational store fits the structured, interconnected records that describe accounts and their projects.
 
 The relational side holds four entities, shown in Figure~\ref{fig:postgres_schema}. A \emph{user} owns one or more \emph{projects}, each identified by its Android package name. A project, in turn, owns a catalogue of \emph{version releases} and its detected \emph{regressions}. The \emph{version releases} entity records each application version observed for a project, together with when it was first seen and how many samples it has accumulated. This catalogue is refreshed periodically from the time-series store and is used to list the releases of a project. The \emph{regressions} entity records each confirmed regression: the affected metric, screen, and device cohort, the baseline and current versions with their P95 values, and a status that marks it as open or closed. This ownership structure also enforces tenancy isolation, since every query can be scoped to the projects that belong to the requesting user.
 
@@ -137,14 +134,18 @@ Before applying any detection model, the incoming data must be grouped into mean
 
 The regression detection pipeline compares consecutive application releases using a release-pair P95 shift. Samples are grouped by version code rather than by a fixed time window, and each release is compared against the one that precedes it. Fixed absolute thresholds were rejected because each one must be calibrated by hand for every metric and application, and a fixed limit does not move as baseline performance shifts over time. A mean-based comparison was avoided as well, since the mean is easily pulled by outliers and copes badly with the heavy-tailed, non-normal distributions that frame time and startup time usually follow. Heavier methods such as ARIMA forecasting or machine-learning models were ruled out too, because they need labelled training data or careful tuning that a lightweight production system cannot justify.
 
+Detection runs only on user-perceived metrics, such as frame time and startup time, because a regression matters when the user actually feels it. Startup time, the delay before the application becomes responsive after launch, is treated as a regression target alongside frame time. Resource metrics such as CPU and memory usage are still collected, but they serve to explain the cause of a perceived slowdown rather than to raise alerts, so a fluctuation in resource use that the user never notices does not trigger a false alarm.
+
 A version is only eligible for comparison after it has accumulated a minimum number of samples. This maturity gate prevents comparisons based on a handful of early measurements, where a single noisy observation could shift the P95 far enough to cross the threshold and produce a false alert.
 
 For each mature version group, the 95th percentile ($P_{95}$) of the metric is computed. A regression is reported when the relative increase from the baseline version to the current version exceeds a configurable threshold:
 \begin{equation}
     \frac{P_{95}(\text{current}) - P_{95}(\text{baseline})}{P_{95}(\text{baseline})} > Threshold
 \end{equation}
-Using $P_{95}$ rather than the mean focuses detection on the worst user experiences rather than the average, and makes the result robust to skewed distributions~\cite{Nguyen2012}. The threshold expresses a directly interpretable criterion: a given percentage of degradation. Unlike the absolute, per-metric limits used by the threshold-based tools discussed in Chapter~\ref{chap:lr}, it is a relative value that compares each release against the previous one, so a single default (15\%) applies across all metrics, screens, and device cohorts. The developer therefore does not have to choose or calibrate a threshold for every metric and application. The system uses this default out of the box. This avoids the main drawback of fixed absolute thresholds, where each limit must be set and maintained by hand. The pipeline runs on production data without any labelled examples, and its core comparison is expressed as a single aggregation query, making it computationally efficient and suitable for continuous execution.
+Using $P_{95}$ rather than the mean focuses detection on the worst user experiences rather than the average, and makes the result robust to skewed distributions~\cite{Nguyen2012, DeanTailAtScale}. The threshold expresses a directly interpretable criterion: a given percentage of degradation. Unlike the absolute, per-metric limits used by the threshold-based tools discussed in Chapter~\ref{chap:lr}, it is a relative value that compares each release against the previous one, so a single default (15\%) applies across all metrics, screens, and device cohorts. The developer therefore does not have to choose or calibrate a threshold for every metric and application. The system uses this default out of the box. This avoids the main drawback of fixed absolute thresholds, where each limit must be set and maintained by hand. The pipeline runs on production data without any labelled examples, and its core comparison is expressed as a single aggregation query, making it computationally efficient and suitable for continuous execution. The detection rule is deliberately kept simple and interpretable: a single comparison against a configurable percentage.
+
+Because $P_{95}$ is taken over the whole version group, it ignores anything that affects fewer than five percent of the samples. A momentary spike is a handful of high values among the thousands collected from many users over the lifetime of a version, so it sits above the 95th percentile and does not move $P_{95}$. The value shifts only when the degradation becomes frequent enough to reach the top five percent of the samples, which is a sustained problem rather than a spike. This is what lets the rule flag sustained degradation while ignoring momentary spikes.
 
 \section{Summary}
 
-This chapter presented the methodology behind the proposed performance monitoring system. The design was driven by the requirements from the literature review, with an emphasis on low overhead, energy efficiency, and robustness across devices. The mobile SDK collects metrics on the user's device and sends them to the backend in batches. The backend stores them, exposes them through an API, and runs statistical regression detection on user cohorts. Together, these parts give developers automated insight into how their applications perform in production. The next chapter turns this design into a working system and describes the technical problems that came up along the way.
+This chapter presented the methodology behind the proposed performance monitoring system. The design was driven by the requirements from the literature review, with an emphasis on low overhead, energy efficiency, and robustness across devices. The mobile SDK collects metrics on the user's device and sends them to the backend in batches. The backend stores them, exposes them through an API, and runs rule-based regression detection on user cohorts. Together, these parts give developers automated insight into how their applications perform in production. The next chapter turns this design into a working system and describes the technical problems that came up along the way.
