@@ -190,23 +190,19 @@ The thesis structure is:
    - Performance regression detection implementation
    - Automated alerting
 
-5. **Results**
-   - Validation results
+5. **Evaluation and Discussion**
+   - Validation setup
    - SDK overhead measurements
-   - Metric accuracy comparison
-   - Regression detection evaluation
-   - Synthetic regression experiments
-   - Summary of findings
+   - End-to-end system testing (synthetic regression scenarios)
+   - Discussion of results in relation to the research questions
+   - Limitations and future work
 
-6. **Discussion**
-   - Interpretation of results
-   - Limitations
-   - Practical implications
-   - Future work
+6. **Conclusion**
+   - Restatement of the problem and what was done
+   - Value of the work
+   - Novel element (cohort stratification)
 
-The **Results** section comes after **Implementation** and includes validation.
-
-The **Discussion** section is placed at the very end of the thesis.
+Chapter 5 merges Results and Discussion: it presents the validation outcomes and immediately interprets them against the research questions, including limitations and future work. Chapter 6 is a short Conclusion that restates the problem, what was built, and the novelty. Do not move the discussion or limitations into a separate Discussion chapter.
 
 ## System architecture
 
@@ -320,23 +316,16 @@ The backend calculates the cohort using hardware metadata such as total RAM and 
 
 ## Results and validation
 
-Validation is reported in the **Results** section, which comes after **Implementation**.
+Validation is reported in **Chapter 5 (Evaluation and Discussion)**, which comes after **Implementation** and includes the discussion of results against the research questions, plus limitations and future work.
 
-The validation covers three main parts:
+The validation covers two main parts:
 
-1. measuring SDK overhead on real devices;
-2. checking metric accuracy against reference tools such as Android Profiler and Systrace;
-3. evaluating regression detection using synthetic regressions.
+1. measuring SDK overhead under a realistic workload, including a head-to-head comparison with Firebase Performance Monitoring and Datadog RUM;
+2. an end-to-end test of the full system using a synthetic frame-time regression injected into the demo application.
 
-Synthetic regressions include:
+Detection runs only on user-perceived metrics (frame time, startup time, interaction delay). Resource metrics (CPU, memory) are still collected, but they serve to explain the cause of a perceived slowdown rather than to raise alerts. The synthetic-regression scenarios therefore inject a frame-time regression (extra CPU work per rendered frame). CPU-load and memory-leak injection are out of scope for the evaluation.
 
-- increased CPU load;
-- memory leaks;
-- UI thread blocking.
-
-The **Methodology** section may describe the validation plan, but actual measurements, observations, tables, charts, and evaluation outcomes should be placed in **Results**.
-
-The **Discussion** section should appear at the very end of the thesis and should interpret the results, explain limitations, and describe what the results mean for the research questions.
+The **Methodology** section may describe the validation plan, but actual measurements, observations, tables, charts, and evaluation outcomes should be placed in **Chapter 5**.
 
 If the source text does not provide actual numerical results, do not invent them. Ask the user for missing evaluation values or mark the issue clearly in the response.
 
@@ -501,11 +490,11 @@ These satisfy the university methodological requirements — do not undo them:
 
 ### Evaluation facts (Chapter 5)
 
-- Detection experiment: 30 injected runs + 15 control runs; roughly one device per cohort (Low emulator, Medium emulator + Redmi Note 9 Pro, High emulator).
-- Three injected regression types map to three metrics: CPU load, memory leak, UI thread blocking (frame time).
-- SDK overhead (worst case across tested devices): at most **5.2 percentage points** CPU usage, **5.4 MB (4.1%)** memory, **75 ms (5.1%)** cold-start time. Report memory and cold-start with both the absolute value and the relative percentage (relative values are computed from the without-SDK baselines in the Chapter 5 tables, not invented).
-- Tier experiment: the hardware-sensitive frame-time regression crossed the 15% threshold only on the Low cohort (27%), not Medium (9%) or High (5%). This answers RQ3 (cohorts isolate a class-specific regression).
-- To demonstrate the value of cohorts, the intended argument is a **cohort-vs-pooled** contrast (re-aggregate the same samples without `GROUP BY device_cohort` and show the pooled shift behaves differently). This is arithmetic, not a statistical test. Caveat: for P95, dilution only clearly hides a regression when the affected cohort is a minority; the population-mix false-positive case is the most robust demonstration.
+- Detection runs only on user-perceived metrics. The injected regression is a single frame-time regression (extra CPU work per rendered frame). CPU-load and memory-leak injection are out of scope for the evaluation.
+- Overhead experiment: four builds of the Cheddar Hacker News client (baseline, PerfX, Firebase Performance Monitoring, Datadog RUM), each cold-started twenty times, then run for ninety seconds while an automated scrolling script exercises the feed.
+- SDK overhead under that workload: **19.5 percentage points** CPU usage, **6.3 MB (3.9%)** memory, **276 ms (15.9%)** cold-start time. Roughly four times less CPU and nine times less memory than either Firebase Performance Monitoring or Datadog RUM (Firebase: +77.6 pp CPU, +59.4 MB; Datadog: +78.4 pp CPU, +57.7 MB).
+- End-to-end test (Section 5.3): three scenarios. Scenario 1 — frame-time regression on the physical device, end-to-end path verified (SDK → backend → detector → dashboard → alert). Scenario 2 — Cheddar with no code change across four pairs, no run crossed the 15% threshold. Scenario 3 — frame-time regression on Low-cohort emulators only (three High, three Medium, one Low), repeated four times. Aggregated shift stayed below 15% in every run, but per-cohort the Low cohort crossed 25–28% while Medium stayed near 9% and High near 5%.
+- The cohort-vs-pooled contrast in Scenario 3 is the demonstration for RQ3. It is arithmetic on the same samples, not a statistical test. Caveat: for P95, dilution only clearly hides a regression when the affected cohort is a minority — which matches the device-population shape used in the scenario.
 
 Do not edit generated files such as:
 
@@ -546,8 +535,7 @@ While editing, actively check for:
 - incomplete sentences, especially near chapter summaries;
 - mismatch between methodology and implementation;
 - mismatch between research questions and evaluation;
-- placing validation results in Methodology instead of Results;
-- placing Discussion before Results or before the end of the thesis;
+- placing validation results in Methodology instead of Chapter 5 (Evaluation and Discussion);
 - overclaiming about accuracy, overhead, or novelty;
 - unsupported claims about user experience or false positives;
 - inconsistent use of “anomaly detection” and “regression detection”;

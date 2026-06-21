@@ -3,16 +3,16 @@
 \chapter{Methodology}
 \label{chap:met}
 
-This chapter describes the design of the proposed performance monitoring system. Section~\ref{sec:req} lists the requirements that influenced the design choices. Section~\ref{sec:arch} gives a high-level overview of the architecture and shows how the components work together. Sections~\ref{sec:sdk},~\ref{sec:backend} describe the details of the mobile SDK and the Backend. Section~\ref{sec:detection} discusses the regression detection methods that were considered and highlights the selected one.
+This chapter describes the design of the proposed performance monitoring system. Section~\ref{sec:req} lists the requirements that influenced the design choices. Section~\ref{sec:arch} gives a high-level overview of the architecture and shows how the components work together. Sections~\ref{sec:sdk},~\ref{sec:backend} describe the details of the mobile SDK and the backend. Section~\ref{sec:detection} discusses the regression detection methods that were considered and highlights the selected one.
 
 \section{System requirements and constraints}
 \label{sec:req}
 
-Since the SDK (Software Development Kit) runs on real user devices, it must be lightweight so that it doesn't affect the user experience of the host application. Moreover, the system must be adaptable to different device performance levels. Finally, regression detection must flag sustained degradation between consecutive releases rather than reacting to momentary spikes.
+Since the SDK (Software Development Kit) runs on real user devices, it must be lightweight so that it does not affect the user experience of the host application. Moreover, the system must be adaptable to different device performance levels. Finally, regression detection must flag sustained degradation between consecutive releases rather than reacting to momentary spikes.
 \section{High-Level System Architecture}
 \label{sec:arch}
 
-The system consists of four components: the mobile SDK (client), the Backend, the frontend, and the regression detection engine. Figure~\ref{fig:system_architecture} shows how they are connected.
+The system consists of four components: the mobile SDK (client), the backend, the frontend, and the regression detection engine. Figure~\ref{fig:system_architecture} shows how they are connected.
 
 The mobile SDK is a library that developers integrate into their Android applications. It collects performance metrics on users' devices and sends them to the backend for further analysis.
 
@@ -20,7 +20,7 @@ Metrics from user devices arrive at the backend, which stores them efficiently a
 
 The frontend is a web application for developers. Through it they manage their projects, explore the collected metrics, and look over any regressions that were found. It pulls all of this from the backend through the same REST APIs and lays the data out in a readable form.
 
-The regression detection engine continuously analyses the incoming metrics to find signs of performance degradation. If such a regression is detected, it can notify developers in a messaging app.
+The regression detection engine analyses the incoming metrics to find signs of performance degradation. If such a regression is detected, it can notify developers in a messaging app.
 
 \begin{figure}[H]
     \centering
@@ -36,7 +36,7 @@ The regression detection engine continuously analyses the incoming metrics to fi
 
 The metrics were selected based on the literature review in Chapter~\ref{chap:lr}. The guiding criterion was that the collected metrics should reflect how the user actually perceives the application, rather than only describe low-level system behaviour. As discussed in the review, performance metrics fall into two kinds: resource metrics, such as CPU and memory usage, that explain where a problem originates, and user-perceived metrics, such as frame time, startup time, and interaction delay, that show how strongly that problem affects the user. The two are linked, because resource pressure usually surfaces as a slower or less responsive interface. The SDK therefore collects user-perceived metrics as the primary signal of experienced performance, together with resource metrics that help explain the cause of a perceived slowdown.
 
-These metrics are collected in two ways: as continuous metrics and as discrete events. Continuous metrics, such as CPU usage and frame time, are sampled at regular intervals. Discrete events, such as crashes, ANRs, and app startups, are recorded immediately when they happen. This approach allows the system to capture both the ongoing performance of the application and the rare but critical events that strongly affect user experience.
+These metrics are collected in two ways: as periodic samples and as discrete events. Periodic samples, such as CPU usage and frame time, are taken at regular intervals. Discrete events, such as crashes, ANRs, and app startups, are recorded immediately when they happen. This approach allows the system to capture both the ongoing performance of the application and the rare but critical events that strongly affect user experience.
 
 \subsection{UI performance metrics}
 
@@ -142,7 +142,7 @@ For each mature version group, the 95th percentile ($P_{95}$) of the metric is c
 \begin{equation}
     \frac{P_{95}(\text{current}) - P_{95}(\text{baseline})}{P_{95}(\text{baseline})} > Threshold
 \end{equation}
-Using $P_{95}$ rather than the mean focuses detection on the worst user experiences rather than the average, and makes the result robust to skewed distributions~\cite{Nguyen2012, DeanTailAtScale}. The threshold expresses a directly interpretable criterion: a given percentage of degradation. Unlike the absolute, per-metric limits used by the threshold-based tools discussed in Chapter~\ref{chap:lr}, it is a relative value that compares each release against the previous one, so a single default (15\%) applies across all metrics, screens, and device cohorts. The developer therefore does not have to choose or calibrate a threshold for every metric and application. The system uses this default out of the box. This avoids the main drawback of fixed absolute thresholds, where each limit must be set and maintained by hand. The pipeline runs on production data without any labelled examples, and its core comparison is expressed as a single aggregation query, making it computationally efficient and suitable for continuous execution. The detection rule is deliberately kept simple and interpretable: a single comparison against a configurable percentage.
+Using $P_{95}$ rather than the mean focuses detection on the worst user experiences rather than the average, and makes the result robust to skewed distributions~\cite{Nguyen2012, DeanTailAtScale}. The threshold expresses a directly interpretable criterion: a given percentage of degradation. Unlike the absolute, per-metric limits used by the threshold-based tools discussed in Chapter~\ref{chap:lr}, it is a relative value that compares each release against the previous one, so a single default (15\%) applies across all metrics, screens, and device cohorts. The developer therefore does not have to choose or calibrate a threshold for every metric and application. The system uses this default out of the box. This avoids the main drawback of fixed absolute thresholds, where each limit must be set and maintained by hand. The pipeline runs on production data without any labelled examples, and its core comparison is expressed as a single aggregation query, making it computationally efficient and suitable for ongoing execution. The detection rule is deliberately kept simple and interpretable: a single comparison against a configurable percentage.
 
 Because $P_{95}$ is taken over the whole version group, it ignores anything that affects fewer than five percent of the samples. A momentary spike is a handful of high values among the thousands collected from many users over the lifetime of a version, so it sits above the 95th percentile and does not move $P_{95}$. The value shifts only when the degradation becomes frequent enough to reach the top five percent of the samples, which is a sustained problem rather than a spike. This is what lets the rule flag sustained degradation while ignoring momentary spikes.
 

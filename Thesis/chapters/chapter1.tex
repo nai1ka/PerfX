@@ -10,13 +10,13 @@ What makes Android performance monitoring particularly challenging is the wide v
 
 \section{Research Gap}
 
-No existing Android solution combines automatic release-to-release comparison with cohort stratification. Most tools rely on fixed thresholds set by hand instead of detecting regressions automatically, and the few that do automate the comparison still do not run it separately within each device cohort. As a result, a regression that affects only weaker devices can be hidden among the stronger ones when every device is measured at once. This gap is what the current work aims to address.
+Existing Android monitoring platforms provide metric collection, dashboards, and configurable alerting, but they require developers to define alert conditions by hand for individual metrics, screens, and use cases, and they do not group devices into performance cohorts. As a result, configuring and maintaining monitoring rules becomes time-consuming, and a regression that affects only one class of Android devices can stay hidden in the aggregated metrics. This creates a need for an automated regression detection approach that reduces manual alert configuration and explicitly accounts for device fragmentation. This gap is what the current work aims to address.
 
 \section{Research Questions and Aim}
 
 The object of study is the runtime performance of Android applications on real user devices, in particular how it changes between consecutive releases.
 
-The aim of this thesis is to develop a system that continuously collects performance metrics from
+The aim of this thesis is to develop a system that collects performance metrics from
 running Android applications and automatically detects performance regressions introduced by new releases, while accounting for the different performance levels of user devices. It gathers key metrics directly from users' devices, sends the data to a backend, and notifies developers when a regression is detected.
 
 The study addresses the following research questions:
@@ -28,10 +28,8 @@ The study addresses the following research questions:
 
 \section{Novelty and Contribution}
 
-The main contribution of this thesis is a complete system for Android performance monitoring and regression detection. It covers the full pipeline, from on-device metric collection to developer alerts. The system is open source\footnote{\url{https://github.com/nai1ka/PerfX}} and already deployed\footnote{\url{https://perfx.ru}}, so developers can integrate the SDK into their own applications. 
+The main contribution of this thesis is a complete system for Android performance monitoring and regression detection. It covers the full pipeline, from on-device metric collection to developer alerts. The system is open source and already deployed\footnote{\url{https://perfx.ru}}, so developers can integrate the SDK into their own applications.
 
-% Old novelty text (removed, kept for reference):
-% The system also detects regressions automatically. Automatic detection already exists in server-side monitoring, for example anomaly detection in Datadog, but Android tools that alert, such as Firebase Performance Monitoring, still use fixed thresholds that a developer sets by hand for each metric and screen.
 The novel element is that the regression comparison is stratified by device performance cohort. Each release is compared with the previous one within groups of devices of similar capability, so a regression that affects only weaker devices is detected instead of being averaged away.
 
 \section{Structure}

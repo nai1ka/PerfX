@@ -2,7 +2,7 @@
 \chapter{Implementation}
 \label{chap:impl}
 
-This chapter describes how the design from Chapter~\ref{chap:met} was turned into working software.\footnote{The source code is available at \url{https://github.com/nai1ka/PerfX}.} Section~\ref{sec:sdk_impl} covers the mobile SDK, from initialization to the individual collectors and the buffering and transmission pipeline. Section~\ref{sec:backend_impl} describes the Backend, focusing on user management and the ingestion path. Section~\ref{sec:regression_impl} explains the regression detection pipeline in detail. Section~\ref{sec:frontend_impl} then walks through the frontend web application and its main features.
+This chapter describes how the design from Chapter~\ref{chap:met} was turned into working software.\footnote{The source code is available at \url{https://github.com/nai1ka/PerfX}.} Section~\ref{sec:sdk_impl} covers the mobile SDK, from initialization to the individual collectors and the buffering and transmission pipeline. Section~\ref{sec:backend_impl} describes the backend, focusing on user management and the ingestion path. Section~\ref{sec:regression_impl} explains the regression detection pipeline in detail. Section~\ref{sec:frontend_impl} then walks through the frontend web application and its main features.
 
 \section{Mobile SDK Implementation}
 \label{sec:sdk_impl}
@@ -10,7 +10,7 @@ This chapter describes how the design from Chapter~\ref{chap:met} was turned int
 The mobile part of the monitoring system was implemented as an Android library written in Kotlin. Kotlin was chosen because it is the official, recommended language for Android development~\cite{KotlinFirst}.
 
 
-The SDK is distributed through a Maven repository, which allows developers to add it to their project easily by adding s dependency to their \texttt{build.gradle} file.
+The SDK is distributed through a Maven repository, which allows developers to add it to their project easily by adding a dependency to their \texttt{build.gradle} file.
 
 \subsection{Initialization and Lifecycle Management}
 
@@ -338,4 +338,4 @@ Developers can also receive regression alerts in messenger. Each message reports
 
 \section{Summary}
 
-This chapter described the implementation of all four system components. The mobile SDK was built as a Kotlin Android library that collects six performance metrics, buffers the data in a two-tier storage layer, and transmits it to the backend in batches. The Backend receives the data and stores it in two separate databases: ClickHouse for time-series metrics and PostgreSQL for user and project metadata. The regression detection pipeline was implemented as a Python service that computes per-version P95 values using ClickHouse aggregation queries and flags regressions when the relative P95 shift between consecutive releases exceeds the configured threshold. Finally, the frontend was built with Streamlit and lets developers explore the collected metrics and review detected regressions. The next chapter evaluates how well this system works in practice.
+This chapter described the implementation of all four system components. The mobile SDK was built as a Kotlin Android library that collects six performance metrics, buffers the data in a two-tier storage layer, and transmits it to the backend in batches. The backend receives the data and stores it in two separate databases: ClickHouse for time-series metrics and PostgreSQL for user and project metadata. The regression detection pipeline was implemented as a Python service that computes per-version P95 values using ClickHouse aggregation queries and flags regressions when the relative P95 shift between consecutive releases exceeds the configured threshold. Finally, the frontend was built with Streamlit and lets developers explore the collected metrics and review detected regressions. The next chapter evaluates how well this system works in practice.
